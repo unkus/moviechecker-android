@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Проверка Фильмов</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_latest_episodes_tab">Последние</string>
+    <string name="title_expected_episodes_tab">Ожидаемые</string>
+    <string name="title_favorites_tab">Избранные</string>
+    <string name="open">Открыть</string>
+    <string name="forgot">Забыть</string>
+    <string name="date">Дата</string>
+    <string name="title">Название</string>
+    <string name="number">Серия</string>
+    <string name="date_tomorrow">Завтра %1$s</string>
+    <string name="date_today">Сегодня %1$s</string>
+    <string name="date_yesterday">Вчера %1$s</string>
+</resources>

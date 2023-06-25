@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Movie Checker</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_latest_episodes_tab">Latest</string>
+    <string name="title_expected_episodes_tab">Expected</string>
+    <string name="title_favorites_tab">Favorites</string>
+    <string name="contentDescription" translatable="false">TODO</string>
+    <string name="open">Open</string>
+    <string name="forgot">Forgot</string>
+    <string name="date">Date</string>
+    <string name="title">Title</string>
+    <string name="number">number</string>
+    <string name="date_tomorrow">Tomorrow %1$s</string>
+    <string name="date_today">Today %1$s</string>
+    <string name="date_yesterday">Yesterday %1$s</string>
+    <string name="date_unstable" translatable="false">\??:??</string>
+</resources>
