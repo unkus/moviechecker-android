@@ -14,24 +14,24 @@ interface SiteDao {
     @get:Query("SELECT * FROM site")
     val sites: Flow<List<Site>>
 
-    @Query("SELECT * FROM Site")
-    suspend fun loadAll(): List<Site>
+    @Query("SELECT * FROM site")
+    fun loadAll(): List<Site>
 
     @Query("SELECT * FROM site s WHERE s.link = :address")
-    suspend fun loadSiteByAddress(address: Uri): Site?
+    fun loadSiteByAddress(address: Uri): Site?
 
     @Query("SELECT * FROM site s JOIN movie m ON s.id = m.site_id")
-    suspend fun loadSiteAndMovies(): Map<Site, List<Movie>>
+    fun loadSiteAndMovies(): Map<Site, List<Movie>>
 
     @Insert
-    suspend fun insert(site: Site)
+    fun insert(site: Site)
 
     @Update
-    suspend fun update(site: Site)
+    fun update(site: Site)
 
     @Delete
-    suspend fun delete(site: Site)
+    fun delete(site: Site)
 
     @Query("DELETE FROM site")
-    suspend fun deleteAll()
+    fun deleteAll()
 }

@@ -14,27 +14,26 @@ interface MovieDao {
     val movies: Flow<List<Movie>>
 
     @Query("SELECT * FROM Movie")
-    suspend fun loadAll(): List<Movie>
+    fun loadAll(): List<Movie>
 
     @Query("SELECT * FROM Movie m WHERE m.id = :id")
-    suspend fun loadById(id: Int): Movie?
+    fun loadById(id: Int): Movie?
 
     @Query("SELECT * FROM movie m WHERE m.site_id = :site_id AND m.page_id = :pageId")
-    suspend fun loadMovieBySiteAndPageId(site_id: Int, pageId: String): Movie?
+    fun loadMovieBySiteAndPageId(site_id: Int, pageId: String): Movie?
 
     @Query("SELECT * FROM movie m JOIN season s ON m.id = s.movie_id")
-    suspend fun loadMovieAndSeasons(): Map<Movie, List<Season>>
-
+    fun loadMovieAndSeasons(): Map<Movie, List<Season>>
 
     @Insert
-    suspend fun insert(movie: Movie)
+    fun insert(movie: Movie)
 
     @Update
-    suspend fun update(movie: Movie)
+    fun update(movie: Movie)
 
     @Delete
-    suspend fun delete(movie: Movie)
+    fun delete(movie: Movie)
 
     @Query("DELETE FROM movie")
-    suspend fun deleteAll()
+    fun deleteAll()
 }

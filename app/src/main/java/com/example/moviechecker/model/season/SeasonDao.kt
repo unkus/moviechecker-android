@@ -14,23 +14,23 @@ interface SeasonDao {
     val seasons: Flow<List<Season>>
 
     @Query("SELECT * FROM Season")
-    suspend fun loadAll(): List<Season>
+    fun loadAll(): List<Season>
 
     @Query("SELECT * FROM season s WHERE s.movie_id = :movie_id and s.number = :number")
-    suspend fun findByMovieAndNumber(movie_id: Int, number: Int): Season?
+    fun findByMovieAndNumber(movie_id: Int, number: Int): Season?
 
     @Query("SELECT * FROM season s JOIN episode e ON s.id = e.season_id")
-    suspend fun loadSeasonAndEpisodes(): Map<Season, List<Episode>>
+    fun loadSeasonAndEpisodes(): Map<Season, List<Episode>>
 
     @Insert
-    suspend fun insert(season: Season)
+    fun insert(season: Season)
 
     @Update
-    suspend fun update(season: Season)
+    fun update(season: Season)
 
     @Delete
-    suspend fun delete(season: Season)
+    fun delete(season: Season)
 
     @Query("DELETE FROM season")
-    suspend fun deleteAll()
+    fun deleteAll()
 }

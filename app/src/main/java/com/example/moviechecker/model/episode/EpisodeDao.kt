@@ -16,7 +16,7 @@ interface EpisodeDao {
     val episodesDetailed: Flow<List<EpisodeDetail>>
 
     @Query("SELECT * FROM Episode")
-    suspend fun loadAll(): List<Episode>
+    fun loadAll(): List<Episode>
 
     @Query("SELECT * FROM EpisodeDetail e WHERE e.state = 'RELEASED' ORDER BY e.date DESC")
     fun loadReleased(): Flow<List<EpisodeDetail>>
@@ -25,17 +25,17 @@ interface EpisodeDao {
     fun loadExpected(): Flow<List<EpisodeDetail>>
 
     @Query("SELECT * FROM episode e WHERE e.season_id = :season_id AND e.number = :number")
-    suspend fun loadBySeasonAndNumber(season_id: Int, number: Int): Episode?
+    fun loadBySeasonAndNumber(season_id: Int, number: Int): Episode?
 
     @Insert
-    suspend fun insert(episode: Episode)
+    fun insert(episode: Episode)
 
     @Update
-    suspend fun update(episode: Episode)
+    fun update(episode: Episode)
 
     @Delete
-    suspend fun delete(episode: Episode)
+    fun delete(episode: Episode)
 
     @Query("DELETE FROM episode")
-    suspend fun deleteAll()
+    fun deleteAll()
 }
