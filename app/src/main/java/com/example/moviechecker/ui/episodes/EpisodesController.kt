@@ -21,8 +21,4 @@ class EpisodesController(private val favoritesViewModel: FavoritesViewModel) : I
         }
     }
 
-    override fun onOpenClicked(context: Context, link: Uri) {
-        super.onOpenClicked(context, link)
-
-    }
 }
