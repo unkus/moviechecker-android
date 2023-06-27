@@ -26,15 +26,9 @@ abstract class EpisodesTabFragment(private val state: State) : Fragment(R.layout
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val swiperefresh = view.findViewById<SwipeRefreshLayout>(R.id.swiperefresh)
-        swiperefresh.setOnRefreshListener {
-            // начинаем показывать прогресс
-            swiperefresh.isRefreshing = true
-            lifecycleScope.launch(Dispatchers.IO) {
-                (activity?.application as CheckerApplication).database.populateDatabase(DataProvider.retrieveData())
-            }
-            // прячем прогресс
-            swiperefresh.isRefreshing = false
+        val swipeRefresh = view.findViewById<SwipeRefreshLayout>(R.id.swiperefresh)
+        swipeRefresh.setOnRefreshListener {
+            onRefresh(swipeRefresh)
         }
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
@@ -46,6 +40,16 @@ abstract class EpisodesTabFragment(private val state: State) : Fragment(R.layout
             }
         }
 
+    }
+
+    fun onRefresh(swipeRefresh: SwipeRefreshLayout) {
+        // начинаем показывать прогресс
+        swipeRefresh.isRefreshing = true
+        lifecycleScope.launch(Dispatchers.IO) {
+            (activity?.application as CheckerApplication).database.populateDatabase(DataProvider.retrieveData())
+        }
+        // прячем прогресс
+        swipeRefresh.isRefreshing = false
     }
 
     abstract fun getData(): LiveData<List<EpisodeDetail>>
