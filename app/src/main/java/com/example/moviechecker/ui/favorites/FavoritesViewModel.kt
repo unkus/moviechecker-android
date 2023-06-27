@@ -32,7 +32,7 @@ class FavoritesViewModel(private val dao: FavoriteDao): ViewModel() {
     fun addNewFavorite(siteAddress: Uri?, moviePageId: String?) = viewModelScope.launch(Dispatchers.IO) {
         Log.i("TEST", "siteAddress: $siteAddress, moviePageId: $moviePageId")
         val movie = dao.loadMovieBySiteAndPage(siteAddress, moviePageId)
-        movie?.let {
+        movie.let {
             val favorite = Favorite(movie.id)
             insert(favorite)
         }
