@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -22,35 +23,21 @@ class FavoritesAdapter(private val controller: FavoritesController): ListAdapter
     override fun onBindViewHolder(holder: FavoriteViewHolder, position: Int) {
         val current = getItem(position)
         holder.bind(current)
+
+        holder.itemView.setOnClickListener {
+            controller.onOpenClicked(holder.itemView.context, Uri.withAppendedPath(current.siteAddress, current.movieLink.toString()))
+        }
+
+        holder.itemView.findViewById<Button>(R.id.forgotButton).setOnClickListener {
+            controller.onForgotClicked(current.siteAddress, current.moviePageId)
+        }
     }
 
     class FavoriteViewHolder(itemView: View, private val controller: FavoritesController) : RecyclerView.ViewHolder(itemView) {
-        private var siteAddress: Uri? = null
-        private var moviePageId: String? = null
-        private var link: Uri? = null
         private val titleTextView: TextView = itemView.findViewById(R.id.title)
-        private val forgotButton: Button = itemView.findViewById(R.id.forgotButton)
-
-        init {
-            itemView.setOnClickListener {
-                link?.let {
-                    controller.onOpenClicked(itemView.context, it)
-                }
-            }
-
-            forgotButton.setOnClickListener {
-                link?.let {
-                    controller.onForgotClicked(siteAddress, moviePageId)
-                }
-            }
-        }
 
         fun bind(favorite: FavoriteDetail?) {
             favorite?.let {
-                siteAddress = it.siteAddress
-                moviePageId = it.moviePageId
-                link = Uri.withAppendedPath(it.siteAddress, it.movieLink.toString())
-
                 titleTextView.text = it.movieTitle
             }
         }

@@ -26,41 +26,30 @@ class EpisodesAdapter(private val controller: EpisodesController) : ListAdapter<
     override fun onBindViewHolder(holder: EpisodeViewHolder, position: Int) {
         val current = getItem(position)
         holder.bind(current)
+
+        holder.itemView.setOnClickListener {
+            controller.onOpenClicked(holder.itemView.context, Uri.withAppendedPath(current.siteAddress, current.link.toString()))
+        }
+
+        holder.itemView.findViewById<CheckBox>(R.id.favoriteFlag).setOnCheckedChangeListener { buttonView, isChecked ->
+            if(buttonView.isPressed) {
+                if (isChecked) {
+                    controller.onFavoriteChecked(current.siteAddress, current.moviePageId)
+                } else {
+                    controller.onFavoriteUnchecked(current.siteAddress, current.moviePageId)
+                }
+            }
+        }
     }
 
     class EpisodeViewHolder(itemView: View, private val controller: EpisodesController) : RecyclerView.ViewHolder(itemView) {
-        private var siteAddress: Uri? = null
-        private var moviePageId: String? = null
-        private var link: Uri? = null
         private val dateTextView: TextView = itemView.findViewById(R.id.date)
         private val titleCheckBox: CheckBox = itemView.findViewById(R.id.favoriteFlag)
         private val titleTextView: TextView = itemView.findViewById(R.id.title)
         private val episodeTextView: TextView = itemView.findViewById(R.id.episode_number)
 
-        init {
-            itemView.setOnClickListener {
-                link?.let {
-                    controller.onOpenClicked(itemView.context, it)
-                }
-            }
-            titleCheckBox.setOnCheckedChangeListener { compoundButton, isChecked ->
-                if(compoundButton.isPressed) {
-                    Log.i("TEST", "isChecked: $isChecked")
-                    if (isChecked) {
-                        controller.onFavoriteChecked(siteAddress, moviePageId)
-                    } else {
-                        controller.onFavoriteUnchecked(siteAddress, moviePageId)
-                    }
-                }
-            }
-        }
-
         fun bind(episode: EpisodeDetail?) {
             episode?.let {
-                siteAddress = it.siteAddress
-                moviePageId = it.moviePageId
-                link = Uri.withAppendedPath(it.siteAddress, it.link.toString())
-
                 if(it.date.isEqual(LocalDate.now().atStartOfDay())) {
                     dateTextView.text = itemView.context.getString(R.string.date_today, itemView.context.getString(R.string.date_unstable))
                 } else if(it.date.isAfter(LocalDate.now().plusDays(2).atStartOfDay())) {
