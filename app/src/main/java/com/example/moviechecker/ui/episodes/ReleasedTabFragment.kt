@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import com.example.moviechecker.model.State
 import com.example.moviechecker.model.episode.EpisodeDetail
 
-class ReleasedTabFragment : EpisodesTabFragment(State.RELEASED) {
+class ReleasedTabFragment : EpisodesTabFragment() {
 
     override fun getData(): LiveData<List<EpisodeDetail>> = episodesViewModel.loadReleased()
 }
