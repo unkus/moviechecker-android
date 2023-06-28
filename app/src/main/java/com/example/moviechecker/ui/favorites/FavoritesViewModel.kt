@@ -1,7 +1,6 @@
 package com.example.moviechecker.ui.favorites
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -27,15 +26,6 @@ class FavoritesViewModel(private val dao: FavoriteDao): ViewModel() {
 
     suspend fun loadBySiteAndMovie(siteAddress: Uri?, moviePageId: String?): Favorite? {
         return dao.loadBySiteAndMovie(siteAddress, moviePageId)
-    }
-
-    fun addNewFavorite(siteAddress: Uri?, moviePageId: String?) = viewModelScope.launch(Dispatchers.IO) {
-        Log.i("TEST", "siteAddress: $siteAddress, moviePageId: $moviePageId")
-        val movie = dao.loadMovieBySiteAndPage(siteAddress, moviePageId)
-        movie.let {
-            val favorite = Favorite(movie.id)
-            insert(favorite)
-        }
     }
 
     fun insert(favorite: Favorite) = viewModelScope.launch(Dispatchers.IO) {
