@@ -11,17 +11,14 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.moviechecker.CheckerApplication
 import com.example.moviechecker.R
-import com.example.moviechecker.model.State
 import com.example.moviechecker.model.episode.EpisodeDetail
 import com.example.moviechecker.source.DataProvider
-import com.example.moviechecker.ui.favorites.FavoritesViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-abstract class EpisodesTabFragment(private val state: State) : Fragment(R.layout.fragment_tab) {
+abstract class EpisodesTabFragment() : Fragment(R.layout.fragment_tab) {
 
     protected val episodesViewModel: EpisodesViewModel by activityViewModels { EpisodesViewModel.Factory }
-    protected val favoritesViewModel: FavoritesViewModel by activityViewModels { FavoritesViewModel.Factory }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -32,7 +29,8 @@ abstract class EpisodesTabFragment(private val state: State) : Fragment(R.layout
         }
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
-        recyclerView.adapter = EpisodesAdapter(EpisodesController(favoritesViewModel))
+        val database = (activity?.application as CheckerApplication).database
+        recyclerView.adapter = EpisodesAdapter(EpisodesController(database))
 
         getData().observe(viewLifecycleOwner) { records ->
             records.let { list ->

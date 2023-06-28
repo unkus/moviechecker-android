@@ -7,8 +7,11 @@ import androidx.room.ForeignKey
 import androidx.room.ForeignKey.Companion.CASCADE
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.example.moviechecker.model.Linkable
+import com.example.moviechecker.model.Numerated
 import com.example.moviechecker.model.season.Season
 import com.example.moviechecker.model.State
+import com.example.moviechecker.model.Titled
 import java.time.LocalDateTime
 
 @Entity(
@@ -23,12 +26,12 @@ import java.time.LocalDateTime
 )
 data class Episode(
     @ColumnInfo(name = "season_id") val seasonId: Int,
-    val number: Int,
-    var title: String,
-    var link: Uri,
+    override val number: Int,
+    override var title: String,
+    override var link: Uri,
     var state: State = State.EXPECTED,
     var date: LocalDateTime
-    ) {
+    ): Numerated, Titled, Linkable {
 
     @PrimaryKey(autoGenerate = true) var id: Int = 0
 

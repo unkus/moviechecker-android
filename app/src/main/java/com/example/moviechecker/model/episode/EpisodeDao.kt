@@ -1,5 +1,6 @@
 package com.example.moviechecker.model.episode
 
+import android.net.Uri
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -18,14 +19,22 @@ interface EpisodeDao {
     @Query("SELECT * FROM Episode")
     fun loadAll(): List<Episode>
 
-    @Query("SELECT * FROM EpisodeDetail e WHERE e.state = 'RELEASED' ORDER BY e.date DESC")
+    @Query("SELECT * FROM EpisodeDetail e " +
+            "WHERE e.state = 'RELEASED' ORDER BY e.date DESC")
     fun loadReleased(): Flow<List<EpisodeDetail>>
 
-    @Query("SELECT * FROM EpisodeDetail e WHERE e.state = 'EXPECTED' ORDER BY e.date ASC")
+    @Query("SELECT * FROM EpisodeDetail e " +
+            "WHERE e.state = 'EXPECTED' ORDER BY e.date ASC")
     fun loadExpected(): Flow<List<EpisodeDetail>>
 
-    @Query("SELECT * FROM episode e WHERE e.season_id = :season_id AND e.number = :number")
+    @Query("SELECT * FROM episode e " +
+            "WHERE e.season_id = :season_id AND e.number = :number")
     fun loadBySeasonAndNumber(season_id: Int, number: Int): Episode?
+
+    @Query("SELECT e.* FROM episode e " +
+            "JOIN site, movie m, season s ON e.season_id = s.id AND s.movie_id = m.id AND m.site_id = site.id " +
+            "WHERE e.number = :number AND s.number = :seasonNumber AND m.page_id = :moviePageId AND site.link = :siteAddress")
+    fun findBySiteAndMovieAndSeasonAndNumber(siteAddress: Uri, moviePageId: String, seasonNumber: Int, number: Int): Episode?
 
     @Insert
     fun insert(episode: Episode)

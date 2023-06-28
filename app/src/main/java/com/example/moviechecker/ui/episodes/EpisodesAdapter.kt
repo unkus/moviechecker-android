@@ -1,7 +1,5 @@
 package com.example.moviechecker.ui.episodes
 
-import android.net.Uri
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,7 +18,7 @@ class EpisodesAdapter(private val controller: EpisodesController) : ListAdapter<
 ) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EpisodeViewHolder {
-        return EpisodeViewHolder.create(parent, controller)
+        return EpisodeViewHolder.create(parent)
     }
 
     override fun onBindViewHolder(holder: EpisodeViewHolder, position: Int) {
@@ -28,21 +26,22 @@ class EpisodesAdapter(private val controller: EpisodesController) : ListAdapter<
         holder.bind(current)
 
         holder.itemView.setOnClickListener {
-            controller.onOpenClicked(holder.itemView.context, Uri.withAppendedPath(current.siteAddress, current.link.toString()))
+            controller.onOpenClicked(it.context, current)
+            controller.setViewed(current)
         }
 
         holder.itemView.findViewById<CheckBox>(R.id.favoriteFlag).setOnCheckedChangeListener { buttonView, isChecked ->
             if(buttonView.isPressed) {
                 if (isChecked) {
-                    controller.onFavoriteChecked(current.siteAddress, current.moviePageId)
+                    controller.onFavoriteChecked(current)
                 } else {
-                    controller.onFavoriteUnchecked(current.siteAddress, current.moviePageId)
+                    controller.onFavoriteUnchecked(current)
                 }
             }
         }
     }
 
-    class EpisodeViewHolder(itemView: View, private val controller: EpisodesController) : RecyclerView.ViewHolder(itemView) {
+    class EpisodeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val dateTextView: TextView = itemView.findViewById(R.id.date)
         private val titleCheckBox: CheckBox = itemView.findViewById(R.id.favoriteFlag)
         private val titleTextView: TextView = itemView.findViewById(R.id.title)
@@ -71,10 +70,10 @@ class EpisodesAdapter(private val controller: EpisodesController) : ListAdapter<
         }
 
         companion object {
-            fun create(parent: ViewGroup, controller: EpisodesController): EpisodeViewHolder {
+            fun create(parent: ViewGroup): EpisodeViewHolder {
                 val view: View = LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_episodes, parent, false)
-                return EpisodeViewHolder(view, controller)
+                return EpisodeViewHolder(view)
             }
         }
     }

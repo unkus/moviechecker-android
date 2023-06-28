@@ -2,11 +2,13 @@ package com.example.moviechecker.model.favorite
 
 import android.net.Uri
 import androidx.room.DatabaseView
+import com.example.moviechecker.model.Linkable
+import com.example.moviechecker.model.Titled
 
 @DatabaseView("SELECT s.link as siteAddress, " +
         "m.page_id as moviePageId, " +
-        "m.title as movieTitle, " +
-        "m.link as movieLink " +
+        "m.title, " +
+        "(s.link || m.link) as link " +
         "FROM favorite f " +
         "INNER JOIN site s, movie m " +
         "ON s.id = m.site_id " +
@@ -14,6 +16,6 @@ import androidx.room.DatabaseView
 data class FavoriteDetail(
     val siteAddress: Uri,
     val moviePageId: String,
-    val movieTitle: String,
-    val movieLink: Uri
-)
+    override val title: String,
+    override val link: Uri
+): Titled, Linkable

@@ -6,6 +6,7 @@ import androidx.room.ForeignKey
 import androidx.room.ForeignKey.Companion.CASCADE
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.example.moviechecker.model.Numerated
 import com.example.moviechecker.model.movie.Movie
 
 @Entity(
@@ -20,8 +21,8 @@ import com.example.moviechecker.model.movie.Movie
 )
 data class Season(
     @ColumnInfo(name = "movie_id") val movieId: Int,
-    val number: Int
-) {
+    override val number: Int
+): Numerated {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
 
     val title: String

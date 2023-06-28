@@ -7,6 +7,8 @@ import androidx.room.ForeignKey
 import androidx.room.ForeignKey.Companion.CASCADE
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.example.moviechecker.model.Linkable
+import com.example.moviechecker.model.Titled
 import com.example.moviechecker.model.site.Site
 
 @Entity(
@@ -22,9 +24,9 @@ import com.example.moviechecker.model.site.Site
 data class Movie(
     @ColumnInfo(name = "site_id") val siteId: Int,
     @ColumnInfo(name = "page_id") val pageId: String,
-    var title: String,
-    var link: Uri
-) {
+    override var title: String,
+    override var link: Uri
+): Titled, Linkable {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
 
     override fun toString(): String {

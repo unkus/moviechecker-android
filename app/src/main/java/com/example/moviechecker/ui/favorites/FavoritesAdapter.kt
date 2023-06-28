@@ -1,11 +1,9 @@
 package com.example.moviechecker.ui.favorites
 
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -17,7 +15,7 @@ class FavoritesAdapter(private val controller: FavoritesController): ListAdapter
     FavoriteComparator()
 ) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavoriteViewHolder {
-        return FavoriteViewHolder.create(parent, controller)
+        return FavoriteViewHolder.create(parent)
     }
 
     override fun onBindViewHolder(holder: FavoriteViewHolder, position: Int) {
@@ -25,7 +23,7 @@ class FavoritesAdapter(private val controller: FavoritesController): ListAdapter
         holder.bind(current)
 
         holder.itemView.setOnClickListener {
-            controller.onOpenClicked(holder.itemView.context, Uri.withAppendedPath(current.siteAddress, current.movieLink.toString()))
+            controller.onOpenClicked(holder.itemView.context, current)
         }
 
         holder.itemView.findViewById<Button>(R.id.forgotButton).setOnClickListener {
@@ -33,20 +31,20 @@ class FavoritesAdapter(private val controller: FavoritesController): ListAdapter
         }
     }
 
-    class FavoriteViewHolder(itemView: View, private val controller: FavoritesController) : RecyclerView.ViewHolder(itemView) {
+    class FavoriteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val titleTextView: TextView = itemView.findViewById(R.id.title)
 
         fun bind(favorite: FavoriteDetail?) {
             favorite?.let {
-                titleTextView.text = it.movieTitle
+                titleTextView.text = it.title
             }
         }
 
         companion object {
-            fun create(parent: ViewGroup, controller: FavoritesController): FavoriteViewHolder {
+            fun create(parent: ViewGroup): FavoriteViewHolder {
                 val view: View = LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_favorite, parent, false)
-                return FavoriteViewHolder(view, controller)
+                return FavoriteViewHolder(view)
             }
         }
     }

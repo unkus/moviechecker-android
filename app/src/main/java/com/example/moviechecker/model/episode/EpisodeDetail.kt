@@ -2,7 +2,10 @@ package com.example.moviechecker.model.episode
 
 import android.net.Uri
 import androidx.room.DatabaseView
+import com.example.moviechecker.model.Linkable
+import com.example.moviechecker.model.Numerated
 import com.example.moviechecker.model.State
+import com.example.moviechecker.model.Titled
 import java.time.LocalDateTime
 
 @DatabaseView("SELECT site.link as siteAddress, " +
@@ -11,7 +14,7 @@ import java.time.LocalDateTime
         "season.number as seasonNumber, " +
         "e.number, " +
         "e.title, " +
-        "e.link, " +
+        "(site.link || e.link) as link, " +
         "e.state, " +
         "e.date, " +
 //        "CAST((SELECT id FROM favorite WHERE movie_id = movie.id) AS BOOLEAN) as isInFavorite " +
@@ -25,11 +28,11 @@ data class EpisodeDetail(
     val siteAddress: Uri,
     val moviePageId: String,
     val movieTitle: String,
-    val seasonNumber: Long,
-    val number: Long,
-    val title: String,
-    val link: Uri,
+    val seasonNumber: Int,
+    override val number: Int,
+    override val title: String,
+    override val link: Uri,
     val state: State,
     val date: LocalDateTime,
     val isInFavorite: Boolean
-)
+): Numerated, Titled, Linkable

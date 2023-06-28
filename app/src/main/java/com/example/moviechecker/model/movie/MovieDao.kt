@@ -1,5 +1,6 @@
 package com.example.moviechecker.model.movie
 
+import android.net.Uri
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -16,13 +17,21 @@ interface MovieDao {
     @Query("SELECT * FROM Movie")
     fun loadAll(): List<Movie>
 
-    @Query("SELECT * FROM Movie m WHERE m.id = :id")
+    @Query("SELECT * FROM Movie m " +
+            "WHERE m.id = :id")
     fun loadById(id: Int): Movie?
 
-    @Query("SELECT * FROM movie m WHERE m.site_id = :site_id AND m.page_id = :pageId")
+    @Query("SELECT * FROM movie m " +
+            "WHERE m.site_id = :site_id AND m.page_id = :pageId")
     fun loadMovieBySiteAndPageId(site_id: Int, pageId: String): Movie?
 
-    @Query("SELECT * FROM movie m JOIN season s ON m.id = s.movie_id")
+    @Query("SELECT m.* FROM movie m " +
+            "JOIN site s ON s.id = m.site_id " +
+            "WHERE s.link = :siteAddress AND m.page_id = :pageId")
+    fun loadMovieBySiteAddressAndPageId(siteAddress: Uri, pageId: String): Movie?
+
+    @Query("SELECT * FROM movie m " +
+            "JOIN season s ON m.id = s.movie_id")
     fun loadMovieAndSeasons(): Map<Movie, List<Season>>
 
     @Insert
