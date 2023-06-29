@@ -14,10 +14,15 @@ interface MovieDao {
     @get:Query("SELECT * FROM movie")
     val movies: Flow<List<Movie>>
 
-    @Query("SELECT * FROM Movie")
+    @Query("SELECT * FROM movie")
     fun loadAll(): List<Movie>
 
-    @Query("SELECT * FROM Movie m " +
+    @Query("SELECT m.* FROM movie m " +
+            "LEFT JOIN favorite f ON f.movie_id = m.id " +
+            "WHERE f.id IS NULL ")
+    fun findNotInFavorites(): List<Movie>
+
+    @Query("SELECT * FROM movie m " +
             "WHERE m.id = :id")
     fun loadById(id: Int): Movie?
 
@@ -41,7 +46,7 @@ interface MovieDao {
     fun update(movie: Movie)
 
     @Delete
-    fun delete(movie: Movie)
+    fun delete(vararg movies: Movie)
 
     @Query("DELETE FROM movie")
     fun deleteAll()

@@ -20,12 +20,17 @@ interface EpisodeDao {
     fun loadAll(): List<Episode>
 
     @Query("SELECT * FROM EpisodeDetail e " +
-            "WHERE e.state = 'RELEASED' ORDER BY e.date DESC")
+            "WHERE e.state != 'EXPECTED' ORDER BY e.date DESC")
     fun loadReleased(): Flow<List<EpisodeDetail>>
 
     @Query("SELECT * FROM EpisodeDetail e " +
             "WHERE e.state = 'EXPECTED' ORDER BY e.date ASC")
     fun loadExpected(): Flow<List<EpisodeDetail>>
+
+    @Query("SELECT * FROM episode e " +
+            "JOIN movie m, season s, favorite f ON e.season_id = s.id AND s.movie_id = m.id AND m.id = f.movie_id " +
+            "WHERE e.state = 'VIEWED' and e.id != f.last_viewed")
+    fun findViewedEpisodesWithExclusion(): List<Episode>?
 
     @Query("SELECT * FROM episode e " +
             "WHERE e.season_id = :season_id AND e.number = :number")
