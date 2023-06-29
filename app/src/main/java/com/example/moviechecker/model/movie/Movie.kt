@@ -25,7 +25,8 @@ data class Movie(
     @ColumnInfo(name = "site_id") val siteId: Int,
     @ColumnInfo(name = "page_id") val pageId: String,
     override var title: String,
-    override var link: Uri
+    override var link: Uri,
+    @ColumnInfo(name = "poster_link") var posterLink: Uri? = null
 ): Titled, Linkable {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
 

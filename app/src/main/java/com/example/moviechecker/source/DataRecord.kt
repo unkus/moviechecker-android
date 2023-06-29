@@ -9,6 +9,7 @@ data class DataRecord(
     val moviePageId: String,
     val movieTitle: String,
     val movieLink: Uri,
+    val posterLink: Uri,
     val seasonNumber: Int,
     val episodeNumber: Int,
     val episodeTitle: String,
@@ -22,6 +23,7 @@ data class DataRecord(
         private var moviePageId: String? = null
         private var movieTitle: String? = null
         private var movieLink: Uri? = null
+        private var posterLink: Uri? = null
         private var seasonNumber: Int? = null
         private var episodeNumber: Int? = null
         private var episodeTitle: String? = null
@@ -46,6 +48,11 @@ data class DataRecord(
 
         fun movieLink(movieLink: Uri): Builder {
             this.movieLink = movieLink
+            return this
+        }
+
+        fun posterLink(posterLink: Uri): Builder {
+            this.posterLink = posterLink
             return this
         }
 
@@ -85,6 +92,7 @@ data class DataRecord(
                 moviePageId!!,
                 movieTitle!!,
                 movieLink!!,
+                posterLink!!,
                 seasonNumber!!,
                 episodeNumber!!,
                 episodeTitle!!,
