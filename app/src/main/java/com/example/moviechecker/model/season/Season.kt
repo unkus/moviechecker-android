@@ -1,11 +1,13 @@
 package com.example.moviechecker.model.season
 
+import android.net.Uri
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.ForeignKey.Companion.CASCADE
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.example.moviechecker.model.Linkable
 import com.example.moviechecker.model.Numerated
 import com.example.moviechecker.model.movie.Movie
 
@@ -21,8 +23,9 @@ import com.example.moviechecker.model.movie.Movie
 )
 data class Season(
     @ColumnInfo(name = "movie_id") val movieId: Int,
-    override val number: Int
-): Numerated {
+    override val number: Int,
+    override val link: Uri
+): Numerated, Linkable {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
 
     val title: String

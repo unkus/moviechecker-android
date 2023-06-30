@@ -103,6 +103,7 @@ abstract class CheckerRoomDatabase : RoomDatabase() {
         movieNullable?.let { movie ->
             movie.title = record.movieTitle
             movie.link = record.movieLink
+            movie.posterLink = record.posterLink
             movieDao.update(movie)
         } ?: run {
             movieDao.insert(
@@ -110,7 +111,8 @@ abstract class CheckerRoomDatabase : RoomDatabase() {
                     site.id,
                     record.moviePageId,
                     record.movieTitle,
-                    record.movieLink
+                    record.movieLink,
+                    record.posterLink
                 )
             )
         }
@@ -135,7 +137,8 @@ abstract class CheckerRoomDatabase : RoomDatabase() {
             seasonDao.insert(
                 Season(
                     movie.id,
-                    record.seasonNumber
+                    record.seasonNumber,
+                    record.seasonLink
                 )
             )
         }

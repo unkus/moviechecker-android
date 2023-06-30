@@ -14,7 +14,7 @@ import java.time.LocalDateTime
         "season.number as seasonNumber, " +
         "e.number, " +
         "e.title, " +
-        "(site.link || e.link) as link, " +
+        "(site.link || TRIM(season.link, \".html\") || e.link) as link, " +
         "e.state, " +
         "e.date, " +
 //        "CAST((SELECT id FROM favorite WHERE movie_id = movie.id) AS BOOLEAN) as isInFavorite " +
