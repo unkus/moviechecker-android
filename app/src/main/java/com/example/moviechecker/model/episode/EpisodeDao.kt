@@ -27,7 +27,7 @@ interface EpisodeDao {
             "WHERE e.state = 'EXPECTED' ORDER BY e.date ASC")
     fun loadExpected(): Flow<List<EpisodeDetail>>
 
-    @Query("SELECT * FROM episode e " +
+    @Query("SELECT e.* FROM episode e " +
             "JOIN movie m, season s, favorite f ON e.season_id = s.id AND s.movie_id = m.id AND m.id = f.movie_id " +
             "WHERE e.state = 'VIEWED' and e.id != f.last_viewed")
     fun findViewedEpisodesWithExclusion(): List<Episode>?
