@@ -161,7 +161,9 @@ abstract class CheckerRoomDatabase : RoomDatabase() {
         episodeNullable?.let { episode ->
             episode.title = record.episodeTitle
             episode.link = record.episodeLink
-            episode.state = record.episodeState
+            if (episode.state != State.VIEWED) {
+                episode.state = record.episodeState
+            }
             episode.date = record.episodeDate
             episodeDao.update(episode)
         } ?: run {
