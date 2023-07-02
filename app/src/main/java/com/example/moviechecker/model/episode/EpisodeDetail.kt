@@ -11,6 +11,7 @@ import java.time.LocalDateTime
 @DatabaseView("SELECT site.link as siteAddress, " +
         "movie.page_id as moviePageId, " +
         "movie.title as movieTitle, " +
+        "movie.poster_link as posterLink, " +
         "season.number as seasonNumber, " +
         "e.number, " +
         "e.title, " +
@@ -28,6 +29,7 @@ data class EpisodeDetail(
     val siteAddress: Uri,
     val moviePageId: String,
     val movieTitle: String,
+    val posterLink: Uri?,
     val seasonNumber: Int,
     override val number: Int,
     override val title: String,
