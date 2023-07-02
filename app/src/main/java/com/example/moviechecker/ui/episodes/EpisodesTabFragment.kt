@@ -23,7 +23,7 @@ abstract class EpisodesTabFragment() : Fragment(R.layout.fragment_tab) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val swipeRefresh = view.findViewById<SwipeRefreshLayout>(R.id.swiperefresh)
+        val swipeRefresh = view.findViewById<SwipeRefreshLayout>(R.id.swipe_refresh)
         swipeRefresh.setOnRefreshListener {
             onRefresh(swipeRefresh)
         }
