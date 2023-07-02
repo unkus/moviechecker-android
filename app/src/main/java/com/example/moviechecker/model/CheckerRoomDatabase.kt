@@ -178,6 +178,21 @@ abstract class CheckerRoomDatabase : RoomDatabase() {
         }
     }
 
+    suspend fun cleanupData() {
+        // удаляем все что не отмечено как избранное
+        INSTANCE?.movieDao()?.findNotInFavorites()?.let {movies ->
+            INSTANCE?.movieDao()?.delete(movies = movies.map { it }.toTypedArray())
+        }
+
+        // удаляем просмотренные эпизоды кроме последнего
+        INSTANCE?.favoriteDao()?.loadAll()?.forEach {
+            INSTANCE?.episodeDao()?.findViewedEpisodesWithExclusion()?.forEach {
+                Log.i("TEST", "episode: $it")
+            }
+        }
+
+    }
+
     private class CheckerDatabaseCallback(private val scope: CoroutineScope) :
         Callback() {
         override fun onCreate(db: SupportSQLiteDatabase) {
@@ -190,44 +205,8 @@ abstract class CheckerRoomDatabase : RoomDatabase() {
             Log.i("TEST", "database opened")
 
             scope.launch {
-                cleanupData()
+                INSTANCE?.cleanupData()
                 INSTANCE?.populateDatabase(DataProvider.retrieveData())
-            }
-        }
-
-        suspend fun cleanupData() {
-            Log.i("TEST", "cleanupData")
-
-            INSTANCE?.episodeDao()?.loadAll()?.forEach {
-                Log.i("TEST", "episode: $it")
-            }
-
-            Log.i("TEST", "удаляем все что не отмечено как избранное")
-            // удаляем все что не отмечено как избранное
-            INSTANCE?.movieDao()?.findNotInFavorites()?.let {movies ->
-                INSTANCE?.movieDao()?.delete(movies = movies.map { it }.toTypedArray())
-            }
-
-            INSTANCE?.episodeDao()?.loadAll()?.forEach {
-                Log.i("TEST", "episode: $it")
-            }
-
-            Log.i("TEST", "удаляем просмотренные эпизоды кроме последнего")
-            // удаляем просмотренные эпизоды кроме последнего
-            INSTANCE?.favoriteDao()?.loadAll()?.forEach {
-                INSTANCE?.episodeDao()?.findViewedEpisodesWithExclusion()?.forEach {
-                    Log.i("TEST", "episode: $it")
-                }
-            }
-
-            INSTANCE?.movieDao()?.loadAll()?.forEach {
-                Log.i("TEST", "movie: $it")
-            }
-            INSTANCE?.seasonDao()?.loadAll()?.forEach {
-                Log.i("TEST", "season: $it")
-            }
-            INSTANCE?.episodeDao()?.loadAll()?.forEach {
-                Log.i("TEST", "episode: $it")
             }
         }
     }
