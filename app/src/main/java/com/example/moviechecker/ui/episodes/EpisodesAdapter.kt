@@ -64,7 +64,11 @@ class EpisodesAdapter(private val controller: EpisodesController) : ListAdapter<
                 }
 
                 titleCheckBox.isChecked = it.isInFavorite
-                titleTextView.text = it.movieTitle
+                if (it.seasonNumber > 1) {
+                    titleTextView.text = "${it.movieTitle} ${it.seasonNumber}"
+                } else {
+                    titleTextView.text = it.movieTitle
+                }
                 episodeTextView.text = it.title
             }
         }
