@@ -65,11 +65,17 @@ class EpisodesAdapter(private val controller: EpisodesController) : ListAdapter<
 
                 titleCheckBox.isChecked = it.isInFavorite
                 if (it.seasonNumber > 1) {
-                    titleTextView.text = "${it.movieTitle} ${it.seasonNumber}"
+                    val movieTitle = "${it.movieTitle} ${it.seasonNumber}"
+                    titleTextView.text = movieTitle
                 } else {
                     titleTextView.text = it.movieTitle
                 }
-                episodeTextView.text = it.title
+                if(it.state == State.VIEWED) {
+                    val episodeTitle = "${it.title} ✓"
+                    episodeTextView.text = episodeTitle
+                } else {
+                    episodeTextView.text = it.title
+                }
             }
         }
 
