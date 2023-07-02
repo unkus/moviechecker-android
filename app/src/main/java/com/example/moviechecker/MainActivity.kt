@@ -4,10 +4,13 @@ import android.os.Bundle
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.example.moviechecker.databinding.ActivityMainBinding
 import com.example.moviechecker.ui.main.TabsAdapter
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,9 +39,11 @@ class MainActivity : AppCompatActivity() {
         // Action button
         val fab: FloatingActionButton = binding.fab
         fab.setOnClickListener { view ->
-            Snackbar.make(view, "Check for new episodes", Snackbar.LENGTH_LONG)
-                .setAction("Check") {
-                    // TODO: retrieve data
+            Snackbar.make(view, "Remove viewed episodes", Snackbar.LENGTH_LONG)
+                .setAction("Cleanup") {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        (application as CheckerApplication).database.cleanupData()
+                    }
                 }.show()
         }
     }
