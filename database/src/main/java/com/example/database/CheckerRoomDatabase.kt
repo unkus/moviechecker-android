@@ -1,4 +1,4 @@
-package com.example.moviechecker.model
+package com.example.database
 
 import android.content.Context
 import android.util.Log
@@ -7,20 +7,21 @@ import androidx.room.Room.databaseBuilder
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.example.moviechecker.model.episode.Episode
-import com.example.moviechecker.model.episode.EpisodeDao
-import com.example.moviechecker.model.episode.EpisodeDetail
-import com.example.moviechecker.model.favorite.Favorite
-import com.example.moviechecker.model.favorite.FavoriteDao
-import com.example.moviechecker.model.favorite.FavoriteDetail
-import com.example.moviechecker.model.movie.Movie
-import com.example.moviechecker.model.movie.MovieDao
-import com.example.moviechecker.model.season.Season
-import com.example.moviechecker.model.season.SeasonDao
-import com.example.moviechecker.model.site.Site
-import com.example.moviechecker.model.site.SiteDao
-import com.example.moviechecker.source.DataProvider
-import com.example.moviechecker.source.DataRecord
+import com.example.database.api.State
+import com.example.database.episode.Episode
+import com.example.database.episode.EpisodeDao
+import com.example.database.episode.EpisodeDetail
+import com.example.database.favorite.Favorite
+import com.example.database.favorite.FavoriteDao
+import com.example.database.favorite.FavoriteDetail
+import com.example.database.movie.Movie
+import com.example.database.movie.MovieDao
+import com.example.database.season.Season
+import com.example.database.season.SeasonDao
+import com.example.database.site.Site
+import com.example.database.site.SiteDao
+import com.example.datasource.DataProvider
+import com.example.datasource.DataRecord
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -182,15 +183,15 @@ abstract class CheckerRoomDatabase : RoomDatabase() {
 
     suspend fun cleanupData() {
         // удаляем все что не отмечено как избранное
-        INSTANCE?.movieDao()?.findNotInFavorites()?.let {movies ->
+        INSTANCE?.movieDao()?.findNotInFavorites()?.let { movies ->
             INSTANCE?.movieDao()?.delete(movies = movies.map { it }.toTypedArray())
         }
 
         // удаляем просмотренные эпизоды кроме последнего
-        INSTANCE?.favoriteDao()?.loadAll()?.forEach {
-            INSTANCE?.episodeDao()?.findViewedEpisodesWithExclusion()?.forEach {
-                Log.i("TEST", "episode: $it")
-            }
+        Log.i("TEST", "удаляем просмотренные эпизоды кроме последнего")
+        INSTANCE?.episodeDao()?.findViewedEpisodesWithExclusion()?.forEach {
+            Log.i("TEST", "episode: $it")
+//            INSTANCE?.episodeDao()?.delete(it)
         }
 
     }
