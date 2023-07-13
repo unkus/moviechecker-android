@@ -44,7 +44,7 @@ abstract class EpisodesTabFragment() : Fragment(R.layout.fragment_tab) {
         // начинаем показывать прогресс
         swipeRefresh.isRefreshing = true
         lifecycleScope.launch(Dispatchers.IO) {
-            (activity?.application as CheckerApplication).database.populateDatabase(com.example.datasource.DataProvider.retrieveData())
+            (activity?.application as CheckerApplication).database.populateDatabase(DataProvider.retrieveData())
         }
         // прячем прогресс
         swipeRefresh.isRefreshing = false
