@@ -1,8 +1,7 @@
 package com.example.moviechecker.ui.episodes
 
 import androidx.lifecycle.LiveData
-import com.example.moviechecker.model.State
-import com.example.moviechecker.model.episode.EpisodeDetail
+import com.example.database.episode.EpisodeDetail
 
 class ReleasedTabFragment : EpisodesTabFragment() {
 

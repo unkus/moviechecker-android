@@ -38,13 +38,9 @@ android {
 }
 
 dependencies {
+    implementation 'androidx.core:core-ktx:1.10.1'
     implementation "androidx.appcompat:appcompat:1.6.1"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1'
-
-    // Room components
-    implementation "androidx.room:room-ktx:2.5.2"
-    kapt "androidx.room:room-compiler:2.5.2"
-    androidTestImplementation "androidx.room:room-testing:2.5.2"
 
     // Lifecycle components
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1"
@@ -58,6 +54,13 @@ dependencies {
     implementation "com.google.android.material:material:1.9.0"
 
     // hilt
-    implementation("com.google.dagger:hilt-android:2.46.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.46.1")
+    implementation "com.google.dagger:hilt-android:2.46.1"
+    kapt "com.google.dagger:hilt-android-compiler:2.46.1"
+
+    // Room components
+    implementation "androidx.room:room-ktx:2.5.2"
+
+    implementation project(path: ':database')
+    implementation project(path: ':database:api')
+    implementation project(path: ':data-source')
 }

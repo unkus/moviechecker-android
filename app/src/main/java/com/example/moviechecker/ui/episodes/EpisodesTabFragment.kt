@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.moviechecker.CheckerApplication
 import com.example.moviechecker.R
-import com.example.moviechecker.model.episode.EpisodeDetail
-import com.example.moviechecker.source.DataProvider
+import com.example.database.episode.EpisodeDetail
+import com.example.datasource.DataProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -44,7 +44,7 @@ abstract class EpisodesTabFragment() : Fragment(R.layout.fragment_tab) {
         // начинаем показывать прогресс
         swipeRefresh.isRefreshing = true
         lifecycleScope.launch(Dispatchers.IO) {
-            (activity?.application as CheckerApplication).database.populateDatabase(DataProvider.retrieveData())
+            (activity?.application as CheckerApplication).database.populateDatabase(com.example.datasource.DataProvider.retrieveData())
         }
         // прячем прогресс
         swipeRefresh.isRefreshing = false

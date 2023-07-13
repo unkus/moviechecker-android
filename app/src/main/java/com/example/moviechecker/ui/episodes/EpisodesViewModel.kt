@@ -9,9 +9,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.moviechecker.CheckerApplication
-import com.example.moviechecker.model.episode.Episode
-import com.example.moviechecker.model.episode.EpisodeDao
-import com.example.moviechecker.model.episode.EpisodeDetail
+import com.example.database.episode.Episode
+import com.example.database.episode.EpisodeDao
+import com.example.database.episode.EpisodeDetail
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

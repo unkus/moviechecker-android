@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moviechecker.R
-import com.example.moviechecker.model.favorite.FavoriteDetail
+import com.example.database.favorite.FavoriteDetail
 
 class FavoritesAdapter(private val controller: FavoritesController): ListAdapter<FavoriteDetail, FavoritesAdapter.FavoriteViewHolder>(
     FavoriteComparator()

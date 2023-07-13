@@ -14,3 +14,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "moviechecker"
 include ':app'
+include ':database'
+include ':data-source'
+include ':database:api'

@@ -1,7 +1,7 @@
 package com.example.moviechecker
 
 import android.app.Application
-import com.example.moviechecker.model.CheckerRoomDatabase
+import com.example.database.CheckerRoomDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 

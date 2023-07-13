@@ -9,9 +9,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.moviechecker.CheckerApplication
-import com.example.moviechecker.model.favorite.Favorite
-import com.example.moviechecker.model.favorite.FavoriteDao
-import com.example.moviechecker.model.favorite.FavoriteDetail
+import com.example.database.favorite.Favorite
+import com.example.database.favorite.FavoriteDao
+import com.example.database.favorite.FavoriteDetail
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

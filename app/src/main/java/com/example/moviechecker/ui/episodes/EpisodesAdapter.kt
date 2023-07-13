@@ -9,7 +9,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moviechecker.R
-import com.example.moviechecker.model.episode.EpisodeDetail
+import com.example.database.api.State
+import com.example.database.episode.EpisodeDetail
 import java.time.LocalDate
 
 
