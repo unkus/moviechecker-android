@@ -13,7 +13,8 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "moviechecker"
-include ':app'
+include ':core'
 include ':database'
-include ':data-source'
-include ':database:api'
+include ':core:di'
+include ':datasource'
+include ':lostfilm'
