@@ -38,11 +38,11 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        startService(Intent(this, DataReceiverService::class.java))
+//        startService(Intent(this, DataReceiverService::class.java))
 
-//        val workRequest = OneTimeWorkRequestBuilder<DataRetrieveWorker>().build()
+        val workRequest = OneTimeWorkRequestBuilder<DataRetrieveWorker>().build()
 //        val workRequest = PeriodicWorkRequestBuilder<DataRetrieveWorker>(Duration.ofMinutes(30)).build()
-//        WorkManager.getInstance(applicationContext).enqueue(workRequest)
+        WorkManager.getInstance(applicationContext).enqueue(workRequest)
 
 //        val jobService = ComponentName(application, DataReceiverService::class.java)
 //        val jobScheduler: JobScheduler = application.getSystemService(JOB_SCHEDULER_SERVICE) as JobScheduler

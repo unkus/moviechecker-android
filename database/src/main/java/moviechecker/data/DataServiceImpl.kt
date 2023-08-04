@@ -4,29 +4,14 @@ import android.util.Log
 import moviechecker.core.di.database.DataService
 import moviechecker.core.di.database.episode.Episode
 import moviechecker.core.di.State
-import moviechecker.core.di.datasource.DataSource
-import moviechecker.data.episode.EpisodeRepositoryImpl
 import moviechecker.data.favorite.FavoriteEntity
-import moviechecker.data.favorite.FavoriteRepositoryImpl
-import moviechecker.data.movie.MovieRepositoryImpl
-import moviechecker.data.season.SeasonRepositoryImpl
-import moviechecker.data.site.SiteRepositoryImpl
-import moviechecker.datasource.DataSourceManager
 import java.net.URI
 
 class DataServiceImpl(
     private val database: CheckerRoomDatabase,
 ) : DataService {
 
-//    private lateinit var database: CheckerRoomDatabase
-
-    override val siteRepository by lazy { SiteRepositoryImpl(database.siteDao()) }
-    override val movieRepository by lazy { MovieRepositoryImpl(database.movieDao()) }
-    override val seasonRepository by lazy { SeasonRepositoryImpl(database.seasonDao()) }
-    override val episodeRepository by lazy { EpisodeRepositoryImpl(database.episodeDao()) }
-    override val favoriteRepository by lazy { FavoriteRepositoryImpl(database.favoriteDao()) }
-
-    override fun cleanupData() {
+    override suspend fun cleanupData() {
         // удаляем все что не отмечено как избранное
         database.movieDao().findNotInFavorites().let { movies ->
             database.movieDao().delete(movies = movies.map { it }.toTypedArray())

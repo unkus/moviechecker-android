@@ -9,7 +9,7 @@ import moviechecker.core.CheckerApplication
 import moviechecker.core.R
 
 class FavoritesTabFragment : Fragment(R.layout.fragment_tab) {
-    private val viewModel: FavoritesViewModel by viewModels { FavoritesViewModel.Factory }
+    private val viewModel: FavoritesViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

@@ -14,18 +14,16 @@ import moviechecker.core.di.database.favorite.FavoriteRepository
 import moviechecker.core.di.database.movie.MovieRepository
 import moviechecker.core.di.database.season.SeasonRepository
 import moviechecker.core.di.database.site.SiteRepository
-import moviechecker.core.di.datasource.DataSource
 import moviechecker.data.episode.EpisodeRepositoryImpl
 import moviechecker.data.favorite.FavoriteRepositoryImpl
 import moviechecker.data.movie.MovieRepositoryImpl
 import moviechecker.data.season.SeasonRepositoryImpl
 import moviechecker.data.site.SiteRepositoryImpl
-import moviechecker.datasource.DataSourceManager
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object DatabaseModuleImpl {
+object DatabaseModule {
 
     @Provides
     @Singleton
