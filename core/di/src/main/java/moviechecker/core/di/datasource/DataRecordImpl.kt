@@ -19,5 +19,25 @@ data class DataRecordImpl(
     override val episodeDate: LocalDateTime
 ) : DataRecord {
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
+        other as DataRecordImpl
+
+        if (siteAddress != other.siteAddress) return false
+        if (moviePageId != other.moviePageId) return false
+        if (seasonNumber != other.seasonNumber) return false
+        if (episodeNumber != other.episodeNumber) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = siteAddress.hashCode()
+        result = 31 * result + moviePageId.hashCode()
+        result = 31 * result + seasonNumber
+        result = 31 * result + episodeNumber
+        return result
+    }
 }

@@ -1,6 +1,9 @@
 package moviechecker.core.ui.episodes
 
+import androidx.fragment.app.viewModels
+
 class ReleasedTabFragment : EpisodesTabFragment() {
 
-    override fun getData() = episodesViewModel.released
+    override val viewModel: ReleasedViewModel by viewModels()
+
 }

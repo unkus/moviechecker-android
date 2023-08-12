@@ -1,75 +1,127 @@
 package moviechecker.lostfilm
 
+import moviechecker.core.di.State
 import moviechecker.core.di.datasource.DataRecord
 import moviechecker.core.di.datasource.DataSource
-import moviechecker.core.di.State
 import java.net.URI
 import java.net.URL
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.util.Locale
+import java.util.regex.Matcher
+
+private const val baseURL = "https://www.lostfilmtv5.site"
 
 class LostfilmDataSource : DataSource {
 
-    private val BASE_URL = "https://www.lostfilmtv5.site"
-    private val NEW_MOVIE_TAG_PATTERN =
-        "<a class=\"new-movie\" href=\"(?<episodeRef>(?<seasonRef>(?<movieRef>/series/(?<moviePageId>.+))/.+)/.+)/\" title=\"(?<title>.+)\">".toRegex()
-    private val EPISODE_TITLE_TAG_PATTERN = "<div class=\"title\">".toRegex()
-    private val DATE_TAG_PATTERN = "<div class=\"date\">(?<date>.+)</div>".toRegex()
-    private val IMG_TAG_PATTERN = "<img src=\"(?<posterLink>.+)\" />".toRegex()
-    private val ID_PATTERN =
-        "(?<seasonNumber>\\d+) сезон (?<episodeTitle>(?<episodeNumber>\\d+) серия)".toRegex()
-    private val dateFormat = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+    private val newMovieClassRegex =
+        "<a class=\"new-movie\" href=\"(?<href>.+)/\" title=\"(?<title>.+)\">".toRegex()
+    private val todayClassRegex = "<td class=\"today\">".toRegex()
+    private val expectedEpisodeRegex =
+        "<a href=\"(?<href>.+)/\" class=\"title\">(?<title>.+)</br>".toRegex()
+    private val breadcrumbsClassRegex = "<div class=\"breadcrumbs-pane\">".toRegex()
+    private val movieItemClassRegex =
+        "<a href=\"(?<moviePath>/series/(?<moviePageId>.+))/\" class=\"item\">(?<movieTitle>.+)</a>".toRegex()
+    private val seasonItemClassRegex =
+        "<a href=\"(?<seasonRef>.+)/\" class=\"item\"><div class=\"arrow\"></div>(?<seasonNumber>\\d+) сезон</a>".toRegex()
+    private val episodeItemClassRegex =
+        "<a href=\"(?<episodeRef>.+)/\" class=\"item\"><div class=\"arrow\"></div>(?<episodeNumber>\\d+) серия</a>".toRegex()
+    private val seriaHeaderClassRegex = "<div class=\"seria-header\">".toRegex()
+    private val thumbsClassRegex = "<img src=\"(?<posterRef>.+)\" class=\"thumb\" />".toRegex()
+    private val titleRuClassRegex = "<h1 class=\"title-ru\">(?<episodeTitle>.+)</h1>".toRegex()
+    private val titleEnClassRegex = "<div class=\"title-en\">(?<episodeTitle>.+)</div>".toRegex()
+    private val expectedClassRegex = "<div class=\"expected\">Ожидается (?<date>.+)</div>".toRegex()
+    private val dateRegex =
+        "<span data-proper=\".+\" data-released=\"(?<dateReleased>\\d{2} .+ \\d{4})\">.+</span>".toRegex()
+
+    private val dateFormat = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.forLanguageTag("ru-RU"))
+
 
     override fun retrieveData(): Collection<DataRecord> {
-        val dataList = mutableListOf<DataRecord>()
+        val baseUri = URI.create(baseURL)
+        val recordList = mutableSetOf<DataRecord>()
+
+        val lineIterator = URL(baseURL).readText().reader().buffered().readLines().iterator()
+        while (lineIterator.hasNext()) {
+            val inputLine = lineIterator.next()
+            var href: String? = null
+            newMovieClassRegex.find(inputLine)?.let { matchResult ->
+                href = matchResult.groups["href"]?.value
+            }
+            todayClassRegex.find(inputLine)?.let {
+                lineIterator.next() // skip tag
+                expectedEpisodeRegex.find(lineIterator.next())?.let { matchResult ->
+                    href = matchResult.groups["href"]?.value
+                }
+            }
+            href?.let {
+                ".+episode_\\d+".toRegex().find(it)?.let {
+                    getEpisodeDetails(baseUri.resolve(href).toURL())?.let(recordList::add)
+                }
+            }
+        }
+        return recordList
+    }
+
+    private fun getEpisodeDetails(url: URL): DataRecord? {
         val dataRecordBuilder = DataRecord.Builder()
-        dataRecordBuilder.site(URI.create(BASE_URL))
+        dataRecordBuilder.site(URI.create(baseURL))
         dataRecordBuilder.episodeState(State.RELEASED)
 
-        val lineIterator = URL(BASE_URL).readText().reader().buffered().readLines().iterator()
+        val lineIterator = url.readText().reader().buffered().readLines().iterator()
         while (lineIterator.hasNext()) {
-            NEW_MOVIE_TAG_PATTERN.find(lineIterator.next())?.let { matchResult ->
-                operator fun <T> List<T>.component6(): T = get(5)
-                val (_, episodeRef, seasonRef, movieRef, moviePageId, title) = matchResult.groupValues
-                dataRecordBuilder
-                    .moviePageId(moviePageId)
-                    .movieTitle(title)
-                    .movieLink(URI.create(movieRef))
-                    .seasonLink(URI.create(seasonRef))
-                    .episodeLink(URI.create(episodeRef))
-
-                EPISODE_TITLE_TAG_PATTERN.find(lineIterator.next())?.let { _ ->
-                    ID_PATTERN.find(lineIterator.next())?.let { idMatcherResult ->
-                        val (_, seasonNumber, episodeTitle, episodeNumber) = idMatcherResult.groupValues
-                        dataRecordBuilder
-                            .seasonNumber(seasonNumber.toInt())
-                            .episodeNumber(episodeNumber.toInt())
-                            .episodeTitle(episodeTitle)
-                        lineIterator.next() // skip closing tag line
+            val inputLine = lineIterator.next()
+            breadcrumbsClassRegex.find(inputLine)?.let {
+                movieItemClassRegex.find(lineIterator.next())?.let { matchResult ->
+                    val (_, moviePath, moviePageId, movieTitle) = matchResult.groupValues
+                    dataRecordBuilder.moviePageId(moviePageId)
+                        .movieLink(URI.create(moviePath))
+                        .movieTitle(movieTitle)
+                    lineIterator.next() // skip
+                }
+                seasonItemClassRegex.find(lineIterator.next())?.let { matchResult ->
+                    val (_, seasonRef, seasonNumber) = matchResult.groupValues
+                    dataRecordBuilder.seasonLink(URI.create(seasonRef))
+                        .seasonNumber(seasonNumber.toInt())
+                }
+                episodeItemClassRegex.find(lineIterator.next())?.let { matchResult ->
+                    val (_, episodeRef, episodeNumber) = matchResult.groupValues
+                    dataRecordBuilder.episodeLink(URI.create(episodeRef))
+                        .episodeNumber(episodeNumber.toInt())
+                }
+            }
+            seriaHeaderClassRegex.find(inputLine)?.let {
+                thumbsClassRegex.find(lineIterator.next())?.let { matchResult ->
+                    matchResult.groups["posterRef"]?.let { matchGroup ->
+                        dataRecordBuilder.moviePosterLink(URI.create(matchGroup.value))
                     }
                 }
-
-                DATE_TAG_PATTERN.find(lineIterator.next())?.let { matchResult ->
-                    val (_, date) = matchResult.groupValues
+                titleRuClassRegex.find(lineIterator.next())?.let { matchResult ->
+                    matchResult.groups["episodeTitle"]?.let { matchGroup ->
+                        dataRecordBuilder.episodeTitle(matchGroup.value)
+                    }
+                }
+                // is this data needed me?
+                // titleEnClassRegex.find(lineIterator.next())?.let { matchResult->
+                // }
+            }
+            expectedClassRegex.find(inputLine)?.let {
+                dataRecordBuilder.episodeState(State.EXPECTED)
+            }
+            dateRegex.find(inputLine)?.let { matchResult ->
+                matchResult.groups["dateReleased"]?.let { matchGroup ->
                     dataRecordBuilder.episodeDate(
                         LocalDateTime.of(
-                            LocalDate.parse(date, dateFormat),
+                            LocalDate.parse(matchGroup.value, dateFormat),
                             LocalTime.MIN
                         )
                     )
                 }
-
-                IMG_TAG_PATTERN.find(lineIterator.next())?.let { matchResult ->
-                    val (_, posterLink) = matchResult.groupValues
-                    dataRecordBuilder.moviePosterLink(URI.create(posterLink))
-                }
-
-                dataList.add(dataRecordBuilder.build())
+                return dataRecordBuilder.build()
             }
         }
-
-        return dataList
+        throw Exception("No record produced for $url")
     }
 }

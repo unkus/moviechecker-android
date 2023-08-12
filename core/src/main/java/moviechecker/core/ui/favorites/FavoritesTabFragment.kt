@@ -5,10 +5,13 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
+import dagger.hilt.android.AndroidEntryPoint
 import moviechecker.core.CheckerApplication
 import moviechecker.core.R
 
+@AndroidEntryPoint
 class FavoritesTabFragment : Fragment(R.layout.fragment_tab) {
+
     private val viewModel: FavoritesViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
