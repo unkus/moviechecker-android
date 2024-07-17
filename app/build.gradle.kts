@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.moviechecker"
+    namespace = "ru.moviechecker"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.moviechecker"
+        applicationId = "ru.moviechecker"
         minSdk = 33
         targetSdk = 33
         versionCode = 1

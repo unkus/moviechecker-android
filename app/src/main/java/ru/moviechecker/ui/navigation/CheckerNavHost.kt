@@ -1,0 +1,65 @@
+package ru.moviechecker.ui.navigation
+
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import ru.moviechecker.ui.episode.EpisodeDetailsDestination
+import ru.moviechecker.ui.episode.EpisodeDetailsScreen
+import ru.moviechecker.ui.episode.EpisodeEditDestination
+import ru.moviechecker.ui.episode.EpisodeEditScreen
+import ru.moviechecker.ui.episode.EpisodeEntryDestination
+import ru.moviechecker.ui.episode.EpisodeEntryScreen
+import ru.moviechecker.ui.home.HomeDestination
+import ru.moviechecker.ui.home.HomeScreen
+
+@Composable
+fun CheckerNavHost(
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
+) {
+    NavHost(
+        navController = navController,
+        startDestination = HomeDestination.route,
+        modifier = modifier
+    ) {
+        composable(route = HomeDestination.route) {
+            HomeScreen(
+                navigateToEpisodeUpdate = {
+                    navController.navigate("${EpisodeDetailsDestination.route}/${it}")
+                }
+            )
+        }
+        composable(route = EpisodeEntryDestination.route) {
+            EpisodeEntryScreen(
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() }
+            )
+        }
+        composable(
+            route = EpisodeDetailsDestination.routeWithArgs,
+            arguments = listOf(navArgument(EpisodeDetailsDestination.episodeIdArg) {
+                type = NavType.IntType
+            })
+        ) {
+            EpisodeDetailsScreen(
+                navigateToEditEpisode = { navController.navigate("${EpisodeEditDestination.route}/$it") },
+                navigateBack = { navController.navigateUp() }
+            )
+        }
+        composable(
+            route = EpisodeEditDestination.routeWithArgs,
+            arguments = listOf(navArgument(EpisodeEditDestination.episodeIdArg) {
+                type = NavType.IntType
+            })
+        ) {
+            EpisodeEditScreen(
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() }
+            )
+        }
+    }
+}
