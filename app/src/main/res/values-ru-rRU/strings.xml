@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">moviechecker</string>
+    <string name="back_button">Назад</string>
+    <string name="episode_detail_title">Детали</string>
+    <string name="edit_episode_title">Редактировать</string>
+    <string name="delete">Удалить</string>
+    <string name="date">Дата</string>
+    <string name="episode">Серия</string>
+    <string name="title">Заголовок</string>
+    <string name="attention">Внимание</string>
+    <string name="delete_question">Вы уверены что хотите удлать?</string>
+    <string name="no">Нет</string>
+    <string name="yes">Да</string>
+    <string name="open_in_browser">Открыть в браузере</string>
+    <string name="save_action">Сохранить</string>
+    <string name="episode_entry_title">Добавить</string>
+    <string name="episode_title_req">Название*</string>
+    <string name="episode_number_req">Серия*</string>
+    <string name="episode_link_req">Ссылка*</string>
+    <string name="episode_date_req">Дата*</string>
+    <string name="episode_state_req">Статус*</string>
+    <string name="required_fields">*обязательные поля</string>
+    <string name="link">Ссылка</string>
+    <string name="state">Статус</string>
+    <string name="add_to_favorites">Добавить в избранные</string>
+    <string name="remove_from_favorites">Убрать из избранных</string>
+    <string name="today_time">Сегодня %s</string>
+    <string name="today_unstable">Сегодня, не стабильно</string>
+    <string name="tomorrow_time">Завтра %s</string>
+    <string name="yesterday_time">Вчера %s</string>
+    <string name="season_serial_number">Сезон №%d</string>
+    <string name="episode_serial_number">Серия №%d</string>
+    <string name="episode_serial_number_titled">%s (%d)</string>
+    <string name="cleanup">Очистка</string>
+    <string name="in_favorites">В избранном</string>
+    <string name="not_in_favorites">Не в избранном</string>
+    <string name="episode_viewed">Просмотрено</string>
+    <string name="poster_error">"Не могу отобразить постер"</string>
+</resources>

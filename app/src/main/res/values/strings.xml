@@ -1,0 +1,41 @@
+<resources>
+    <string name="app_name">moviechecker</string>
+    <string name="back_button">Back</string>
+    <string name="episode_detail_title">" Details"</string>
+    <string name="edit_episode_title">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="date">Date</string>
+    <string name="episode">Episode</string>
+    <string name="title">Title</string>
+    <string name="attention">Attention</string>
+    <string name="delete_question">Are you sure you want to delete?</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="open_in_browser">Open In Browser</string>
+    <string name="save_action">Save</string>
+    <string name="episode_entry_title">Add</string>
+    <string name="episode_title_req">Title*</string>
+    <string name="episode_number_req">Number*</string>
+    <string name="episode_link_req">Link*</string>
+    <string name="episode_date_req">Date*</string>
+    <string name="episode_state_req">State*</string>
+    <string name="required_fields">*required fields</string>
+    <string name="link">Link</string>
+    <string name="state">State</string>
+    <string name="add_to_favorites">Add To Favorites</string>
+    <string name="remove_from_favorites">Remove From Favorites</string>
+    <string name="today_time">Today %s</string>
+    <string name="today_unstable">Today unstable</string>
+    <string name="tomorrow_time">Tomorrow %s</string>
+    <string name="yesterday_time">Yesterday %s</string>
+    <string name="date_time" formatted="false" translatable="false">%s %s</string>
+    <string name="edit_button_text" translatable="false">…</string>
+    <string name="season_serial_number">Season #%d</string>
+    <string name="episode_serial_number">Episode #%d</string>
+    <string name="episode_serial_number_titled">%s (%d)</string>
+    <string name="cleanup">Cleanup</string>
+    <string name="in_favorites">In favorites</string>
+    <string name="not_in_favorites">Out of favorites</string>
+    <string name="episode_viewed">Viewed</string>
+    <string name="poster_error">Unable to process poster data</string>
+</resources>
