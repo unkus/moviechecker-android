@@ -10,14 +10,9 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.AutoMigrationSpec
 import androidx.sqlite.db.SupportSQLiteDatabase
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import ru.moviechecker.data.source.DataRecord
-import ru.moviechecker.data.source.EpisodeData
-import ru.moviechecker.data.source.MovieData
-import ru.moviechecker.data.source.SeasonData
-import ru.moviechecker.data.source.SiteData
 import ru.moviechecker.database.episodes.EpisodeDao
 import ru.moviechecker.database.episodes.EpisodeEntity
 import ru.moviechecker.database.episodes.EpisodeState
@@ -28,6 +23,11 @@ import ru.moviechecker.database.seasons.SeasonDao
 import ru.moviechecker.database.seasons.SeasonEntity
 import ru.moviechecker.database.sites.SiteDao
 import ru.moviechecker.database.sites.SiteEntity
+import ru.moviechecker.datasource.model.DataRecord
+import ru.moviechecker.datasource.model.EpisodeData
+import ru.moviechecker.datasource.model.MovieData
+import ru.moviechecker.datasource.model.SeasonData
+import ru.moviechecker.datasource.model.SiteData
 import ru.moviechecker.workers.RetrieveDataWorker
 
 
@@ -65,10 +65,11 @@ abstract class CheckerDatabase : RoomDatabase() {
         @Volatile
         private var Instance: CheckerDatabase? = null
 
-        fun getDatabase(context: Context): CheckerDatabase {
+        fun getDatabase(appContext: Context): CheckerDatabase {
             // if the Instance is not null, return it, otherwise create a new database instance.
             return Instance ?: synchronized(this) {
-                Room.databaseBuilder(context, CheckerDatabase::class.java, "checker.db")
+                Room.databaseBuilder(appContext, CheckerDatabase::class.java, "checker.db")
+//                    .createFromAsset("checker.db")
                     /**
                      * Setting this option in your app's database builder means that Room
                      * permanently deletes all data from the tables in your database when it
@@ -85,8 +86,13 @@ abstract class CheckerDatabase : RoomDatabase() {
                             super.onOpen(db)
                             Log.d(this.javaClass.simpleName, "База данных открыта")
 
-                            WorkManager.getInstance(context)
-                                .enqueue(OneTimeWorkRequest.from(RetrieveDataWorker::class.java))
+                            WorkManager.getInstance(appContext)
+                                .beginUniqueWork(
+                                    RetrieveDataWorker::class.java.simpleName,
+                                    ExistingWorkPolicy.KEEP,
+                                    OneTimeWorkRequest.from(RetrieveDataWorker::class.java)
+                                )
+                                .enqueue()
                         }
                     })
                     .build()

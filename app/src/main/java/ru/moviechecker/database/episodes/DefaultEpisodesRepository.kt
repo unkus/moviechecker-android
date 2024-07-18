@@ -2,7 +2,7 @@ package ru.moviechecker.database.episodes
 
 import kotlinx.coroutines.flow.Flow
 
-class OfflineEpisodesRepository(private val episodeDao: EpisodeDao) : EpisodesRepository {
+class DefaultEpisodesRepository(private val episodeDao: EpisodeDao) : EpisodesRepository {
     override fun getAllStream(): Flow<List<EpisodeEntity>> = episodeDao.getAllEpisodesStream()
     override fun getByIdStream(id: Int): Flow<EpisodeEntity> = episodeDao.getEpisodeById(id)
 

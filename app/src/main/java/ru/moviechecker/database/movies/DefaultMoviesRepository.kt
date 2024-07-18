@@ -1,6 +1,6 @@
 package ru.moviechecker.database.movies
 
-class OfflineMoviesRepository(private val moviesDao: MovieDao) : MoviesRepository {
+class DefaultMoviesRepository(private val moviesDao: MovieDao) : MoviesRepository {
     override suspend fun getById(id: Int): MovieEntity? = moviesDao.getMovieById(id)
     override suspend fun getAll(): List<MovieEntity> = moviesDao.getMovies()
 

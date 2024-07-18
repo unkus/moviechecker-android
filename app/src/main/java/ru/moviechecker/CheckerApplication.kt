@@ -1,10 +1,8 @@
 package ru.moviechecker
 
 import android.app.Application
-import android.util.Log
-import androidx.work.Configuration
 import ru.moviechecker.database.AppContainer
-import ru.moviechecker.database.AppDataContainer
+import ru.moviechecker.database.DefaultAppContainer
 
 class CheckerApplication : Application() {
 
@@ -15,7 +13,7 @@ class CheckerApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        container = AppDataContainer(this)
+        container = DefaultAppContainer(this)
     }
 
 }

@@ -79,6 +79,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -144,7 +145,12 @@ fun HomeScreen(
             FloatingActionButton(
                 onClick = {
                     WorkManager.getInstance(context)
-                        .enqueue(OneTimeWorkRequest.from(CleanupDataWorker::class.java))
+                        .beginUniqueWork(
+                            CleanupDataWorker::class.java.simpleName,
+                            ExistingWorkPolicy.KEEP,
+                            OneTimeWorkRequest.from(CleanupDataWorker::class.java)
+                        )
+                        .enqueue()
                 },
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
@@ -183,13 +189,22 @@ private fun HomeBody(
     showFavorites: Boolean,
     showViewed: Boolean
 ) {
-    val isLoading = false
+    val isRefreshing by remember {
+        mutableStateOf(false)
+    }
     val context = LocalContext.current
 
     val pullRefreshState = rememberPullRefreshState(
-        refreshing = isLoading,
-        onRefresh = { WorkManager.getInstance(context)
-            .enqueue(OneTimeWorkRequest.from(RetrieveDataWorker::class.java)) }
+        refreshing = isRefreshing,
+        onRefresh = {
+            WorkManager.getInstance(context)
+                .beginUniqueWork(
+                    RetrieveDataWorker::class.java.simpleName,
+                    ExistingWorkPolicy.KEEP,
+                    OneTimeWorkRequest.from(RetrieveDataWorker::class.java)
+                )
+                .enqueue()
+        }
     )
 
     Box(
@@ -206,10 +221,10 @@ private fun HomeBody(
             showViewed = showViewed
         )
         PullRefreshIndicator(
-            refreshing = isLoading,
+            refreshing = isRefreshing,
             state = pullRefreshState,
             modifier = Modifier.align(TopCenter),
-            backgroundColor = if (isLoading) Color.Red else Color.Green
+            backgroundColor = if (isRefreshing) Color.Red else Color.Green
         )
     }
 }
@@ -345,7 +360,8 @@ private fun EpisodeItem(
                 }
                 Column {
                     if (episode.seasonTitle == null
-                        || !episode.seasonTitle!!.startsWith(episode.movieTitle)) {
+                        || !episode.seasonTitle!!.startsWith(episode.movieTitle)
+                    ) {
                         Text(
                             text = episode.movieTitle,
                             style = MaterialTheme.typography.titleLarge,
@@ -364,7 +380,7 @@ private fun EpisodeItem(
                     ) {
                         val episodeColor = if (episode.episodeNumber == 1) {
                             Color.Green
-                        } else{
+                        } else {
                             Color.Gray
                         }
                         Text(

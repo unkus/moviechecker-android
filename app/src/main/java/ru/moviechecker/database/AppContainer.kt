@@ -1,10 +1,10 @@
 package ru.moviechecker.database
 
 import android.content.Context
+import ru.moviechecker.database.episodes.DefaultEpisodesRepository
 import ru.moviechecker.database.episodes.EpisodesRepository
-import ru.moviechecker.database.episodes.OfflineEpisodesRepository
+import ru.moviechecker.database.movies.DefaultMoviesRepository
 import ru.moviechecker.database.movies.MoviesRepository
-import ru.moviechecker.database.movies.OfflineMoviesRepository
 
 /**
  * App container for Dependency injection.
@@ -15,17 +15,15 @@ interface AppContainer {
 }
 
 /**
- * [AppContainer] implementation that provides instance of [OfflineEpisodesRepository]
+ * [AppContainer] implementation that provides instance of [DefaultEpisodesRepository]
  */
-class AppDataContainer(private val context: Context) : AppContainer {
-    /**
-     * Implementation for [EpisodesRepository]
-     */
+class DefaultAppContainer(private val context: Context) : AppContainer {
+
     override val episodesRepository: EpisodesRepository by lazy {
-        OfflineEpisodesRepository(CheckerDatabase.getDatabase(context).episodeDao())
+        DefaultEpisodesRepository(CheckerDatabase.getDatabase(context).episodeDao())
     }
 
     override val moviesRepository: MoviesRepository by lazy {
-        OfflineMoviesRepository(CheckerDatabase.getDatabase(context).movieDao())
+        DefaultMoviesRepository(CheckerDatabase.getDatabase(context).movieDao())
     }
 }

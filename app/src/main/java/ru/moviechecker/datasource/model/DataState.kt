@@ -1,4 +1,4 @@
-package ru.moviechecker.data.source
+package ru.moviechecker.datasource.model
 
 enum class DataState {
     RELEASED, EXPECTED

@@ -1,7 +1,6 @@
-package ru.moviechecker.data.source
+package ru.moviechecker.datasource.model
 
 import android.util.Log
-import ru.moviechecker.data.LostfilmDataSource
 import io.mockk.every
 import io.mockk.mockkStatic
 import kotlinx.coroutines.CoroutineScope
@@ -10,6 +9,7 @@ import kotlinx.coroutines.launch
 import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Test
+import ru.moviechecker.datasource.LostfilmDataSource
 
 class LostfilmDataReceiverTest {
 
