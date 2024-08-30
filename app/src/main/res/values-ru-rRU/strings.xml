@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">moviechecker</string>
+    <string name="app_name">Проверка новых серий</string>
     <string name="back_button">Назад</string>
     <string name="episode_detail_title">Детали</string>
     <string name="edit_episode_title">Редактировать</string>
@@ -9,7 +9,7 @@
     <string name="episode">Серия</string>
     <string name="title">Заголовок</string>
     <string name="attention">Внимание</string>
-    <string name="delete_question">Вы уверены что хотите удлать?</string>
+    <string name="delete_question">Вы уверены что хотите удалить?</string>
     <string name="no">Нет</string>
     <string name="yes">Да</string>
     <string name="open_in_browser">Открыть в браузере</string>

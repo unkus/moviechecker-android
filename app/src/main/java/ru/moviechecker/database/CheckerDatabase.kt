@@ -69,6 +69,7 @@ abstract class CheckerDatabase : RoomDatabase() {
             // if the Instance is not null, return it, otherwise create a new database instance.
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(appContext, CheckerDatabase::class.java, "checker.db")
+                        // Раскомментировать для загрузки базы из файла
 //                    .createFromAsset("checker.db")
                     /**
                      * Setting this option in your app's database builder means that Room
@@ -109,8 +110,7 @@ abstract class CheckerDatabase : RoomDatabase() {
             // Site
             val site = processSiteData(siteDao(), record.site)
             // Movie
-            val movie =
-                processMovieData(movieDao(), site.id, record.movie)
+            val movie = processMovieData(movieDao(), site.id, record.movie)
             // Season
             val season = processSeasonData(seasonDao(), movie.id, record.season)
             // Episode

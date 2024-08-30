@@ -241,10 +241,6 @@ private fun EpisodeList(
     showNonFavorites: Boolean,
     showViewed: Boolean
 ) {
-    Log.d("TEST", "начало ${episodeList.size}")
-    episodeList.forEach {
-        Log.d("TEST", it.toString())
-    }
     val context = LocalContext.current
     LazyColumn(modifier = modifier) {
         items(items = episodeList, key = { it.episodeId }) { episodeView ->
