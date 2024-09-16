@@ -43,8 +43,8 @@ class HomeViewModel(
      */
     val homeUiState: StateFlow<HomeUiState> =
         episodesRepository.getReleasedEpisodesViewStream().map {
-            Log.d(this.javaClass.simpleName, "фильмов: ${moviesRepository.getAll().size}")
-            Log.d(this.javaClass.simpleName, "серий: ${it.size}")
+            Log.d(this.javaClass.simpleName, "Фильмов в базе: ${moviesRepository.getCount()}")
+            Log.d(this.javaClass.simpleName, "Серий в базе: ${it.size}")
             HomeUiState(it)
         }
             .stateIn(

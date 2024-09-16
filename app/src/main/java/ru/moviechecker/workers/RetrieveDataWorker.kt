@@ -7,6 +7,7 @@ import androidx.work.WorkerParameters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ru.moviechecker.database.CheckerDatabase
+import ru.moviechecker.datasource.AmediaDataSource
 import ru.moviechecker.datasource.LostfilmDataSource
 
 class RetrieveDataWorker(appContext: Context, workerParams: WorkerParameters) :
@@ -19,10 +20,11 @@ class RetrieveDataWorker(appContext: Context, workerParams: WorkerParameters) :
 
             Log.d(
                 this.javaClass.simpleName,
-                "фильмов в базе ${database.movieDao().getMovies().size}"
+                "Фильмов в базе ${database.movieDao().getCount()}"
             )
 
             database.populateDatabase(LostfilmDataSource().retrieveData())
+            database.populateDatabase(AmediaDataSource().retrieveData())
 
             Result.success()
         } catch (ex: Exception) {

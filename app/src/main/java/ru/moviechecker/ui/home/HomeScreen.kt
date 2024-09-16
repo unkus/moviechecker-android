@@ -295,7 +295,6 @@ private fun EpisodeItem(
                 Column(modifier = Modifier.wrapContentWidth()) {
                     Row {
                         val imageData = episode.seasonPoster ?: episode.moviePoster
-                        Log.d(this.javaClass.simpleName, "imageData: ${imageData?.size}")
                         var image: ImageBitmap? = null
                         imageData?.let {
                             try {

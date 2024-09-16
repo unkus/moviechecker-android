@@ -15,6 +15,8 @@ interface MovieDao {
     suspend fun getMovieById(id: Int): MovieEntity?
     @Query("SELECT * FROM movies m")
     suspend fun getMovies(): List<MovieEntity>
+    @Query("SELECT count(*) FROM movies m")
+    suspend fun getCount(): Int
     @Query("SELECT * FROM movies m WHERE m.site_id = :siteId AND m.page_id = :pageId")
     suspend fun getMovieBySiteIdAndPageId(siteId: Int, pageId: String): MovieEntity?
 
