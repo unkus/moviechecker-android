@@ -63,6 +63,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -72,6 +74,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -79,9 +82,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import kotlinx.coroutines.launch
 import ru.moviechecker.CheckerTopAppBar
 import ru.moviechecker.R
 import ru.moviechecker.database.episodes.EpisodeState
@@ -188,23 +196,41 @@ private fun HomeBody(
     showFavorites: Boolean,
     showViewed: Boolean
 ) {
-    val isRefreshing by remember {
-        mutableStateOf(false)
-    }
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val refreshScope = rememberCoroutineScope()
+    var refreshing by remember { mutableStateOf(false) }
 
-    val pullRefreshState = rememberPullRefreshState(
-        refreshing = isRefreshing,
-        onRefresh = {
-            WorkManager.getInstance(context)
-                .beginUniqueWork(
-                    RetrieveDataWorker::class.java.simpleName,
-                    ExistingWorkPolicy.KEEP,
-                    OneTimeWorkRequest.from(RetrieveDataWorker::class.java)
-                )
-                .enqueue()
-        }
-    )
+    fun refresh() = refreshScope.launch {
+        refreshing = true
+
+        val workManager = WorkManager.getInstance(context);
+        val workRequest = OneTimeWorkRequestBuilder<RetrieveDataWorker>()
+            .setConstraints(
+                Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .setRequiresStorageNotLow(true)
+                    .build()
+            )
+            .build()
+        workManager
+            .beginUniqueWork(
+                RetrieveDataWorker::class.java.simpleName,
+                ExistingWorkPolicy.KEEP,
+                workRequest
+            )
+            .enqueue()
+
+        workManager.getWorkInfoByIdLiveData(workRequest.id)
+            .observe(lifecycleOwner) { workInfo ->
+                Log.d(this.javaClass.simpleName, "Статус обновления: $workInfo")
+                refreshing = workInfo == null
+                        || workInfo.state == WorkInfo.State.RUNNING
+                        || workInfo.state == WorkInfo.State.ENQUEUED
+            }
+    }
+
+    val pullRefreshState = rememberPullRefreshState(refreshing, ::refresh)
 
     Box(
         modifier = modifier.pullRefresh(pullRefreshState)
@@ -220,10 +246,10 @@ private fun HomeBody(
             showViewed = showViewed
         )
         PullRefreshIndicator(
-            refreshing = isRefreshing,
+            refreshing = refreshing,
             state = pullRefreshState,
             modifier = Modifier.align(TopCenter),
-            backgroundColor = if (isRefreshing) Color.Red else Color.Green
+            backgroundColor = if (refreshing) Color.Red else Color.Green
         )
     }
 }
