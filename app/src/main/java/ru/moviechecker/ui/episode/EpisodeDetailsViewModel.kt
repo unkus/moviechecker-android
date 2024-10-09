@@ -19,6 +19,7 @@ package ru.moviechecker.ui.episode
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import ru.moviechecker.database.episodes.EpisodeState
 import ru.moviechecker.database.episodes.EpisodesRepository
 import kotlinx.coroutines.flow.SharingStarted
@@ -59,7 +60,7 @@ class EpisodeDetailsViewModel(
      * Mark the episode viewed.
      */
     fun setViewed() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val currentEpisode = uiState.value.episodeDetails.toEntity()
             currentEpisode.state = EpisodeState.VIEWED
             episodesRepository.updateEpisode(currentEpisode)
@@ -70,7 +71,7 @@ class EpisodeDetailsViewModel(
      * Add the episode to favorites
      */
     fun addToFavorites() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val currentEpisode = uiState.value.episodeDetails.toEntity()
             episodesRepository.updateEpisode(currentEpisode)
         }
@@ -80,7 +81,7 @@ class EpisodeDetailsViewModel(
      * Remove the episode from favorites
      */
     fun removeFromFavorites() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val currentEpisode = uiState.value.episodeDetails.toEntity()
             episodesRepository.updateEpisode(currentEpisode)
         }
@@ -90,7 +91,9 @@ class EpisodeDetailsViewModel(
      * Deletes the episode from the [EpisodesRepository]'s data source.
      */
     suspend fun deleteEpisode() {
-        episodesRepository.deleteEpisode(uiState.value.episodeDetails.toEntity())
+        viewModelScope.launch(Dispatchers.IO) {
+            episodesRepository.deleteEpisode(uiState.value.episodeDetails.toEntity())
+        }
     }
 
     companion object {

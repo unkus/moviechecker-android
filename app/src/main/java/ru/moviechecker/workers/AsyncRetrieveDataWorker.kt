@@ -2,18 +2,26 @@ package ru.moviechecker.workers
 
 import android.content.Context
 import android.util.Log
-import androidx.work.Worker
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import ru.moviechecker.database.CheckerDatabase
 import ru.moviechecker.datasource.AmediaDataSource
 import ru.moviechecker.datasource.LostfilmDataSource
 
-class RetrieveDataWorker(appContext: Context, workerParams: WorkerParameters) :
-    Worker(appContext, workerParams) {
-    override fun doWork(): Result {
+class AsyncRetrieveDataWorker(appContext: Context, workerParams: WorkerParameters) :
+    CoroutineWorker(appContext, workerParams) {
+
+    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         Log.d(this.javaClass.simpleName, "Получаем данные")
-        return try {
+        return@withContext try {
             val database = CheckerDatabase.getDatabase(applicationContext)
+
+            Log.d(
+                this.javaClass.simpleName,
+                "Фильмов в базе ${database.movieDao().getCount()}"
+            )
 
             database.populateDatabase(LostfilmDataSource().retrieveData())
             database.populateDatabase(AmediaDataSource().retrieveData())
@@ -24,6 +32,4 @@ class RetrieveDataWorker(appContext: Context, workerParams: WorkerParameters) :
             Result.failure()
         }
     }
-
-
 }

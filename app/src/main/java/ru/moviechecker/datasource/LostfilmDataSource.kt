@@ -72,7 +72,7 @@ class LostfilmDataSource : DataSource {
     private val dateFormat =
         DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.forLanguageTag("ru-RU"))
 
-    override suspend fun retrieveData(): Collection<DataRecord> {
+    override fun retrieveData(): Collection<DataRecord> {
         Log.i(this.javaClass.simpleName, "Получаем данные от ${site.address}")
         val recordList = mutableSetOf<DataRecord>()
 

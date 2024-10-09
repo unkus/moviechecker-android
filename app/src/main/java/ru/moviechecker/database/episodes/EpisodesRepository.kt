@@ -10,9 +10,9 @@ interface EpisodesRepository {
     fun getExpectedEpisodesViewStream(): Flow<List<IEpisodeView>>
     fun getReleasedEpisodesViewStream(): Flow<List<IEpisodeView>>
 
-    suspend fun getById(id: Int): EpisodeEntity?
+    fun getById(id: Int): EpisodeEntity?
 
-    suspend fun insertEpisode(episode: EpisodeEntity)
-    suspend fun updateEpisode(episode: EpisodeEntity)
-    suspend fun deleteEpisode(episode: EpisodeEntity)
+    fun insertEpisode(episode: EpisodeEntity)
+    fun updateEpisode(episode: EpisodeEntity)
+    fun deleteEpisode(episode: EpisodeEntity)
 }

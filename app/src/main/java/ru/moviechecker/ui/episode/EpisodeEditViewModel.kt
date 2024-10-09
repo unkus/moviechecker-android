@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import ru.moviechecker.database.episodes.EpisodesRepository
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -44,7 +45,7 @@ class EpisodeEditViewModel(
     private val episodeId: Int = checkNotNull(savedStateHandle[EpisodeEditDestination.episodeIdArg])
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             episodeUiState = episodesRepository.getByIdStream(episodeId)
                 .filterNotNull()
                 .first()
@@ -57,7 +58,9 @@ class EpisodeEditViewModel(
      */
     suspend fun updateEpisode() {
         if (validateInput(episodeUiState.episodeDetails)) {
-            episodesRepository.updateEpisode(episodeUiState.episodeDetails.toEntity())
+            viewModelScope.launch(Dispatchers.IO) {
+                episodesRepository.updateEpisode(episodeUiState.episodeDetails.toEntity())
+            }
         }
     }
 

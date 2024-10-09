@@ -16,18 +16,18 @@
 
 package ru.moviechecker.ui.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ru.moviechecker.database.episodes.EpisodeState
-import ru.moviechecker.database.episodes.EpisodesRepository
-import ru.moviechecker.database.episodes.IEpisodeView
-import ru.moviechecker.database.movies.MoviesRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import ru.moviechecker.database.episodes.EpisodeState
+import ru.moviechecker.database.episodes.EpisodesRepository
+import ru.moviechecker.database.episodes.IEpisodeView
+import ru.moviechecker.database.movies.MoviesRepository
 
 /**
  * ViewModel to retrieve all items in the Room database.
@@ -43,8 +43,6 @@ class HomeViewModel(
      */
     val homeUiState: StateFlow<HomeUiState> =
         episodesRepository.getReleasedEpisodesViewStream().map {
-            Log.d(this.javaClass.simpleName, "Фильмов в базе: ${moviesRepository.getCount()}")
-            Log.d(this.javaClass.simpleName, "Серий в базе: ${it.size}")
             HomeUiState(it)
         }
             .stateIn(
@@ -61,7 +59,7 @@ class HomeViewModel(
      * Mark the episode viewed.
      */
     fun markEpisodeViewed(id: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             episodesRepository.getById(id)?.let {
                 it.state = EpisodeState.VIEWED
                 episodesRepository.updateEpisode(it)
@@ -73,7 +71,7 @@ class HomeViewModel(
      * Mark/unmark the movie as favorite.
      */
     fun switchFavoritesMark(id: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             moviesRepository.getById(id)?.let {
                 it.favoritesMark = !it.favoritesMark
                 moviesRepository.updateMovie(it)
@@ -85,7 +83,7 @@ class HomeViewModel(
      * Mark/unmark the episode as viewed.
      */
     fun switchViewedMark(id: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             episodesRepository.getById(id)?.let {
                 if (EpisodeState.VIEWED == it.state) {
                     it.state = EpisodeState.RELEASED;

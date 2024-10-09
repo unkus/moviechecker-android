@@ -10,12 +10,12 @@ import androidx.room.Update
 @Dao
 interface SeasonDao {
     @Query("SELECT * FROM seasons s WHERE s.movie_id = :movieId AND s.number = :number")
-    suspend fun getSeasonByMovieIdAndNumber(movieId: Int, number: Int): SeasonEntity?
+    fun getSeasonByMovieIdAndNumber(movieId: Int, number: Int): SeasonEntity?
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(vararg seasons: SeasonEntity)
+    fun insert(vararg seasons: SeasonEntity)
     @Update
-    suspend fun update(vararg seasons: SeasonEntity)
+    fun update(vararg seasons: SeasonEntity)
     @Delete
-    suspend fun delete(vararg season: SeasonEntity)
+    fun delete(vararg season: SeasonEntity)
 }

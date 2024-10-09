@@ -11,12 +11,12 @@ import java.net.URI
 @Dao
 interface SiteDao {
     @Query("SELECT * FROM sites s WHERE s.address = :address")
-    suspend fun getSiteByAddress(address: URI): SiteEntity?
+    fun getSiteByAddress(address: URI): SiteEntity?
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(vararg sites: SiteEntity)
+    fun insert(vararg sites: SiteEntity)
     @Update
-    suspend fun update(vararg sites: SiteEntity)
+    fun update(vararg sites: SiteEntity)
     @Delete
-    suspend fun delete(vararg sites: SiteEntity)
+    fun delete(vararg sites: SiteEntity)
 }

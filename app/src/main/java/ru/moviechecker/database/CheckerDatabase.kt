@@ -70,7 +70,7 @@ abstract class CheckerDatabase : RoomDatabase() {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(appContext, CheckerDatabase::class.java, "checker.db")
                         // Раскомментировать для загрузки базы из файла
-//                    .createFromAsset("checker.db")
+                    .createFromAsset("checker.db")
                     /**
                      * Setting this option in your app's database builder means that Room
                      * permanently deletes all data from the tables in your database when it
@@ -87,13 +87,13 @@ abstract class CheckerDatabase : RoomDatabase() {
                             super.onOpen(db)
                             Log.d(this.javaClass.simpleName, "База данных открыта")
 
-                            WorkManager.getInstance(appContext)
-                                .beginUniqueWork(
-                                    RetrieveDataWorker::class.java.simpleName,
-                                    ExistingWorkPolicy.KEEP,
-                                    OneTimeWorkRequest.from(RetrieveDataWorker::class.java)
-                                )
-                                .enqueue()
+//                            WorkManager.getInstance(appContext)
+//                                .beginUniqueWork(
+//                                    RetrieveDataWorker::class.java.simpleName,
+//                                    ExistingWorkPolicy.KEEP,
+//                                    OneTimeWorkRequest.from(RetrieveDataWorker::class.java)
+//                                )
+//                                .enqueue()
                         }
                     })
                     .build()
@@ -104,7 +104,7 @@ abstract class CheckerDatabase : RoomDatabase() {
         }
     }
 
-    suspend fun populateDatabase(records: Collection<DataRecord>) {
+    fun populateDatabase(records: Collection<DataRecord>) {
         Log.d(this.javaClass.simpleName, "Получено ${records.size} записей")
         records.forEach { record ->
             // Site
@@ -118,7 +118,7 @@ abstract class CheckerDatabase : RoomDatabase() {
         }
     }
 
-    private suspend fun processSiteData(
+    private fun processSiteData(
         siteDao: SiteDao,
         siteData: SiteData
     ): SiteEntity {
@@ -130,7 +130,7 @@ abstract class CheckerDatabase : RoomDatabase() {
         return siteDao.getSiteByAddress(siteData.address)!!
     }
 
-    private suspend fun processMovieData(
+    private fun processMovieData(
         movieDao: MovieDao,
         siteId: Int,
         movieData: MovieData
@@ -157,7 +157,7 @@ abstract class CheckerDatabase : RoomDatabase() {
         return movieDao.getMovieBySiteIdAndPageId(siteId, movieData.pageId)!!
     }
 
-    private suspend fun processSeasonData(
+    private fun processSeasonData(
         seasonDao: SeasonDao,
         movieId: Int,
         seasonData: SeasonData
@@ -184,7 +184,7 @@ abstract class CheckerDatabase : RoomDatabase() {
         return seasonDao.getSeasonByMovieIdAndNumber(movieId, seasonData.number)!!
     }
 
-    private suspend fun processEpisodeData(
+    private fun processEpisodeData(
         episodeDao: EpisodeDao,
         seasonId: Int,
         episodeData: EpisodeData
@@ -215,7 +215,7 @@ abstract class CheckerDatabase : RoomDatabase() {
         )
     }
 
-    suspend fun cleanupData() {
+    fun cleanupData() {
         // удаляем все что не отмечено как избранное
         movieDao().getMoviesByFavoriteMark(false).forEach { movieDao().delete(it) }
 

@@ -26,16 +26,16 @@ interface EpisodeDao {
     fun getReleasedEpisodesViewStream(): Flow<List<EpisodeView>>
 
     @Query("SELECT * FROM episodes e WHERE e.id = :id")
-    suspend fun getById(id: Int): EpisodeEntity?
+    fun getById(id: Int): EpisodeEntity?
     @Query("SELECT * FROM episodes e WHERE e.season_id = :seasonId AND e.number = :number")
-    suspend fun getBySeasonIdAndNumber(seasonId: Int, number: Int): EpisodeEntity?
+    fun getBySeasonIdAndNumber(seasonId: Int, number: Int): EpisodeEntity?
     @Query("SELECT * FROM episodes e WHERE e.state = :state ORDER BY e.season_id, e.number ASC")
-    suspend fun getByStateSortByNumberAsc(state: EpisodeState): List<EpisodeEntity>
+    fun getByStateSortByNumberAsc(state: EpisodeState): List<EpisodeEntity>
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(vararg episodes: EpisodeEntity)
+    fun insert(vararg episodes: EpisodeEntity)
     @Update
-    suspend fun update(vararg episodes: EpisodeEntity)
+    fun update(vararg episodes: EpisodeEntity)
     @Delete
-    suspend fun delete(vararg episodes: EpisodeEntity)
+    fun delete(vararg episodes: EpisodeEntity)
 }

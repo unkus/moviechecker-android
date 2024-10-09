@@ -8,7 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ru.moviechecker.database.CheckerDatabase
 
-class CleanupDataWorker(appContext: Context, workerParams: WorkerParameters) :
+class AsyncCleanupDataWorker(appContext: Context, workerParams: WorkerParameters) :
     CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {

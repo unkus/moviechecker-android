@@ -20,6 +20,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.moviechecker.database.episodes.EpisodeEntity
 import ru.moviechecker.database.episodes.EpisodeState
 import ru.moviechecker.database.episodes.EpisodesRepository
@@ -53,7 +56,9 @@ class EpisodeEntryViewModel(private val episodesRepository: EpisodesRepository) 
      */
     suspend fun saveEpisode() {
         if (validateInput()) {
-            episodesRepository.insertEpisode(episodeUiState.episodeDetails.toEntity())
+            viewModelScope.launch(Dispatchers.IO) {
+                episodesRepository.insertEpisode(episodeUiState.episodeDetails.toEntity())
+            }
         }
     }
 

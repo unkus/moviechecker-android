@@ -81,7 +81,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import ru.moviechecker.CheckerTopAppBar
 import ru.moviechecker.R
@@ -91,7 +90,7 @@ import ru.moviechecker.database.episodes.IEpisodeView
 import ru.moviechecker.ui.AppViewModelProvider
 import ru.moviechecker.ui.navigation.NavigationDestination
 import ru.moviechecker.ui.theme.MoviecheckerTheme
-import ru.moviechecker.workers.CleanupDataWorker
+import ru.moviechecker.workers.AsyncCleanupDataWorker
 import ru.moviechecker.workers.RetrieveDataWorker
 import java.net.URI
 import java.time.LocalDate
@@ -146,9 +145,9 @@ fun HomeScreen(
                 onClick = {
                     WorkManager.getInstance(context)
                         .beginUniqueWork(
-                            CleanupDataWorker::class.java.simpleName,
+                            AsyncCleanupDataWorker::class.java.simpleName,
                             ExistingWorkPolicy.KEEP,
-                            OneTimeWorkRequest.from(CleanupDataWorker::class.java)
+                            OneTimeWorkRequest.from(AsyncCleanupDataWorker::class.java)
                         )
                         .enqueue()
                 },
