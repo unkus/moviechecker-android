@@ -70,7 +70,7 @@ abstract class CheckerDatabase : RoomDatabase() {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(appContext, CheckerDatabase::class.java, "checker.db")
                         // Раскомментировать для загрузки базы из файла
-                    .createFromAsset("checker.db")
+//                    .createFromAsset("checker.db")
                     /**
                      * Setting this option in your app's database builder means that Room
                      * permanently deletes all data from the tables in your database when it
@@ -87,13 +87,13 @@ abstract class CheckerDatabase : RoomDatabase() {
                             super.onOpen(db)
                             Log.d(this.javaClass.simpleName, "База данных открыта")
 
-//                            WorkManager.getInstance(appContext)
-//                                .beginUniqueWork(
-//                                    RetrieveDataWorker::class.java.simpleName,
-//                                    ExistingWorkPolicy.KEEP,
-//                                    OneTimeWorkRequest.from(RetrieveDataWorker::class.java)
-//                                )
-//                                .enqueue()
+                            WorkManager.getInstance(appContext)
+                                .beginUniqueWork(
+                                    RetrieveDataWorker::class.java.simpleName,
+                                    ExistingWorkPolicy.KEEP,
+                                    OneTimeWorkRequest.from(RetrieveDataWorker::class.java)
+                                )
+                                .enqueue()
                         }
                     })
                     .build()

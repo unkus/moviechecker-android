@@ -167,7 +167,7 @@ fun HomeScreen(
                     contentDescription = stringResource(R.string.cleanup)
                 )
             }
-        },
+        }
     ) { innerPadding ->
         HomeBody(
             episodeList = homeUiState.episodeList,
