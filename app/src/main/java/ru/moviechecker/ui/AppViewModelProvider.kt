@@ -27,6 +27,7 @@ import ru.moviechecker.ui.episode.EpisodeDetailsViewModel
 import ru.moviechecker.ui.episode.EpisodeEditViewModel
 import ru.moviechecker.ui.episode.EpisodeEntryViewModel
 import ru.moviechecker.ui.home.HomeViewModel
+import ru.moviechecker.ui.movie.MoviesScreenViewModel
 
 /**
  * Provides Factory to create instance of ViewModel for the entire Checker app
@@ -36,27 +37,38 @@ object AppViewModelProvider {
         // Initializer for EpisodeEditViewModel
         initializer {
             EpisodeEditViewModel(
-                this.createSavedStateHandle(),
-                checkerApplication().container.episodesRepository
+                savedStateHandle = this.createSavedStateHandle(),
+                episodesRepository = checkerApplication().container.episodesRepository
             )
         }
         // Initializer for EpisodeEntryViewModel
         initializer {
-            EpisodeEntryViewModel(checkerApplication().container.episodesRepository)
+            EpisodeEntryViewModel(
+                episodesRepository = checkerApplication().container.episodesRepository
+            )
         }
 
         // Initializer for EpisodeDetailsViewModel
         initializer {
             EpisodeDetailsViewModel(
-                this.createSavedStateHandle(),
-                checkerApplication().container.episodesRepository
+                savedStateHandle = this.createSavedStateHandle(),
+                episodesRepository = checkerApplication().container.episodesRepository
             )
         }
 
         // Initializer for HomeViewModel
         initializer {
-            HomeViewModel(checkerApplication().container.episodesRepository,
-                checkerApplication().container.moviesRepository)
+            HomeViewModel(
+                episodesRepository = checkerApplication().container.episodesRepository,
+                moviesRepository = checkerApplication().container.moviesRepository
+            )
+        }
+
+        initializer {
+            MoviesScreenViewModel(
+                moviesRepository = checkerApplication().container.moviesRepository,
+                episodesRepository = checkerApplication().container.episodesRepository
+            )
         }
     }
 }

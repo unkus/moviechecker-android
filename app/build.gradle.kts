@@ -68,6 +68,12 @@ dependencies {
 
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.test.core.ktx)
+    implementation(libs.androidx.junit.ktx)
+    testImplementation(libs.androidx.ui.test.junit4.android)
+    testImplementation(libs.mockk.android)
+    androidTestImplementation(libs.junit)
+    debugImplementation(libs.androidx.ui.tooling)
 
     ksp(libs.androidx.room.compiler)
 }

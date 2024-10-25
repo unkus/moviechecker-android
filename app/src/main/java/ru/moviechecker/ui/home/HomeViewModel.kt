@@ -60,7 +60,7 @@ class HomeViewModel(
      */
     fun markEpisodeViewed(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            episodesRepository.getById(id)?.let {
+            episodesRepository.findById(id)?.let {
                 it.state = EpisodeState.VIEWED
                 episodesRepository.updateEpisode(it)
             }
@@ -72,7 +72,7 @@ class HomeViewModel(
      */
     fun switchFavoritesMark(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            moviesRepository.getById(id)?.let {
+            moviesRepository.findById(id)?.let {
                 it.favoritesMark = !it.favoritesMark
                 moviesRepository.updateMovie(it)
             }
@@ -84,7 +84,7 @@ class HomeViewModel(
      */
     fun switchViewedMark(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            episodesRepository.getById(id)?.let {
+            episodesRepository.findById(id)?.let {
                 if (EpisodeState.VIEWED == it.state) {
                     it.state = EpisodeState.RELEASED;
                 } else if (EpisodeState.RELEASED == it.state) {

@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -169,7 +170,7 @@ fun HomeScreen(
         HomeBody(
             episodeList = homeUiState.episodeList,
             onEpisodeClick = { viewModel.markEpisodeViewed(it) },
-            onEpisodeLongClick = navigateToEpisodeUpdate,
+            onEpisodeLongClick = {}, //navigateToEpisodeUpdate,
             onFavoriteIconClick = { viewModel.switchFavoritesMark(it) },
             onViewedIconClick = { viewModel.switchViewedMark(it) },
             modifier = modifier
@@ -342,36 +343,18 @@ private fun EpisodeItem(
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        if (episode.movieFavoritesMark) {
-                            Icon(
-                                imageVector = Icons.Default.Favorite,
-                                contentDescription = stringResource(id = R.string.in_favorites),
-                                modifier = Modifier.clickable { onFavoriteIconClick(episode) },
-                                tint = Color.Yellow
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Default.FavoriteBorder,
-                                contentDescription = stringResource(id = R.string.not_in_favorites),
-                                modifier = Modifier.clickable { onFavoriteIconClick(episode) },
-                                tint = Color.Gray
-                            )
-                        }
-                        if (episode.episodeState == EpisodeState.VIEWED) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = stringResource(R.string.episode_viewed),
-                                modifier = Modifier.clickable { onViewedIconClick(episode) },
-                                tint = Color.Green
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = stringResource(R.string.episode_viewed),
-                                modifier = Modifier.clickable { onViewedIconClick(episode) },
-                                tint = Color.Gray
-                            )
-                        }
+                        Icon(
+                            imageVector = if (episode.movieFavoritesMark) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            contentDescription = null,
+                            modifier = Modifier.clickable { onFavoriteIconClick(episode) },
+                            tint = if (episode.movieFavoritesMark) Color.Yellow else Color.Gray
+                        )
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null,
+                            modifier = Modifier.clickable { onViewedIconClick(episode) },
+                            tint = if (episode.episodeState == EpisodeState.VIEWED) Color.Green else Color.Gray
+                        )
                     }
                 }
                 Column {

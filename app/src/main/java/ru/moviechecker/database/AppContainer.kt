@@ -15,7 +15,7 @@ interface AppContainer {
 }
 
 /**
- * [AppContainer] implementation that provides instance of [DefaultEpisodesRepository]
+ * [AppContainer] implementation that provides instance of [EpisodesRepository] and [MoviesRepository]
  */
 class DefaultAppContainer(private val context: Context) : AppContainer {
 

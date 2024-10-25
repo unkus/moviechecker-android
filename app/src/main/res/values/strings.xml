@@ -34,8 +34,6 @@
     <string name="episode_serial_number">Episode #%d</string>
     <string name="episode_serial_number_titled">%s (%d)</string>
     <string name="cleanup">Cleanup</string>
-    <string name="in_favorites">In favorites</string>
-    <string name="not_in_favorites">Out of favorites</string>
-    <string name="episode_viewed">Viewed</string>
     <string name="poster_error">Unable to process poster data</string>
+    <string name="movies_title">Movies</string>
 </resources>

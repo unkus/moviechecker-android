@@ -16,13 +16,13 @@ interface EpisodeDao {
     @Query("SELECT * FROM episodes e WHERE e.id = :id")
     fun getEpisodeById(id: Int): Flow<EpisodeEntity>
 
-    @Query("SELECT * FROM EpisodeView v ORDER BY v.episodeDate DESC")
+    @Query("SELECT * FROM v_episodes v ORDER BY v.episodeDate DESC")
     fun getAllEpisodesViewStream(): Flow<List<EpisodeView>>
 
-    @Query("SELECT * FROM EpisodeView v WHERE v.episodeState = 'EXPECTED' ORDER BY v.episodeDate ASC")
+    @Query("SELECT * FROM v_episodes v WHERE v.episodeState = 'EXPECTED' ORDER BY v.episodeDate ASC")
     fun getExpectedEpisodesViewStream(): Flow<List<EpisodeView>>
 
-    @Query("SELECT * FROM EpisodeView v WHERE v.episodeState = 'RELEASED' OR v.episodeState = 'VIEWED' ORDER BY v.episodeDate DESC")
+    @Query("SELECT * FROM v_episodes v WHERE v.episodeState = 'RELEASED' OR v.episodeState = 'VIEWED' ORDER BY v.episodeDate DESC")
     fun getReleasedEpisodesViewStream(): Flow<List<EpisodeView>>
 
     @Query("SELECT * FROM episodes e WHERE e.id = :id")

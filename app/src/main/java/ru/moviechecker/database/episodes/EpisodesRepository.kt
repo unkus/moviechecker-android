@@ -10,7 +10,7 @@ interface EpisodesRepository {
     fun getExpectedEpisodesViewStream(): Flow<List<IEpisodeView>>
     fun getReleasedEpisodesViewStream(): Flow<List<IEpisodeView>>
 
-    fun getById(id: Int): EpisodeEntity?
+    fun findById(id: Int): EpisodeEntity?
 
     fun insertEpisode(episode: EpisodeEntity)
     fun updateEpisode(episode: EpisodeEntity)

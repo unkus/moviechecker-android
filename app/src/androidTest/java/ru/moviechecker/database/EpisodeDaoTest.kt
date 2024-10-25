@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import ru.moviechecker.database.CheckerDatabase
 import ru.moviechecker.database.episodes.EpisodeDao
 import ru.moviechecker.database.episodes.EpisodeEntity
 import ru.moviechecker.database.episodes.EpisodeState

@@ -10,12 +10,16 @@ import java.net.URI
 data class MovieEntity(
     @PrimaryKey(autoGenerate = true)
     override val id: Int = 0,
-    @ColumnInfo(name = "site_id") override val siteId: Int = 0,
-    @ColumnInfo(name = "page_id") override val pageId: String,
+    @ColumnInfo(name = "site_id")
+    override val siteId: Int = 0,
+    @ColumnInfo(name = "page_id")
+    override val pageId: String,
     override var title: String,
     override var link: URI? = null,
-    @ColumnInfo(typeAffinity = ColumnInfo.BLOB) override var poster: ByteArray? = null,
-    @ColumnInfo(name = "favorites_mark") override var favoritesMark: Boolean = false
+    @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
+    override var poster: ByteArray? = null,
+    @ColumnInfo(name = "favorites_mark")
+    override var favoritesMark: Boolean = false
 ) : IMovie {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -66,7 +66,7 @@ fun CheckerTopAppBar(
             }) {
                 Icon(
                     imageVector = if (nonFavoritesVisibilityState.value) Icons.Default.FavoriteBorder else Icons.Default.Favorite,
-                    contentDescription = stringResource(id = R.string.in_favorites),
+                    contentDescription = null,
                     tint = if (nonFavoritesVisibilityState.value) Color.Gray else Color.Yellow
                 )
             }
@@ -76,7 +76,7 @@ fun CheckerTopAppBar(
             }) {
                 Icon(
                     imageVector = Icons.Default.Check,
-                    contentDescription = stringResource(R.string.episode_viewed),
+                    contentDescription = null,
                     tint = if (viewedVisibilityState.value) Color.Green else Color.Gray
                 )
             }

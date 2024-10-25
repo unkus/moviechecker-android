@@ -5,7 +5,8 @@ import java.net.URI
 import java.time.LocalDateTime
 
 @DatabaseView(
-    "SELECT sites.id as 'siteId', sites.address as 'siteAddress', " +
+    viewName = "v_episodes",
+    value = "SELECT sites.id as 'siteId', sites.address as 'siteAddress', " +
             "m.id as 'movieId', m.page_id as 'moviePageId', m.title as 'movieTitle', m.link as 'movieLink', m.poster as 'moviePoster', m.favorites_mark as 'movieFavoritesMark', " +
             "s.id as 'seasonId', s.title as 'seasonTitle', s.number as 'seasonNumber', s.link as 'seasonLink', s.poster as 'seasonPoster', " +
             "e.id as 'episodeId', e.number as 'episodeNumber', e.title as 'episodeTitle', e.link as 'episodeLink', e.state as 'episodeState', e.date as 'episodeDate' " +

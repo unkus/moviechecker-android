@@ -10,11 +10,13 @@ import java.net.URI
 data class SeasonEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    @ColumnInfo(name = "movie_id") val movieId: Int = 0,
+    @ColumnInfo(name = "movie_id")
+    val movieId: Int = 0,
     val number: Int,
     var title: String? = null,
     var link: URI? = null,
-    @ColumnInfo(typeAffinity = ColumnInfo.BLOB) var poster: ByteArray? = null
+    @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
+    var poster: ByteArray? = null
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

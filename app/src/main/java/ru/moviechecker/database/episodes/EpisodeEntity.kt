@@ -7,11 +7,12 @@ import androidx.room.PrimaryKey
 import java.net.URI
 import java.time.LocalDateTime
 
-@Entity(tableName = "episodes", indices = [Index(value = ["season_id", "number"], unique = true)])
+@Entity(tableName = "episodes", indices = [Index(value = ["season_id", "number"], unique = true), Index(value = ["state"])])
 data class EpisodeEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    @ColumnInfo(name = "season_id") val seasonId: Int = 0,
+    @ColumnInfo(name = "season_id")
+    val seasonId: Int = 0,
     val number: Int,
     var title: String?,
     var link: URI,

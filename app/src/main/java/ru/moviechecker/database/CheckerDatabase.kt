@@ -10,15 +10,13 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.AutoMigrationSpec
 import androidx.sqlite.db.SupportSQLiteDatabase
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
 import ru.moviechecker.database.episodes.EpisodeDao
 import ru.moviechecker.database.episodes.EpisodeEntity
 import ru.moviechecker.database.episodes.EpisodeState
 import ru.moviechecker.database.episodes.EpisodeView
 import ru.moviechecker.database.movies.MovieDao
 import ru.moviechecker.database.movies.MovieEntity
+import ru.moviechecker.database.movies.MovieCardsView
 import ru.moviechecker.database.seasons.SeasonDao
 import ru.moviechecker.database.seasons.SeasonEntity
 import ru.moviechecker.database.sites.SiteDao
@@ -28,15 +26,15 @@ import ru.moviechecker.datasource.model.EpisodeData
 import ru.moviechecker.datasource.model.MovieData
 import ru.moviechecker.datasource.model.SeasonData
 import ru.moviechecker.datasource.model.SiteData
-import ru.moviechecker.workers.RetrieveDataWorker
-
 
 @Database(
     entities = [SiteEntity::class, MovieEntity::class, SeasonEntity::class, EpisodeEntity::class],
-    views = [EpisodeView::class],
-    version = 2,
+    views = [EpisodeView::class, MovieCardsView::class],
+    version = 4,
     autoMigrations = [
-        AutoMigration(from = 1, to = 2, spec = CheckerDatabase.Ver1To2AutoMigration::class)
+        AutoMigration(from = 1, to = 2, spec = CheckerDatabase.Ver1To2AutoMigration::class),
+        AutoMigration(from = 2, to = 3),
+        AutoMigration(from = 3, to = 4)
     ]
 )
 @TypeConverters(Converters::class)
@@ -69,7 +67,7 @@ abstract class CheckerDatabase : RoomDatabase() {
             // if the Instance is not null, return it, otherwise create a new database instance.
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(appContext, CheckerDatabase::class.java, "checker.db")
-                        // Раскомментировать для загрузки базы из файла
+                    // Раскомментировать для загрузки базы из файла
 //                    .createFromAsset("checker.db")
                     /**
                      * Setting this option in your app's database builder means that Room
@@ -87,13 +85,13 @@ abstract class CheckerDatabase : RoomDatabase() {
                             super.onOpen(db)
                             Log.d(this.javaClass.simpleName, "База данных открыта")
 
-                            WorkManager.getInstance(appContext)
-                                .beginUniqueWork(
-                                    RetrieveDataWorker::class.java.simpleName,
-                                    ExistingWorkPolicy.KEEP,
-                                    OneTimeWorkRequest.from(RetrieveDataWorker::class.java)
-                                )
-                                .enqueue()
+//                            WorkManager.getInstance(appContext)
+//                                .beginUniqueWork(
+//                                    RetrieveDataWorker::class.java.simpleName,
+//                                    ExistingWorkPolicy.KEEP,
+//                                    OneTimeWorkRequest.from(RetrieveDataWorker::class.java)
+//                                )
+//                                .enqueue()
                         }
                     })
                     .build()

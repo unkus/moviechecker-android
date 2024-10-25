@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MovieDao {
@@ -19,6 +20,9 @@ interface MovieDao {
     fun getCount(): Int
     @Query("SELECT * FROM movies m WHERE m.site_id = :siteId AND m.page_id = :pageId")
     fun getMovieBySiteIdAndPageId(siteId: Int, pageId: String): MovieEntity?
+
+    @Query("SELECT * FROM v_movie_cards card")
+    fun getMovieStream(): Flow<List<MovieCardsView>>
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     fun insert(vararg movies: MovieEntity)
