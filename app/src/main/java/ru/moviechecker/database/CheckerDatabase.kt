@@ -30,11 +30,12 @@ import ru.moviechecker.datasource.model.SiteData
 @Database(
     entities = [SiteEntity::class, MovieEntity::class, SeasonEntity::class, EpisodeEntity::class],
     views = [EpisodeView::class, MovieCardsView::class],
-    version = 4,
+    version = 5,
     autoMigrations = [
         AutoMigration(from = 1, to = 2, spec = CheckerDatabase.Ver1To2AutoMigration::class),
         AutoMigration(from = 2, to = 3),
-        AutoMigration(from = 3, to = 4)
+        AutoMigration(from = 3, to = 4),
+        AutoMigration(from = 4, to = 5)
     ]
 )
 @TypeConverters(Converters::class)
@@ -105,14 +106,12 @@ abstract class CheckerDatabase : RoomDatabase() {
     fun populateDatabase(records: Collection<DataRecord>) {
         Log.d(this.javaClass.simpleName, "Получено ${records.size} записей")
         records.forEach { record ->
-            // Site
-            val site = processSiteData(siteDao(), record.site)
-            // Movie
-            val movie = processMovieData(movieDao(), site.id, record.movie)
-            // Season
-            val season = processSeasonData(seasonDao(), movie.id, record.season)
-            // Episode
-            processEpisodeData(episodeDao(), season.id, record.episode)
+            runInTransaction {
+                val site = processSiteData(siteDao(), record.site)
+                val movie = processMovieData(movieDao(), site.id, record.movie)
+                val season = processSeasonData(seasonDao(), movie.id, record.season)
+                processEpisodeData(episodeDao(), season.id, record.episode)
+            }
         }
     }
 
@@ -192,9 +191,7 @@ abstract class CheckerDatabase : RoomDatabase() {
             "Обрабатываем эпизод: ${episodeData.title}(${episodeData.number})"
         )
         episodeDao.getBySeasonIdAndNumber(seasonId, episodeData.number)?.let {
-            episodeData.title?.let { title ->
-                it.title = title
-            }
+            it.title = episodeData.title
             it.link = episodeData.link
             if (it.state != EpisodeState.VIEWED) {
                 it.state = EpisodeState.valueOf(episodeData.state.name)
