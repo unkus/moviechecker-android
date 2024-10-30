@@ -26,7 +26,7 @@ import java.time.LocalDateTime
             "FROM movies movie " +
             "JOIN seasons season ON season.movie_id = movie.id " +
             "LEFT JOIN (SELECT e.id, e.season_id, e.number, e.date, e.title, e.link, MIN(e.date) 'date' FROM episodes e WHERE e.state = 'RELEASED' GROUP BY e.season_id) 'next_episode' ON next_episode.season_id = season.id " +
-            "LEFT JOIN (SELECT e.id, e.season_id, e.number, e.date, e.title, e.link, e.state, MAX(e.date) 'date' FROM episodes e WHERE e.state IN ('EXPECTED', 'RELEASED', 'VIEWED') GROUP BY e.season_id) 'last_episode' ON last_episode.season_id = season.id " +
+            "JOIN (SELECT e.id, e.season_id, e.number, e.date, e.title, e.link, e.state, MAX(e.date) 'date' FROM episodes e WHERE e.state IN ('RELEASED', 'VIEWED') GROUP BY e.season_id) 'last_episode' ON last_episode.season_id = season.id " +
             "GROUP BY season.id " +
             "ORDER BY last_episode_date DESC"
 )

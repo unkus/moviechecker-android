@@ -30,12 +30,13 @@ import ru.moviechecker.datasource.model.SiteData
 @Database(
     entities = [SiteEntity::class, MovieEntity::class, SeasonEntity::class, EpisodeEntity::class],
     views = [EpisodeView::class, MovieCardsView::class],
-    version = 5,
+    version = 6,
     autoMigrations = [
         AutoMigration(from = 1, to = 2, spec = CheckerDatabase.Ver1To2AutoMigration::class),
         AutoMigration(from = 2, to = 3),
         AutoMigration(from = 3, to = 4),
-        AutoMigration(from = 4, to = 5)
+        AutoMigration(from = 4, to = 5),
+        AutoMigration(from = 5, to = 6)
     ]
 )
 @TypeConverters(Converters::class)
@@ -193,9 +194,7 @@ abstract class CheckerDatabase : RoomDatabase() {
         episodeDao.getBySeasonIdAndNumber(seasonId, episodeData.number)?.let {
             it.title = episodeData.title
             it.link = episodeData.link
-            if (it.state != EpisodeState.VIEWED) {
-                it.state = EpisodeState.valueOf(episodeData.state.name)
-            }
+            it.state = EpisodeState.valueOf(episodeData.state.name)
             it.date = episodeData.date
             episodeDao.update(it)
         } ?: episodeDao.insert(
