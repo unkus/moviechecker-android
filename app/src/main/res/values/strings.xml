@@ -36,4 +36,7 @@
     <string name="cleanup">Cleanup</string>
     <string name="poster_error">Unable to process poster data</string>
     <string name="movies_title">Movies</string>
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
+    <string name="fcm_message" translatable="false">FCM Message</string>
+    <string name="default_notification_channel_name" translatable="false">Movie Checker</string>
 </resources>

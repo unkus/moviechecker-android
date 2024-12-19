@@ -20,6 +20,10 @@ navigationCompose = "2.8.3"
 mockkAndroid = "1.13.13"
 uiTestJunit4Android = "1.7.5"
 junit = "4.13.2"
+firebaseAuth = "23.1.0"
+firebaseFirestore = "25.1.1"
+firebaseMessaging = "24.1.0"
+googleServices = "4.4.2"
 coreKtxVersion = "1.6.1"
 junitKtx = "1.2.1"
 uiTooling = "1.7.5"
@@ -52,6 +56,10 @@ androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx"
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 
+firebase-auth = { module = "com.google.firebase:firebase-auth", version.ref = "firebaseAuth" }
+firebase-firestore = { module = "com.google.firebase:firebase-firestore", version.ref = "firebaseFirestore" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging", version.ref = "firebaseMessaging" }
+
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
 
@@ -65,3 +73,4 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
