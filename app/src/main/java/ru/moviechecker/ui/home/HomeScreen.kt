@@ -29,10 +29,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -104,7 +102,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
-object HomeDestination : NavigationDestination {
+data object HomeDestination : NavigationDestination {
     override val route = "home"
     override val titleRes = R.string.app_name
 }
@@ -211,20 +209,22 @@ private fun HomeBody(
                         .build()
                 )
                 .build()
-            workManager
-                .beginUniqueWork(
+
+            workManager.beginUniqueWork(
                     RetrieveDataWorker::class.java.simpleName,
                     ExistingWorkPolicy.KEEP,
                     workRequest
                 )
                 .enqueue()
 
-            workManager.getWorkInfoByIdLiveData(workRequest.id)
-                .observe(lifecycleOwner) { workInfo ->
-                    Log.d(this.javaClass.simpleName, "Статус обновления: $workInfo")
-                    isRefreshing = workInfo == null
-                            || workInfo.state == WorkInfo.State.RUNNING
-                            || workInfo.state == WorkInfo.State.ENQUEUED
+            workManager.getWorkInfoByIdFlow(workRequest.id)
+                .collect { workInfo ->
+                    workInfo?.let {
+                        Log.d(this.javaClass.simpleName, "Статус обновления: ${workInfo.state}")
+                        if (workInfo.state == WorkInfo.State.SUCCEEDED) {
+                            isRefreshing = false
+                        }
+                    }
                 }
             isRefreshing = false
         }
@@ -282,7 +282,7 @@ private fun EpisodeList(
                             onClick = {
                                 val browserIntent = Intent(
                                     Intent.ACTION_VIEW,
-                                    Uri.parse(episodeView.episodeLink.toString())
+                                    Uri.parse(episodeView.episodeLink)
                                 )
                                 ContextCompat.startActivity(context, browserIntent, null)
 
@@ -452,7 +452,7 @@ fun HomeBodyPreview() {
                     episodeId = 1,
                     episodeNumber = 1,
                     episodeTitle = "Some episode of first movie with long title",
-                    episodeLink = URI.create("stub"),
+                    episodeLink = "stub",
                     episodeState = EpisodeState.VIEWED,
                     episodeDate = LocalDateTime.now().minusDays(2)
                 ), EpisodeView(
@@ -467,7 +467,7 @@ fun HomeBodyPreview() {
                     episodeId = 2,
                     episodeNumber = 1,
                     episodeTitle = null,
-                    episodeLink = URI.create("stub"),
+                    episodeLink = "stub",
                     episodeState = EpisodeState.RELEASED,
                     episodeDate = LocalDateTime.now().minusDays(1)
                 ), EpisodeView(
@@ -482,7 +482,7 @@ fun HomeBodyPreview() {
                     episodeId = 3,
                     episodeNumber = 1,
                     episodeTitle = null,
-                    episodeLink = URI.create("stub"),
+                    episodeLink = "stub",
                     episodeState = EpisodeState.EXPECTED,
                     episodeDate = LocalDateTime.now()
                 ), EpisodeView(
@@ -497,7 +497,7 @@ fun HomeBodyPreview() {
                     episodeId = 4,
                     episodeNumber = 2,
                     episodeTitle = "Some episode of first movie",
-                    episodeLink = URI.create("stub"),
+                    episodeLink = "stub",
                     episodeState = EpisodeState.EXPECTED,
                     episodeDate = LocalDateTime.now().plusDays(1)
                 )
@@ -530,7 +530,7 @@ fun CheckerEpisodePreview() {
                 episodeId = 1,
                 episodeNumber = 1,
                 episodeTitle = null,
-                episodeLink = URI.create("stub"),
+                episodeLink = "stub",
                 episodeState = EpisodeState.VIEWED,
                 episodeDate = LocalDateTime.now()
             ), onFavoriteIconClick = {}, onViewedIconClick = {}

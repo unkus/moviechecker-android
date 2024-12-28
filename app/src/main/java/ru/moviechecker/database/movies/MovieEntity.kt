@@ -4,7 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import java.net.URI
 
 @Entity(tableName = "movies", indices = [Index(value = ["site_id", "page_id"], unique = true)])
 data class MovieEntity(
@@ -15,7 +14,7 @@ data class MovieEntity(
     @ColumnInfo(name = "page_id")
     override val pageId: String,
     override var title: String,
-    override var link: URI? = null,
+    override var link: String? = null,
     @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
     override var poster: ByteArray? = null,
     @ColumnInfo(name = "favorites_mark")

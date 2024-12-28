@@ -1,10 +1,11 @@
 package ru.moviechecker.ui.movie
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
+import android.widget.Toast.LENGTH_SHORT
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -15,7 +16,6 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -86,19 +86,18 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
-object MoviesDestination : NavigationDestination {
+data object MoviesDestination : NavigationDestination {
     override val route = "movies"
     override val titleRes = R.string.movies_title
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MoviesScreen(
     modifier: Modifier = Modifier,
-    viewModel: MoviesScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: MovieCardsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val homeUiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val context = LocalContext.current
 
@@ -191,12 +190,20 @@ fun MoviesScreen(
             onRefresh = onRefresh,
         ) {
             MovieList(
-                movies = homeUiState.movies,
+                movies = uiState.movies,
                 showNonFavorites = nonFavoritesVisibilityState.value,
                 showViewed = viewedVisibilityState.value,
-                onClick = { viewModel.markEpisodeViewed(it) },
+                onClick = { id, uri ->
+                    val browserIntent = Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse(uri.toString())
+                    )
+                    ContextCompat.startActivity(context, browserIntent, null)
+
+                    viewModel.markEpisodeViewed(id)
+                },
                 onLongClick = {},
-                onViewedIconClick = { viewModel.markEpisodeViewed(it) },
+                onViewedIconClick = { viewModel.switchEpisodeViewedMark(it) },
                 onFavoriteIconClick = { viewModel.switchFavoritesMark(it) }
             )
         }
@@ -209,7 +216,7 @@ fun MovieList(
     showNonFavorites: Boolean,
     showViewed: Boolean,
     modifier: Modifier = Modifier,
-    onClick: (Int) -> Unit = {},
+    onClick: (Int, URI) -> Unit = { id, uri -> },
     onLongClick: (Int) -> Unit = {},
     onViewedIconClick: (Int) -> Unit = {},
     onFavoriteIconClick: (Int) -> Unit = {}
@@ -239,7 +246,7 @@ fun MovieList(
 fun MovieItem(
     movie: MovieCardsView,
     modifier: Modifier = Modifier,
-    onClick: (Int) -> Unit = {},
+    onClick: (Int, URI) -> Unit = { id, uri -> },
     onLongClick: (Int) -> Unit = {},
     onViewedIconClick: (Int) -> Unit = {},
     onFavoriteIconClick: (Int) -> Unit = {}
@@ -249,15 +256,16 @@ fun MovieItem(
         modifier = modifier
             .combinedClickable(
                 onClick = {
-                    movie.nextEpisodeId?.let { episodeId ->
-                        val browserIntent = Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse(movie.nextEpisodeLink.toString())
-                        )
-                        ContextCompat.startActivity(context, browserIntent, null)
-
-                        onClick(episodeId)
-                    }
+                    movie.nextEpisodeId?.let { id ->
+                        movie.nextEpisodeLink?.let { onClick(id, it) }
+                            ?: Toast
+                                .makeText(
+                                    context,
+                                    "Эпизод %d не имеет ссылки".format(id),
+                                    LENGTH_SHORT
+                                )
+                                .show()
+                    } ?: onClick(movie.lastEpisodeId, movie.lastEpisodeLink)
                 },
                 onLongClick = { onLongClick(movie.id) }
             )
@@ -278,7 +286,12 @@ fun MovieItem(
             ) {
                 Column(modifier = Modifier.wrapContentWidth()) {
                     Row {
-                        movie.poster?.let { Poster(it) }
+                        movie.poster?.let {
+                            Poster(
+                                it,
+                                modifier = Modifier.width(Icons.Default.Favorite.defaultWidth * 2)
+                            )
+                        }
                     }
                 }
                 Column {
@@ -322,22 +335,15 @@ fun MovieItem(
                         }
                     }
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(dimensionResource(id = R.dimen.padding_small)),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        EpisodeItem(
-                            id = movie.lastEpisodeId,
-                            number = movie.lastEpisodeNumber,
-                            title = movie.lastEpisodeTitle,
-                            date = movie.lastEpisodeDate,
-                            viewedMark = movie.viewedMark,
-                            style = MaterialTheme.typography.bodySmall,
-                            onViewedIconClick = onViewedIconClick
-                        )
-                    }
+                    EpisodeItem(
+                        id = movie.lastEpisodeId,
+                        number = movie.lastEpisodeNumber,
+                        title = movie.lastEpisodeTitle,
+                        date = movie.lastEpisodeDate,
+                        viewedMark = movie.viewedMark,
+                        style = MaterialTheme.typography.bodySmall,
+                        onViewedIconClick = onViewedIconClick
+                    )
                 }
             }
         }
@@ -345,19 +351,25 @@ fun MovieItem(
 }
 
 @Composable
-fun Poster(data: ByteArray) {
-    val image = BitmapFactory.decodeByteArray(
-        data,
-        0,
-        data.size
-    )
-        .asImageBitmap()
+private fun Poster(
+    data: ByteArray,
+    modifier: Modifier = Modifier
+) {
+    val image = try {
+        BitmapFactory.decodeByteArray(
+            data,
+            0,
+            data.size
+        )
+            .asImageBitmap()
+    } catch (exception: Exception) {
+        return
+    }
     Image(
         bitmap = image,
         contentDescription = null,
         contentScale = ContentScale.Crop,
-        modifier = Modifier
-            .width(Icons.Default.Favorite.defaultWidth * 2)
+        modifier = modifier
             .clip(RoundedCornerShape(8.dp))
     )
 }
@@ -426,18 +438,18 @@ fun Date(
     if (future) {
         dateString =
             date.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT))
-    } else if(tomorrow) {
+    } else if (tomorrow) {
         dateString = stringResource(
             R.string.tomorrow_time,
             date.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
         )
-    } else if(today) {
+    } else if (today) {
         dateString = stringResource(
             R.string.today_time, date.format(
                 DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
             )
         )
-    } else if(yesterday) {
+    } else if (yesterday) {
         dateString = stringResource(
             R.string.yesterday_time,
             date.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))

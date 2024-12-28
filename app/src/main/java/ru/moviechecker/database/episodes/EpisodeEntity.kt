@@ -14,8 +14,8 @@ data class EpisodeEntity(
     @ColumnInfo(name = "season_id")
     val seasonId: Int = 0,
     val number: Int,
-    var title: String?,
-    var link: URI,
+    var title: String? = null,
+    var link: String,
     var state: EpisodeState,
     var date: LocalDateTime
 ) {

@@ -15,15 +15,16 @@ import java.time.LocalDateTime
             "next_episode.id 'next_episode_id', " +
             "next_episode.number 'next_episode_number', " +
             "next_episode.title 'next_episode_title', " +
-            "next_episode.link 'next_episode_link', " +
+            "site.address || next_episode.link 'next_episode_link', " +
             "next_episode.date 'next_episode_date', " +
             "last_episode.id 'last_episode_id', " +
             "last_episode.number 'last_episode_number', " +
             "last_episode.title 'last_episode_title', " +
-            "last_episode.link 'last_episode_link', " +
+            "site.address || last_episode.link 'last_episode_link', " +
             "last_episode.date 'last_episode_date', " +
             "CASE WHEN last_episode.state = 'VIEWED' THEN true ELSE false END AS 'viewed_mark' " +
             "FROM movies movie " +
+            "JOIN sites site ON site.id = movie.site_id " +
             "JOIN seasons season ON season.movie_id = movie.id " +
             "LEFT JOIN (SELECT e.id, e.season_id, e.number, e.date, e.title, e.link, MIN(e.date) 'date' FROM episodes e WHERE e.state = 'RELEASED' GROUP BY e.season_id) 'next_episode' ON next_episode.season_id = season.id " +
             "JOIN (SELECT e.id, e.season_id, e.number, e.date, e.title, e.link, e.state, MAX(e.date) 'date' FROM episodes e WHERE e.state IN ('RELEASED', 'VIEWED') GROUP BY e.season_id) 'last_episode' ON last_episode.season_id = season.id " +

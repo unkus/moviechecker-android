@@ -112,9 +112,9 @@ class LostfilmDataSource : DataSource {
             breadcrumbsClassRegex.find(inputLine)?.let {
                 moviePathRegex.find(lineIterator.next())?.let { matchResult ->
                     val (_, moviePath, moviePageId, movieTitle) = matchResult.groupValues
-                    Log.d(this.javaClass.simpleName, "Парсим данные для $moviePageId")
+                    Log.d(this.javaClass.simpleName, "moviePageId: $moviePageId, moviePath: $moviePath, movieTitle: $movieTitle")
                     movie.pageId(moviePageId)
-                    movie.link(site.address.resolve(moviePath))
+                    movie.link(moviePath)
                     movie.title(movieTitle)
                 }
                 // <a href="/series/Monarch_Legacy_of_Monsters/seasons/" class="item"><div class="arrow"></div>Гид по сериям</a>
@@ -123,8 +123,8 @@ class LostfilmDataSource : DataSource {
                 Log.d(this.javaClass.simpleName, inputLine)
                 seasonPathRegex.find(inputLine)?.let { matchResult ->
                     val (_, seasonPath, seasonNumber) = matchResult.groupValues
-                    Log.d(this.javaClass.simpleName, "season $seasonPath ($seasonNumber)")
-                    season.link(site.address.resolve(seasonPath))
+                    Log.d(this.javaClass.simpleName, "season: $seasonPath ($seasonNumber)")
+                    season.link(seasonPath)
                     season.number(seasonNumber.toInt())
                 }
                 inputLine = lineIterator.next().trim()
@@ -132,7 +132,7 @@ class LostfilmDataSource : DataSource {
                 episodePathRegex.find(inputLine)?.let { matchResult ->
                     val (_, episodePath, episodeNumber) = matchResult.groupValues
                     Log.d(this.javaClass.simpleName, "episode $episodePath ($episodeNumber)")
-                    episode.link(site.address.resolve(episodePath))
+                    episode.link(episodePath)
                     episode.number(episodeNumber.toInt())
                 }
             }
@@ -141,7 +141,7 @@ class LostfilmDataSource : DataSource {
                 // <img src="//static.lostfilm.top/Images/791/Posters/icon_s1.jpg" class="thumb">
                 thumbsClassRegex.find(lineIterator.next())?.let { matchResult ->
                     val (_, posterRef) = matchResult.groupValues
-                    movie.posterLink(site.address.resolve(URI.create(posterRef)))
+                    movie.posterLink(posterRef)
                 }
                 // <h1 class="title-ru">За гранью логики</h1>
                 ruEpisodeTitleRegex.find(lineIterator.next())?.let { matchResult ->
@@ -179,6 +179,7 @@ class LostfilmDataSource : DataSource {
                         Log.e(this.javaClass.simpleName, "invalid episode data: $episode")
                     }
                     Log.e(this.javaClass.simpleName, "unexpected error")
+                    return null
                 }
             }
         }

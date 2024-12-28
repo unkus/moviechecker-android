@@ -21,20 +21,20 @@ data class EpisodeView(
     override val movieId: Int,
     override val moviePageId: String,
     override val movieTitle: String,
-    override val movieLink: URI? = null,
+    override val movieLink: String? = null,
     override val moviePoster: ByteArray? = null,
     override val movieFavoritesMark: Boolean = false,
 
     override val seasonId: Int,
     override val seasonNumber: Int,
     override val seasonTitle: String?,
-    override val seasonLink: URI? = null,
+    override val seasonLink: String? = null,
     override val seasonPoster: ByteArray? = null,
 
     override val episodeId: Int,
     override val episodeNumber: Int,
     override val episodeTitle: String?,
-    override val episodeLink: URI,
+    override val episodeLink: String,
     override val episodeState: EpisodeState,
     override val episodeDate: LocalDateTime
 ): IEpisodeView {

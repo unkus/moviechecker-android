@@ -94,7 +94,7 @@ fun EpisodeDetails.toEntity(): EpisodeEntity {
     return EpisodeEntity(
         number = 1,
         title = title,
-        link = URI.create(link),
+        link = link,
         state = EpisodeState.valueOf(state),
         date = LocalDateTime.parse(date, DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT))
     )

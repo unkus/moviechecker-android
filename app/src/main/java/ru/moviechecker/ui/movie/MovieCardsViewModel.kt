@@ -13,7 +13,7 @@ import ru.moviechecker.database.episodes.EpisodesRepository
 import ru.moviechecker.database.movies.MovieCardsView
 import ru.moviechecker.database.movies.MoviesRepository
 
-class MoviesScreenViewModel(
+class MovieCardsViewModel(
     private val moviesRepository: MoviesRepository,
     private val episodesRepository: EpisodesRepository
 ) : ViewModel() {
@@ -39,6 +39,21 @@ class MoviesScreenViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             episodesRepository.findById(episodeId)?.let { episode ->
                 episode.state = EpisodeState.VIEWED
+                episodesRepository.updateEpisode(episode)
+            }
+        }
+    }
+
+    fun switchEpisodeViewedMark(episodeId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            episodesRepository.findById(episodeId)?.let { episode ->
+                episode.state = if (episode.state == EpisodeState.VIEWED) {
+                    EpisodeState.RELEASED
+                } else if(episode.state == EpisodeState.RELEASED) {
+                    EpisodeState.VIEWED
+                } else {
+                    episode.state
+                }
                 episodesRepository.updateEpisode(episode)
             }
         }

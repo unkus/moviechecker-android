@@ -26,17 +26,19 @@ import ru.moviechecker.datasource.model.EpisodeData
 import ru.moviechecker.datasource.model.MovieData
 import ru.moviechecker.datasource.model.SeasonData
 import ru.moviechecker.datasource.model.SiteData
+import java.net.URI
 
 @Database(
     entities = [SiteEntity::class, MovieEntity::class, SeasonEntity::class, EpisodeEntity::class],
     views = [EpisodeView::class, MovieCardsView::class],
-    version = 6,
+    version = 7,
     autoMigrations = [
         AutoMigration(from = 1, to = 2, spec = CheckerDatabase.Ver1To2AutoMigration::class),
         AutoMigration(from = 2, to = 3),
         AutoMigration(from = 3, to = 4),
         AutoMigration(from = 4, to = 5),
-        AutoMigration(from = 5, to = 6)
+        AutoMigration(from = 5, to = 6),
+        AutoMigration(from = 6, to = 7)
     ]
 )
 @TypeConverters(Converters::class)
@@ -68,7 +70,7 @@ abstract class CheckerDatabase : RoomDatabase() {
         fun getDatabase(appContext: Context): CheckerDatabase {
             // if the Instance is not null, return it, otherwise create a new database instance.
             return Instance ?: synchronized(this) {
-                Room.databaseBuilder(appContext, CheckerDatabase::class.java, "checker.db")
+                Room.databaseBuilder(appContext, CheckerDatabase::class.java, "checker_db")
                     // Раскомментировать для загрузки базы из файла
 //                    .createFromAsset("checker.db")
                     /**
@@ -109,8 +111,8 @@ abstract class CheckerDatabase : RoomDatabase() {
         records.forEach { record ->
             runInTransaction {
                 val site = processSiteData(siteDao(), record.site)
-                val movie = processMovieData(movieDao(), site.id, record.movie)
-                val season = processSeasonData(seasonDao(), movie.id, record.season)
+                val movie = processMovieData(movieDao(), site.id, site.address, record.movie)
+                val season = processSeasonData(seasonDao(), site.address, movie.id, record.season)
                 processEpisodeData(episodeDao(), season.id, record.episode)
             }
         }
@@ -131,24 +133,27 @@ abstract class CheckerDatabase : RoomDatabase() {
     private fun processMovieData(
         movieDao: MovieDao,
         siteId: Int,
+        siteAddress: URI,
         movieData: MovieData
     ): MovieEntity {
         Log.d(
             this.javaClass.simpleName,
             "Обрабатываем фильм: ${movieData.title}(${movieData.pageId})"
         )
-        movieDao.getMovieBySiteIdAndPageId(siteId, movieData.pageId)?.let {
-            it.title = movieData.title
-            it.link = movieData.link
-//            it.poster = movieData.posterLink?.toURL()?.readBytes()
-            movieDao.update(it)
+        movieDao.getMovieBySiteIdAndPageId(siteId, movieData.pageId)?.let { entity ->
+            entity.title = movieData.title
+            entity.link = movieData.link
+            entity.poster = entity.poster ?: movieData.posterLink?.let { data ->
+                siteAddress.resolve(data).toURL()?.readBytes()
+            }
+            movieDao.update(entity)
         } ?: movieDao.insert(
             MovieEntity(
                 siteId = siteId,
                 pageId = movieData.pageId,
                 title = movieData.title,
                 link = movieData.link,
-                poster = movieData.posterLink?.toURL()?.readBytes()
+                poster = movieData.posterLink?.let { siteAddress.resolve(it).toURL()?.readBytes() }
             )
         )
 
@@ -157,6 +162,7 @@ abstract class CheckerDatabase : RoomDatabase() {
 
     private fun processSeasonData(
         seasonDao: SeasonDao,
+        siteAddress: URI,
         movieId: Int,
         seasonData: SeasonData
     ): SeasonEntity {
@@ -164,18 +170,20 @@ abstract class CheckerDatabase : RoomDatabase() {
             this.javaClass.simpleName,
             "Обрабатываем сезон: ${seasonData.title}(${seasonData.number})"
         )
-        seasonDao.getSeasonByMovieIdAndNumber(movieId, seasonData.number)?.let {
-            it.title = seasonData.title
-            it.link = seasonData.link
-//            it.poster = seasonData.posterLink?.toURL()?.readBytes()
-            seasonDao.update(it)
+        seasonDao.getSeasonByMovieIdAndNumber(movieId, seasonData.number)?.let { entity ->
+            entity.title = seasonData.title
+            entity.link = seasonData.link
+            entity.poster = entity.poster ?: seasonData.posterLink?.let { data ->
+                siteAddress.resolve(data).toURL()?.readBytes()
+            }
+            seasonDao.update(entity)
         } ?: seasonDao.insert(
             SeasonEntity(
                 movieId = movieId,
                 number = seasonData.number,
                 title = seasonData.title,
                 link = seasonData.link,
-                poster = seasonData.posterLink?.toURL()?.readBytes()
+                poster = seasonData.posterLink?.let { siteAddress.resolve(it).toURL()?.readBytes() }
             )
         )
 
@@ -191,12 +199,14 @@ abstract class CheckerDatabase : RoomDatabase() {
             this.javaClass.simpleName,
             "Обрабатываем эпизод: ${episodeData.title}(${episodeData.number})"
         )
-        episodeDao.getBySeasonIdAndNumber(seasonId, episodeData.number)?.let {
-            it.title = episodeData.title
-            it.link = episodeData.link
-            it.state = EpisodeState.valueOf(episodeData.state.name)
-            it.date = episodeData.date
-            episodeDao.update(it)
+        episodeDao.getBySeasonIdAndNumber(seasonId, episodeData.number)?.let { entity ->
+            entity.title = episodeData.title
+            entity.link = episodeData.link
+            if (entity.state != EpisodeState.VIEWED) {
+                entity.state = EpisodeState.valueOf(episodeData.state.name)
+            }
+            entity.date = episodeData.date
+            episodeDao.update(entity)
         } ?: episodeDao.insert(
             EpisodeEntity(
                 seasonId = seasonId,

@@ -30,7 +30,7 @@ class EpisodeDaoTest {
         1,
         1,
         "Episode #1",
-        URI.create("http://movie/episode/1"),
+        "http://movie/episode/1",
         EpisodeState.EXPECTED,
         LocalDateTime.now()
     )
@@ -39,7 +39,7 @@ class EpisodeDaoTest {
         1,
         2,
         "Episode #2",
-        URI.create("http://movie/episode/1"),
+        "http://movie/episode/1",
         EpisodeState.RELEASED,
         LocalDateTime.now()
     )
@@ -48,7 +48,7 @@ class EpisodeDaoTest {
         1,
         3,
         "Episode #3",
-        URI.create("http://movie/episode/1"),
+        "http://movie/episode/1",
         EpisodeState.VIEWED,
         LocalDateTime.now()
     )
