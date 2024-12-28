@@ -15,6 +15,8 @@ import ru.moviechecker.ui.episode.EpisodeEntryDestination
 import ru.moviechecker.ui.episode.EpisodeEntryScreen
 import ru.moviechecker.ui.home.HomeDestination
 import ru.moviechecker.ui.home.HomeScreen
+import ru.moviechecker.ui.movie.MovieDetailsDestination
+import ru.moviechecker.ui.movie.MovieDetailsScreen
 import ru.moviechecker.ui.movie.MoviesDestination
 import ru.moviechecker.ui.movie.MoviesScreen
 
@@ -36,7 +38,22 @@ fun CheckerNavHost(
             )
         }
         composable(route = MoviesDestination.route) {
-            MoviesScreen()
+            MoviesScreen(
+                navigateToMovieDetails = {
+                    navController.navigate("${MovieDetailsDestination.route}/${it}")
+                }
+            )
+        }
+        composable(
+            route = MovieDetailsDestination.routeWithArgs,
+            arguments = listOf(navArgument(MovieDetailsDestination.movieIdArg) {
+                type = NavType.IntType
+            })
+        ) {
+            MovieDetailsScreen(
+                navigateToMovieEdit = { },
+                navigateBack = { navController.navigateUp() }
+            )
         }
         composable(route = EpisodeEntryDestination.route) {
             EpisodeEntryScreen(

@@ -7,5 +7,6 @@ interface MoviesRepository {
     fun getAll(): List<MovieEntity>
     fun updateMovie(movie: MovieEntity)
 
-    fun getMovieCardsStream(): Flow<List<MovieCardsView>>
+    fun getMovieStream(): Flow<List<MovieCardsView>>
+    fun getMovieByIdStream(id: Int): Flow<MovieEntity>
 }

@@ -36,4 +36,5 @@
     <string name="cleanup">Cleanup</string>
     <string name="poster_error">Unable to process poster data</string>
     <string name="movies_title">Movies</string>
+    <string name="movie_details_title">Movie Details</string>
 </resources>

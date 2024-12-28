@@ -28,6 +28,7 @@ import ru.moviechecker.ui.episode.EpisodeEditViewModel
 import ru.moviechecker.ui.episode.EpisodeEntryViewModel
 import ru.moviechecker.ui.home.HomeViewModel
 import ru.moviechecker.ui.movie.MovieCardsViewModel
+import ru.moviechecker.ui.movie.MovieDetailsViewModel
 
 /**
  * Provides Factory to create instance of ViewModel for the entire Checker app
@@ -67,6 +68,15 @@ object AppViewModelProvider {
         initializer {
             MovieCardsViewModel(
                 moviesRepository = checkerApplication().container.moviesRepository,
+                episodesRepository = checkerApplication().container.episodesRepository
+            )
+        }
+
+        initializer {
+            MovieDetailsViewModel(
+                savedStateHandle = this.createSavedStateHandle(),
+                moviesRepository = checkerApplication().container.moviesRepository,
+                seasonsRepository = checkerApplication().container.seasonsRepository,
                 episodesRepository = checkerApplication().container.episodesRepository
             )
         }
