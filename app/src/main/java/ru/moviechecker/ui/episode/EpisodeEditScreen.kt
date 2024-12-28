@@ -32,7 +32,7 @@ import ru.moviechecker.ui.navigation.NavigationDestination
 import ru.moviechecker.ui.theme.MoviecheckerTheme
 import kotlinx.coroutines.launch
 
-object EpisodeEditDestination : NavigationDestination {
+data object EpisodeEditDestination : NavigationDestination {
     override val route = "episode_edit"
     override val titleRes = R.string.edit_episode_title
     const val episodeIdArg = "episode_id"

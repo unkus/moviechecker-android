@@ -9,6 +9,8 @@ interface EpisodesRepository {
     fun getAllEpisodesViewStream(): Flow<List<IEpisodeView>>
     fun getExpectedEpisodesViewStream(): Flow<List<IEpisodeView>>
     fun getReleasedEpisodesViewStream(): Flow<List<IEpisodeView>>
+    fun getEpisodesBySeasonIdStream(seasonId: Int): Flow<List<EpisodeEntity>>
+    fun getEpisodesBySeasonIdStream(seasonIds: List<Int>): Flow<List<EpisodeEntity>>
 
     fun findById(id: Int): EpisodeEntity?
 

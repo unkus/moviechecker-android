@@ -35,4 +35,5 @@
     <string name="cleanup">Очистка</string>
     <string name="poster_error">"Не могу отобразить постер"</string>
     <string name="movies_title">Фильмы/Сериалы</string>
+    <string name="movie_details_title">Детализация Фильма/Сериала</string>
 </resources>

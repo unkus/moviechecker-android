@@ -25,6 +25,11 @@ interface EpisodeDao {
     @Query("SELECT * FROM v_episodes v WHERE v.episodeState = 'RELEASED' OR v.episodeState = 'VIEWED' ORDER BY v.episodeDate DESC")
     fun getReleasedEpisodesViewStream(): Flow<List<EpisodeView>>
 
+    @Query("SELECT * FROM episodes e WHERE e.season_id = :seasonId")
+    fun getEpisodesBySeasonId(seasonId: Int): Flow<List<EpisodeEntity>>
+    @Query("SELECT * FROM episodes e WHERE e.season_id in (:seasonId)")
+    fun getEpisodesBySeasonId(seasonId: List<Int>): Flow<List<EpisodeEntity>>
+
     @Query("SELECT * FROM episodes e WHERE e.id = :id")
     fun getById(id: Int): EpisodeEntity?
     @Query("SELECT * FROM episodes e WHERE e.season_id = :seasonId AND e.number = :number")

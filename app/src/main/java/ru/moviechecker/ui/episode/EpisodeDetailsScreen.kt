@@ -62,7 +62,7 @@ import ru.moviechecker.ui.theme.MoviecheckerTheme
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
-object EpisodeDetailsDestination : NavigationDestination {
+data object EpisodeDetailsDestination : NavigationDestination {
     override val route = "episode_details"
     override val titleRes = R.string.episode_detail_title
     const val episodeIdArg = "id"

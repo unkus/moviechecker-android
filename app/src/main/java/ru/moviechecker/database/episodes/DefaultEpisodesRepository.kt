@@ -9,6 +9,8 @@ class DefaultEpisodesRepository(private val episodeDao: EpisodeDao) : EpisodesRe
     override fun getAllEpisodesViewStream(): Flow<List<IEpisodeView>> = episodeDao.getAllEpisodesViewStream()
     override fun getExpectedEpisodesViewStream(): Flow<List<IEpisodeView>> = episodeDao.getExpectedEpisodesViewStream()
     override fun getReleasedEpisodesViewStream(): Flow<List<IEpisodeView>> = episodeDao.getReleasedEpisodesViewStream()
+    override fun getEpisodesBySeasonIdStream(seasonId: Int): Flow<List<EpisodeEntity>> = episodeDao.getEpisodesBySeasonId(seasonId)
+    override fun getEpisodesBySeasonIdStream(seasonIds: List<Int>): Flow<List<EpisodeEntity>> = episodeDao.getEpisodesBySeasonId(seasonIds)
 
     override fun findById(id: Int): EpisodeEntity? = episodeDao.getById(id)
 

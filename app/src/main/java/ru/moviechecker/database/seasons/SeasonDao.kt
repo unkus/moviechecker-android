@@ -6,11 +6,14 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SeasonDao {
     @Query("SELECT * FROM seasons s WHERE s.movie_id = :movieId AND s.number = :number")
     fun getSeasonByMovieIdAndNumber(movieId: Int, number: Int): SeasonEntity?
+    @Query("SELECT * FROM seasons s WHERE s.movie_id = :movieId")
+    fun getSeasons(movieId: Int): Flow<List<SeasonEntity>>
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     fun insert(vararg seasons: SeasonEntity)
