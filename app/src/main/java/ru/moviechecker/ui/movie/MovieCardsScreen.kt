@@ -322,15 +322,10 @@ fun MovieItem(
                                 number = movie.nextEpisodeNumber,
                                 title = movie.nextEpisodeTitle,
                                 date = movie.nextEpisodeDate,
-                                viewedMark = false,
+                                viewedMark = movie.viewedMark,
                                 style = MaterialTheme.typography.bodySmall,
                                 onViewedIconClick = onViewedIconClick
                             )
-                        }
-                    }
-
-                    movie.nextEpisodeNumber?.let { nextEpisodeNumber ->
-                        if (movie.lastEpisodeNumber - nextEpisodeNumber > 1) {
                             HorizontalDivider()
                         }
                     }

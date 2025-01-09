@@ -14,9 +14,9 @@ import ru.moviechecker.database.episodes.EpisodeDao
 import ru.moviechecker.database.episodes.EpisodeEntity
 import ru.moviechecker.database.episodes.EpisodeState
 import ru.moviechecker.database.episodes.EpisodeView
+import ru.moviechecker.database.movies.MovieCardsView
 import ru.moviechecker.database.movies.MovieDao
 import ru.moviechecker.database.movies.MovieEntity
-import ru.moviechecker.database.movies.MovieCardsView
 import ru.moviechecker.database.seasons.SeasonDao
 import ru.moviechecker.database.seasons.SeasonEntity
 import ru.moviechecker.database.sites.SiteDao
@@ -71,14 +71,8 @@ abstract class CheckerDatabase : RoomDatabase() {
             // if the Instance is not null, return it, otherwise create a new database instance.
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(appContext, CheckerDatabase::class.java, "checker_db")
-                    // Раскомментировать для загрузки базы из файла
-//                    .createFromAsset("checker.db")
-                    /**
-                     * Setting this option in your app's database builder means that Room
-                     * permanently deletes all data from the tables in your database when it
-                     * attempts to perform a migration with no defined migration path.
-                     */
-//                    .fallbackToDestructiveMigration()
+                    // Подгружает данные из файла
+//                        .createFromAsset("checker.db")
                     .addCallback(object : Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
