@@ -95,7 +95,7 @@ fun EpisodeDetailsScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.Edit,
-                    contentDescription = stringResource(R.string.edit_episode_title),
+                    contentDescription = stringResource(R.string.edit_movie_title),
                 )
             }
         },

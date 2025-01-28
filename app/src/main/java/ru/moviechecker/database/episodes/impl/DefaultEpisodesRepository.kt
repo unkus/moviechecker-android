@@ -1,6 +1,10 @@
-package ru.moviechecker.database.episodes
+package ru.moviechecker.database.episodes.impl
 
 import kotlinx.coroutines.flow.Flow
+import ru.moviechecker.database.episodes.EpisodeDao
+import ru.moviechecker.database.episodes.EpisodeEntity
+import ru.moviechecker.database.episodes.EpisodesRepository
+import ru.moviechecker.database.episodes.IEpisodeView
 
 class DefaultEpisodesRepository(private val episodeDao: EpisodeDao) : EpisodesRepository {
     override fun getAllStream(): Flow<List<EpisodeEntity>> = episodeDao.getAllEpisodesStream()

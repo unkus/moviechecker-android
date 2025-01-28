@@ -1,11 +1,11 @@
 package ru.moviechecker.database
 
 import android.content.Context
-import ru.moviechecker.database.episodes.DefaultEpisodesRepository
+import ru.moviechecker.database.episodes.impl.DefaultEpisodesRepository
 import ru.moviechecker.database.episodes.EpisodesRepository
-import ru.moviechecker.database.movies.DefaultMoviesRepository
+import ru.moviechecker.database.movies.impl.DefaultMoviesRepository
 import ru.moviechecker.database.movies.MoviesRepository
-import ru.moviechecker.database.seasons.DefaultSeasonsRepository
+import ru.moviechecker.database.seasons.impl.DefaultSeasonsRepository
 import ru.moviechecker.database.seasons.SeasonsRepository
 
 /**

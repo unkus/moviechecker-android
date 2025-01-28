@@ -1,6 +1,7 @@
 package ru.moviechecker
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -46,41 +47,13 @@ fun CheckerTopAppBar(
     modifier: Modifier = Modifier,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     navigateUp: () -> Unit = {},
-    onFavoritesClicked: () -> Unit = {},
-    onViewedClicked: () -> Unit = {}
+    actions: @Composable() (RowScope.() -> Unit) = {}
 ) {
-    val nonFavoritesVisibilityState = remember {
-        mutableStateOf(true)
-    }
-    val viewedVisibilityState = remember {
-        mutableStateOf(true)
-    }
     CenterAlignedTopAppBar(
         title = { Text(title) },
         modifier = modifier,
         scrollBehavior = scrollBehavior,
-        actions = {
-            IconButton(onClick = {
-                onFavoritesClicked()
-                nonFavoritesVisibilityState.value = !nonFavoritesVisibilityState.value
-            }) {
-                Icon(
-                    imageVector = if (nonFavoritesVisibilityState.value) Icons.Default.FavoriteBorder else Icons.Default.Favorite,
-                    contentDescription = null,
-                    tint = if (nonFavoritesVisibilityState.value) Color.Gray else Color.Yellow
-                )
-            }
-            IconButton(onClick = {
-                onViewedClicked()
-                viewedVisibilityState.value = !viewedVisibilityState.value
-            }) {
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = null,
-                    tint = if (viewedVisibilityState.value) Color.Green else Color.Gray
-                )
-            }
-        },
+        actions = actions,
         navigationIcon = {
             if (canNavigateBack) {
                 IconButton(onClick = navigateUp) {
@@ -100,9 +73,7 @@ fun CheckerTopAppBar(
 fun CheckerTopAppBarPreview() {
     MoviecheckerTheme {
         CheckerTopAppBar(title = stringResource(HomeDestination.titleRes),
-            canNavigateBack = false,
-            onFavoritesClicked = {},
-            onViewedClicked = {}
+            canNavigateBack = false
         )
     }
 }

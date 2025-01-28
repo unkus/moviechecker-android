@@ -72,7 +72,7 @@ abstract class CheckerDatabase : RoomDatabase() {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(appContext, CheckerDatabase::class.java, "checker_db")
                     // Подгружает данные из файла
-//                        .createFromAsset("checker.db")
+                        .createFromAsset("checker.db")
                     .addCallback(object : Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
@@ -217,23 +217,7 @@ abstract class CheckerDatabase : RoomDatabase() {
         // удаляем все что не отмечено как избранное
         movieDao().getMoviesByFavoriteMark(false).forEach { movieDao().delete(it) }
 
-        // удаляем просмотренные эпизоды кроме последнего
-        Log.d(this.javaClass.simpleName, "удаляем просмотренные эпизоды кроме последнего")
-        episodeDao().getByStateSortByNumberAsc(EpisodeState.VIEWED)
-            // группируем по сезону
-            .groupBy { it.seasonId }
-            .forEach { entry ->
-                val iter = entry.value.iterator()
-                while (iter.hasNext()) {
-                    val ep = iter.next()
-                    if (iter.hasNext()) {
-                        Log.d(this.javaClass.simpleName, ep.toString())
-                        // удаляем если не последний
-                        episodeDao().delete(ep)
-                    }
-                }
-            }
-
+        // TODO: проверить удаляются ли сезоны и серии, кажется надо их удалять отдельно
     }
 
 }

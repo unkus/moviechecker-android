@@ -49,6 +49,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -75,7 +76,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.Constraints
@@ -122,10 +122,10 @@ fun HomeScreen(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val context = LocalContext.current
 
-    val nonFavoritesVisibilityState = remember {
-        mutableStateOf(true)
+    val shouldShowOnlyFavorites = remember {
+        mutableStateOf(false)
     }
-    val viewedVisibilityState = remember {
+    val shouldShowViewedEpisodes = remember {
         mutableStateOf(true)
     }
 
@@ -136,11 +136,25 @@ fun HomeScreen(
                 title = stringResource(HomeDestination.titleRes),
                 canNavigateBack = false,
                 scrollBehavior = scrollBehavior,
-                onFavoritesClicked = {
-                    nonFavoritesVisibilityState.value = !nonFavoritesVisibilityState.value
-                },
-                onViewedClicked = {
-                    viewedVisibilityState.value = !viewedVisibilityState.value
+                actions = {
+                    IconButton(onClick = {
+                        shouldShowOnlyFavorites.value = !shouldShowOnlyFavorites.value
+                    }) {
+                        Icon(
+                            imageVector = if (shouldShowOnlyFavorites.value) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            contentDescription = null,
+                            tint = if (shouldShowOnlyFavorites.value) Color.Yellow else Color.Gray
+                        )
+                    }
+                    IconButton(onClick = {
+                        shouldShowViewedEpisodes.value = !shouldShowViewedEpisodes.value
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null,
+                            tint = if (shouldShowViewedEpisodes.value) Color.Green else Color.Gray
+                        )
+                    }
                 }
             )
         },
@@ -174,8 +188,8 @@ fun HomeScreen(
             modifier = modifier
                 .padding(innerPadding)
                 .fillMaxSize(),
-            nonFavoritesVisibilityState.value,
-            viewedVisibilityState.value
+            showFavorites = shouldShowOnlyFavorites.value,
+            showViewedEpisodes = shouldShowViewedEpisodes.value
         )
     }
 }
@@ -190,7 +204,7 @@ private fun HomeBody(
     onViewedIconClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     showFavorites: Boolean,
-    showViewed: Boolean
+    showViewedEpisodes: Boolean
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -246,7 +260,7 @@ private fun HomeBody(
             onViewedIconClick = { onViewedIconClick(it.episodeId) },
             modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small)),
             showNonFavorites = showFavorites,
-            showViewed = showViewed
+            showViewed = showViewedEpisodes
         )
     }
 }
@@ -284,7 +298,7 @@ private fun EpisodeList(
                                     Intent.ACTION_VIEW,
                                     Uri.parse(episodeView.episodeLink)
                                 )
-                                ContextCompat.startActivity(context, browserIntent, null)
+                                context.startActivity(browserIntent)
 
                                 onEpisodeClick(episodeView)
                             },
@@ -507,7 +521,7 @@ fun HomeBodyPreview() {
             onFavoriteIconClick = {},
             onViewedIconClick = {},
             showFavorites = true,
-            showViewed = true
+            showViewedEpisodes = true
         )
     }
 }
