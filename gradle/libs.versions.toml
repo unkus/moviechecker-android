@@ -1,6 +1,6 @@
 [versions]
 # AGP and tools should be updated together
-androidGradlePlugin = "8.7.3"
+androidGradlePlugin = "8.8.0"
 # @keep
 compileSdk = "35"
 # @keep

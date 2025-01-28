@@ -22,7 +22,7 @@ interface MovieDao {
     fun getMovieBySiteIdAndPageId(siteId: Int, pageId: String): MovieEntity?
 
     @Query("SELECT * FROM v_movie_cards card")
-    fun getMovieStream(): Flow<List<MovieCardsView>>
+    fun getMovieCardsStream(): Flow<List<MovieCardsView>>
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     fun insert(vararg movies: MovieEntity)

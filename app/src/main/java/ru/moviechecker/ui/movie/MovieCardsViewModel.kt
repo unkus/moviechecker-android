@@ -1,5 +1,7 @@
 package ru.moviechecker.ui.movie
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +20,7 @@ class MovieCardsViewModel(
     private val episodesRepository: EpisodesRepository
 ) : ViewModel() {
 
-    val uiState: StateFlow<MoviesUiState> = moviesRepository.getMovieStream()
+    val uiState: StateFlow<MoviesUiState> = moviesRepository.getMovieCardsStream()
         .map { MoviesUiState(it) }
         .stateIn(
             scope = viewModelScope,
@@ -63,5 +65,7 @@ class MovieCardsViewModel(
 
 data class MoviesUiState(
     val movies: List<MovieCardsView> = listOf(),
+    val shouldShowOnlyFavorites: MutableState<Boolean> = mutableStateOf(false),
+    val shouldShowViewedEpisodes: MutableState<Boolean> = mutableStateOf(true),
     val refreshing: Boolean = false
 )

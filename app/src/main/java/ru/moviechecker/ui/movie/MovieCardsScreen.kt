@@ -35,6 +35,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -62,7 +63,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
@@ -101,12 +101,8 @@ fun MoviesScreen(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val context = LocalContext.current
 
-    val nonFavoritesVisibilityState = remember {
-        mutableStateOf(true)
-    }
-    val viewedVisibilityState = remember {
-        mutableStateOf(true)
-    }
+    val shouldShowOnlyFavorites = remember { uiState.shouldShowOnlyFavorites }
+    val shouldShowViewedEpisodes = remember { uiState.shouldShowViewedEpisodes }
 
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -115,11 +111,25 @@ fun MoviesScreen(
                 title = stringResource(MoviesDestination.titleRes),
                 canNavigateBack = false,
                 scrollBehavior = scrollBehavior,
-                onFavoritesClicked = {
-                    nonFavoritesVisibilityState.value = !nonFavoritesVisibilityState.value
-                },
-                onViewedClicked = {
-                    viewedVisibilityState.value = !viewedVisibilityState.value
+                actions = {
+                    IconButton(onClick = {
+                        shouldShowOnlyFavorites.value = !shouldShowOnlyFavorites.value
+                    }) {
+                        Icon(
+                            imageVector = if (shouldShowOnlyFavorites.value) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            contentDescription = null,
+                            tint = if (shouldShowOnlyFavorites.value) Color.Yellow else Color.Gray
+                        )
+                    }
+                    IconButton(onClick = {
+                        shouldShowViewedEpisodes.value = !shouldShowViewedEpisodes.value
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null,
+                            tint = if (shouldShowViewedEpisodes.value) Color.Green else Color.Gray
+                        )
+                    }
                 }
             )
         },
@@ -191,20 +201,16 @@ fun MoviesScreen(
         ) {
             MovieList(
                 movies = uiState.movies,
-                showNonFavorites = nonFavoritesVisibilityState.value,
-                showViewed = viewedVisibilityState.value,
                 onClick = { id, uri ->
                     val browserIntent = Intent(
                         Intent.ACTION_VIEW,
                         Uri.parse(uri.toString())
                     )
-                    ContextCompat.startActivity(context, browserIntent, null)
+                    context.startActivity(browserIntent)
 
                     viewModel.markEpisodeViewed(id)
                 },
-                onLongClick = {},
-                onViewedIconClick = { viewModel.switchEpisodeViewedMark(it) },
-                onFavoriteIconClick = { viewModel.switchFavoritesMark(it) }
+                onLongClick = {}
             )
         }
     }
@@ -213,28 +219,26 @@ fun MoviesScreen(
 @Composable
 fun MovieList(
     movies: List<MovieCardsView>,
-    showNonFavorites: Boolean,
-    showViewed: Boolean,
     modifier: Modifier = Modifier,
-    onClick: (Int, URI) -> Unit = { id, uri -> },
+    onClick: (Int, URI) -> Unit = { _, _ -> },
     onLongClick: (Int) -> Unit = {},
-    onViewedIconClick: (Int) -> Unit = {},
-    onFavoriteIconClick: (Int) -> Unit = {}
+    viewModel: MovieCardsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    val uiState = viewModel.uiState.collectAsState()
+    val shouldShowOnlyFavorites = remember { uiState.value.shouldShowOnlyFavorites }
+    val shouldShowViewedEpisodes = remember { uiState.value.shouldShowViewedEpisodes }
     LazyColumn(modifier = modifier.fillMaxSize()) {
         items(items = movies, key = { listOf(it.id, it.seasonNumber) }) { movie ->
             AnimatedVisibility(
-                visible = (showNonFavorites || movie.favoritesMark)
-                        && (showViewed || !movie.viewedMark),
+                visible = (!shouldShowOnlyFavorites.value || movie.favoritesMark)
+                        && (shouldShowViewedEpisodes.value || !movie.viewedMark),
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
                 MovieItem(
                     movie = movie,
                     onClick = onClick,
-                    onLongClick = onLongClick,
-                    onViewedIconClick = onViewedIconClick,
-                    onFavoriteIconClick = onFavoriteIconClick
+                    onLongClick = onLongClick
                 )
             }
         }
@@ -246,11 +250,11 @@ fun MovieList(
 fun MovieItem(
     movie: MovieCardsView,
     modifier: Modifier = Modifier,
-    onClick: (Int, URI) -> Unit = { id, uri -> },
+    onClick: (Int, URI) -> Unit = { _, _ -> },
     onLongClick: (Int) -> Unit = {},
-    onViewedIconClick: (Int) -> Unit = {},
-    onFavoriteIconClick: (Int) -> Unit = {}
+    viewModel: MovieCardsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     Card(
         modifier = modifier
@@ -304,7 +308,7 @@ fun MovieItem(
                         Icon(
                             imageVector = if (movie.favoritesMark) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                             contentDescription = null,
-                            modifier = Modifier.clickable { onFavoriteIconClick(movie.id) },
+                            modifier = Modifier.clickable { viewModel.switchFavoritesMark(movieId = movie.id) },
                             tint = if (movie.favoritesMark) Color.Yellow else Color.Gray
                         )
                         Text(
@@ -318,13 +322,12 @@ fun MovieItem(
                     movie.nextEpisodeNumber?.let { nextEpisodeNumber ->
                         if (nextEpisodeNumber < movie.lastEpisodeNumber) {
                             EpisodeItem(
-                                id = movie.nextEpisodeId,
+                                id = movie.nextEpisodeId!!,
                                 number = movie.nextEpisodeNumber,
                                 title = movie.nextEpisodeTitle,
                                 date = movie.nextEpisodeDate,
-                                viewedMark = movie.viewedMark,
-                                style = MaterialTheme.typography.bodySmall,
-                                onViewedIconClick = onViewedIconClick
+                                viewedMark = false,
+                                style = MaterialTheme.typography.bodySmall
                             )
                             HorizontalDivider()
                         }
@@ -336,8 +339,7 @@ fun MovieItem(
                         title = movie.lastEpisodeTitle,
                         date = movie.lastEpisodeDate,
                         viewedMark = movie.viewedMark,
-                        style = MaterialTheme.typography.bodySmall,
-                        onViewedIconClick = onViewedIconClick
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
             }
@@ -371,13 +373,13 @@ private fun Poster(
 
 @Composable
 fun EpisodeItem(
-    id: Int?,
+    id: Int,
     number: Int,
     title: String?,
     date: LocalDateTime?,
     viewedMark: Boolean,
-    onViewedIconClick: (Int) -> Unit,
-    style: TextStyle = LocalTextStyle.current
+    style: TextStyle = LocalTextStyle.current,
+    viewModel: MovieCardsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     Row(
         modifier = Modifier
@@ -389,7 +391,7 @@ fun EpisodeItem(
             imageVector = Icons.Default.Check,
             contentDescription = null,
             modifier = Modifier.clickable {
-                id?.let(onViewedIconClick)
+                viewModel.switchEpisodeViewedMark(id)
             },
             tint = if (viewedMark) Color.Green else Color.Gray
         )
@@ -524,9 +526,7 @@ fun MovieListPreview() {
                     lastEpisodeLink = URI.create("stub"),
                     viewedMark = true
                 )
-            ),
-            showNonFavorites = true,
-            showViewed = true
+            )
         )
     }
 }

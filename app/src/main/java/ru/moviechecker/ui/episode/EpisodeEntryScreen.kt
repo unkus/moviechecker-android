@@ -51,7 +51,7 @@ import java.time.format.FormatStyle
 import java.util.Currency
 import java.util.Locale
 
-object EpisodeEntryDestination : NavigationDestination {
+data object EpisodeEntryDestination : NavigationDestination {
     override val route = "episode_entry"
     override val titleRes = R.string.episode_entry_title
 }
