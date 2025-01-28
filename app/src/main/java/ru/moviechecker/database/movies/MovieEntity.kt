@@ -2,8 +2,10 @@ package ru.moviechecker.database.movies
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import ru.moviechecker.database.sites.SiteEntity
 
 @Entity(tableName = "movies", indices = [Index(value = ["site_id", "page_id"], unique = true)])
 data class MovieEntity(

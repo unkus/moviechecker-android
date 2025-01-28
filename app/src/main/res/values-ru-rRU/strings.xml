@@ -3,7 +3,7 @@
     <string name="app_name">Проверка новых серий</string>
     <string name="back_button">Назад</string>
     <string name="episode_detail_title">Детали</string>
-    <string name="edit_episode_title">Редактировать</string>
+    <string name="edit_movie_title">Редактировать</string>
     <string name="delete">Удалить</string>
     <string name="date">Дата</string>
     <string name="episode">Серия</string>

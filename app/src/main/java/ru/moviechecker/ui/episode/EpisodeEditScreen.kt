@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 
 data object EpisodeEditDestination : NavigationDestination {
     override val route = "episode_edit"
-    override val titleRes = R.string.edit_episode_title
+    override val titleRes = R.string.edit_movie_title
     const val episodeIdArg = "episode_id"
     val routeWithArgs = "$route/{$episodeIdArg}"
 }

@@ -12,8 +12,15 @@ import kotlinx.coroutines.flow.Flow
 interface SeasonDao {
     @Query("SELECT * FROM seasons s WHERE s.movie_id = :movieId AND s.number = :number")
     fun getSeasonByMovieIdAndNumber(movieId: Int, number: Int): SeasonEntity?
+
     @Query("SELECT * FROM seasons s WHERE s.movie_id = :movieId")
-    fun getSeasons(movieId: Int): Flow<List<SeasonEntity>>
+    fun getSeasonsByMovieIdStream(movieId: Int): Flow<List<SeasonEntity>>
+
+    @Query("SELECT * FROM seasons s WHERE s.movie_id = :movieId")
+    fun getSeasonsWithEpisodesByMovieIdStream(movieId: Int): Flow<List<SeasonWithEpisodes>>
+
+    @Query("SELECT COUNT(*) FROM seasons s WHERE s.movie_id = :movieId")
+    fun getNumberOfSeasonsByMovieId(movieId: Int): Flow<Int>
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     fun insert(vararg seasons: SeasonEntity)

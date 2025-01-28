@@ -2,7 +2,7 @@
     <string name="app_name">Moviechecker</string>
     <string name="back_button">Back</string>
     <string name="episode_detail_title">Details</string>
-    <string name="edit_episode_title">Edit</string>
+    <string name="edit_movie_title">Edit</string>
     <string name="delete">Delete</string>
     <string name="date">Date</string>
     <string name="episode">Episode</string>

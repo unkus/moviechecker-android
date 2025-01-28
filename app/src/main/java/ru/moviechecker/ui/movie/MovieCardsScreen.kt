@@ -94,6 +94,7 @@ data object MoviesDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoviesScreen(
+    navigateToMovieDetails: (Int) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MovieCardsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
@@ -210,7 +211,7 @@ fun MoviesScreen(
 
                     viewModel.markEpisodeViewed(id)
                 },
-                onLongClick = {}
+                onLongClick = { navigateToMovieDetails(it) }
             )
         }
     }

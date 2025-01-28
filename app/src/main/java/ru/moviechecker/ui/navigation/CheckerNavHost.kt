@@ -46,7 +46,7 @@ fun CheckerNavHost(
         }
         composable(
             route = MovieDetailsDestination.routeWithArgs,
-            arguments = listOf(navArgument(MovieDetailsDestination.movieIdArg) {
+            arguments = listOf(navArgument(MovieDetailsDestination.ID_ARG) {
                 type = NavType.IntType
             })
         ) {
