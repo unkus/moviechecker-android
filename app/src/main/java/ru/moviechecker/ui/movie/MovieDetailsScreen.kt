@@ -147,7 +147,7 @@ private fun MovieData(
     style: TextStyle = LocalTextStyle.current,
     viewModel: MovieDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val movieUiState = viewModel.movieDataUiState.collectAsState()
+    val movieUiState by viewModel.movieDataUiState.collectAsState()
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -159,7 +159,7 @@ private fun MovieData(
                 .padding(dimensionResource(id = R.dimen.padding_small)),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
         ) {
-            movieUiState.value.movie.poster?.let {
+            movieUiState.movie.poster?.let {
                 Poster(
                     it,
                     modifier = Modifier
@@ -169,14 +169,14 @@ private fun MovieData(
             }
             Row {
                 Icon(
-                    imageVector = if (movieUiState.value.movie.favoritesMark) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    imageVector = if (movieUiState.movie.favoritesMark) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = null,
-                    modifier = Modifier.clickable { viewModel.switchFavoritesMark(movieUiState.value.movie.id) },
-                    tint = if (movieUiState.value.movie.favoritesMark) Color.Yellow else Color.Gray
+                    modifier = Modifier.clickable { viewModel.switchFavoritesMark(movieUiState.movie.id) },
+                    tint = if (movieUiState.movie.favoritesMark) Color.Yellow else Color.Gray
                 )
-                Text(text = movieUiState.value.movie.title, style = style)
+                Text(text = movieUiState.movie.title, style = style)
             }
-            Text(text = "Сайт: ${movieUiState.value.movie.site}", style = style)
+            Text(text = "Сайт: ${movieUiState.movie.site}", style = style)
         }
     }
 }
