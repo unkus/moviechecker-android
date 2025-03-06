@@ -1,12 +1,8 @@
 package ru.moviechecker.database
 
-import android.content.Context
 import androidx.room.Room
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import ru.moviechecker.database.episodes.EpisodeDao
-import ru.moviechecker.database.episodes.EpisodeEntity
-import ru.moviechecker.database.episodes.EpisodeState
+import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -17,7 +13,9 @@ import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.net.URI
+import ru.moviechecker.database.episodes.EpisodeDao
+import ru.moviechecker.database.episodes.EpisodeEntity
+import ru.moviechecker.database.episodes.EpisodeState
 import java.time.LocalDateTime
 
 @RunWith(AndroidJUnit4::class)
@@ -55,7 +53,7 @@ class EpisodeDaoTest {
 
     @Before
     fun createDb() {
-        val context: Context = ApplicationProvider.getApplicationContext()
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
         checkerDatabase = Room.inMemoryDatabaseBuilder(context, CheckerDatabase::class.java)
             .allowMainThreadQueries()
             .build()

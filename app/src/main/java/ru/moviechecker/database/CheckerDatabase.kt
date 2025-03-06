@@ -106,8 +106,10 @@ abstract class CheckerDatabase : RoomDatabase() {
             runInTransaction {
                 val site = processSiteData(siteDao(), record.site)
                 val movie = processMovieData(movieDao(), site.id, site.address, record.movie)
-                val season = processSeasonData(seasonDao(), site.address, movie.id, record.season)
-                processEpisodeData(episodeDao(), season.id, record.episode)
+                record.season?.let {
+                    val season = processSeasonData(seasonDao(), site.address, movie.id, record.season)
+                    processEpisodeData(episodeDao(), season.id, record.episode!!)
+                }
             }
         }
     }

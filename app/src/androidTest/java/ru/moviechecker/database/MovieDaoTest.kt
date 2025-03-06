@@ -1,18 +1,19 @@
 package ru.moviechecker.database
 
-import android.content.Context
 import androidx.room.Room
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import ru.moviechecker.database.CheckerDatabase
-import ru.moviechecker.database.movies.MovieDao
-import ru.moviechecker.database.movies.MovieEntity
+import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
 import org.junit.After
-import org.junit.Assert
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import ru.moviechecker.database.CheckerDatabase
+import ru.moviechecker.database.movies.MovieDao
+import ru.moviechecker.database.movies.MovieEntity
 
 @RunWith(AndroidJUnit4::class)
 class MovieDaoTest {
@@ -26,7 +27,7 @@ class MovieDaoTest {
 
     @Before
     fun createDb() {
-        val context: Context = ApplicationProvider.getApplicationContext()
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
         checkerDatabase = Room.inMemoryDatabaseBuilder(context, CheckerDatabase::class.java)
             .allowMainThreadQueries()
             .build()
@@ -42,29 +43,29 @@ class MovieDaoTest {
     fun daoGetMovieBySiteIdAndPageId_returnsMovieFromDB() = runBlocking {
         movieDao.insert(movie1, movie2, movie3)
         movieDao.getMovieBySiteIdAndPageId(1, "movie1")?.let {
-            Assert.assertEquals(movie1, it)
-        }
+            assertEquals(movie1, it)
+        } ?: fail("Movie not found")
     }
 
     @Test
     fun daoGetMovieById_returnsMovieFromDB() = runBlocking {
         movieDao.insert(movie1, movie2, movie3)
         movieDao.getMovieById(4)?.let {
-            Assert.assertNull("Some movie found but not expected", it)
+            assertNull("Some movie found but not expected", it)
         }
         movieDao.getMovieById(2)?.let {
-            Assert.assertEquals(movie2, it)
-        }
+            assertEquals(movie2, it)
+        } ?: fail("Movie not found")
     }
 
     @Test
     fun daoGetMovieBySiteIdAndMovieId_returnsMovieFromDB() = runBlocking {
         movieDao.insert(movie1, movie2, movie3)
         movieDao.getMovieBySiteIdAndPageId(2, "movie2")?.let {
-            Assert.fail("Some movie found but not expected")
+            fail("Some movie found but not expected")
         }
         movieDao.getMovieBySiteIdAndPageId(1, "movie2")?.let {
-            Assert.assertEquals(movie2, it)
-        } ?: Assert.fail("Movie not found")
+            assertEquals(movie2, it)
+        } ?: fail("Movie not found")
     }
 }

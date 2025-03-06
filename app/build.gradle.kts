@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.compose)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.room)
     alias(libs.plugins.ksp)
 }
@@ -51,23 +51,19 @@ android {
         jvmTarget = "11"
     }
 
-    kotlin {
-
-    }
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.core)
     implementation(libs.androidx.runtime.android)
 
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room)
 
-    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.work.runtime)
 
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel)
+    implementation(libs.androidx.lifecycle.runtime)
+    implementation(libs.androidx.lifecycle.livedata)
 
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material3.android)
@@ -75,13 +71,16 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.tooling.preview.android)
 
-    implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.androidx.navigation.runtime)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.test.core.ktx)
-    implementation(libs.androidx.junit.ktx)
-    testImplementation(libs.androidx.ui.test.junit4.android)
-    testImplementation(libs.mockk.android)
-    androidTestImplementation(libs.junit)
+
+    androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+
+    testImplementation(libs.androidx.test.ext.junit)
+    testImplementation(libs.mockk)
+
     debugImplementation(libs.androidx.ui.tooling)
 
     ksp(libs.androidx.room.compiler)
