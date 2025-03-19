@@ -36,4 +36,8 @@
     <string name="cleanup">Cleanup</string>
     <string name="poster_error">Unable to process poster data</string>
     <string name="movies_title">Movies</string>
+    <string name="cd_open_navigation_drawer">Open navigation drawer</string>
+    <string name="cd_search">Search</string>
+    <string name="cd_favorites_filter">Favorites filter</string>
+    <string name="cd_viewed_filter">Viewed filter</string>
 </resources>

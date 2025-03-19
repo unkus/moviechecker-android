@@ -35,4 +35,8 @@
     <string name="cleanup">Очистка</string>
     <string name="poster_error">"Не могу отобразить постер"</string>
     <string name="movies_title">Фильмы/Сериалы</string>
+    <string name="cd_open_navigation_drawer">Открыть навигационный drawer</string>
+    <string name="cd_search">Поиск</string>
+    <string name="cd_favorites_filter">Фильтр по избранным</string>
+    <string name="cd_viewed_filter">Фильтр по просмотренным</string>
 </resources>
