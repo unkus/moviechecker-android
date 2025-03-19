@@ -67,8 +67,7 @@ dependencies {
 
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material3.android)
-
-    implementation(libs.androidx.paging)
+    implementation(libs.androidx.material3.window.size.class1.android)
 
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.tooling.preview.android)

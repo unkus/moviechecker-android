@@ -2,8 +2,6 @@
 <resources>
     <string name="app_name">Проверка новых серий</string>
     <string name="back_button">Назад</string>
-    <string name="episode_detail_title">Детали</string>
-    <string name="edit_movie_title">Редактировать</string>
     <string name="delete">Удалить</string>
     <string name="date">Дата</string>
     <string name="episode">Серия</string>
@@ -36,4 +34,8 @@
     <string name="poster_error">"Не могу отобразить постер"</string>
     <string name="movies_title">Фильмы/Сериалы</string>
     <string name="movie_details_title">Детализация Фильма/Сериала</string>
+    <string name="cd_open_navigation_drawer">Открыть навигационный drawer</string>
+    <string name="cd_search">Поиск</string>
+    <string name="cd_favorites_filter">Фильтр по избранным</string>
+    <string name="cd_viewed_filter">Фильтр по просмотренным</string>
 </resources>

@@ -2,8 +2,6 @@ package ru.moviechecker.ui.movie
 
 import android.content.Intent
 import android.graphics.BitmapFactory
-import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.compose.animation.AnimatedVisibility
@@ -29,8 +27,10 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -41,15 +41,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.TopAppBarState
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -58,80 +57,53 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.work.Constraints
+import androidx.core.net.toUri
 import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import kotlinx.coroutines.launch
-import ru.moviechecker.CheckerTopAppBar
 import ru.moviechecker.R
-import ru.moviechecker.database.movies.MovieCardsView
-import ru.moviechecker.ui.AppViewModelProvider
-import ru.moviechecker.ui.navigation.NavigationDestination
-import ru.moviechecker.ui.theme.MoviecheckerTheme
+import ru.moviechecker.ui.theme.CheckerTheme
 import ru.moviechecker.workers.AsyncCleanupDataWorker
-import ru.moviechecker.workers.RetrieveDataWorker
 import java.net.URI
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
-data object MoviesDestination : NavigationDestination {
-    override val route = "movies"
-    override val titleRes = R.string.movies_title
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoviesScreen(
-    navigateToMovieDetails: (Int) -> Unit,
-    modifier: Modifier = Modifier,
-    viewModel: MovieCardsViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    uiState: MoviesUiState,
+    moviesProvider: () -> List<MovieCardModel>,
+    openDrawer: () -> Unit,
+    onRefresh: () -> Unit,
+    onShouldShowOnlyFavoritesIconClick: () -> Unit,
+    onShouldShowViewedEpisodesIconClick: () -> Unit,
+    onMovieClick: (Int) -> Unit,
+    onMovieLongClick: (Int) -> Unit,
+    onFavoriteIconClick: (Int) -> Unit,
+    onViewedIconClick: (Int) -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val topAppBarState = rememberTopAppBarState()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
     val context = LocalContext.current
 
-    val shouldShowOnlyFavorites = remember { uiState.shouldShowOnlyFavorites }
-    val shouldShowViewedEpisodes = remember { uiState.shouldShowViewedEpisodes }
-
     Scaffold(
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            CheckerTopAppBar(
-                title = stringResource(MoviesDestination.titleRes),
-                canNavigateBack = false,
-                scrollBehavior = scrollBehavior,
-                actions = {
-                    IconButton(onClick = {
-                        shouldShowOnlyFavorites.value = !shouldShowOnlyFavorites.value
-                    }) {
-                        Icon(
-                            imageVector = if (shouldShowOnlyFavorites.value) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = null,
-                            tint = if (shouldShowOnlyFavorites.value) Color.Yellow else Color.Gray
-                        )
-                    }
-                    IconButton(onClick = {
-                        shouldShowViewedEpisodes.value = !shouldShowViewedEpisodes.value
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = null,
-                            tint = if (shouldShowViewedEpisodes.value) Color.Green else Color.Gray
-                        )
-                    }
-                }
+            MoviesTopAppBar(
+                shouldShowOnlyFavorites = uiState.shouldShowOnlyFavorites,
+                shouldShowViewedEpisodes = uiState.shouldShowViewedEpisodes,
+                openDrawer = openDrawer,
+                topAppBarState = topAppBarState,
+                onShouldShowOnlyFavoritesClick = onShouldShowOnlyFavoritesIconClick,
+                onShouldShowViewedEpisodesClick = onShouldShowViewedEpisodesIconClick,
             )
         },
         floatingActionButton = {
@@ -155,91 +127,120 @@ fun MoviesScreen(
             }
         }
     ) { innerPadding ->
-        var isRefreshing by remember { mutableStateOf(false) }
-        val coroutineScope = rememberCoroutineScope()
-
-        val onRefresh: () -> Unit = {
-            isRefreshing = true
-            coroutineScope.launch {
-                val workManager = WorkManager.getInstance(context);
-                val workRequest = OneTimeWorkRequestBuilder<RetrieveDataWorker>()
-                    .setConstraints(
-                        Constraints.Builder()
-                            .setRequiredNetworkType(NetworkType.CONNECTED)
-                            .setRequiresStorageNotLow(true)
-                            .build()
-                    )
-                    .build()
-                workManager
-                    .beginUniqueWork(
-                        RetrieveDataWorker::class.java.simpleName,
-                        ExistingWorkPolicy.KEEP,
-                        workRequest
-                    )
-                    .enqueue()
-
-                workManager.getWorkInfoByIdFlow(workRequest.id)
-                    .collect { workInfo ->
-                        workInfo?.let {
-                            Log.d(this.javaClass.simpleName, "Статус обновления: ${workInfo.state}")
-                            if (workInfo.state == WorkInfo.State.SUCCEEDED) {
-                                isRefreshing = false
-                            }
-                        }
-                    }
-            }
-        }
-
-        val pullToRefreshState = rememberPullToRefreshState()
+        val refreshState = rememberPullToRefreshState()
 
         PullToRefreshBox(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
-            state = pullToRefreshState,
-            isRefreshing = isRefreshing,
+            isRefreshing = uiState.isLoading,
             onRefresh = onRefresh,
+            state = refreshState,
+            indicator = {
+                Indicator(
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .align(Alignment.TopCenter),
+                    isRefreshing = uiState.isLoading,
+                    state = refreshState
+                )
+            }
         ) {
             MovieList(
-                movies = uiState.movies,
-                onClick = { id, uri ->
-                    val browserIntent = Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse(uri.toString())
-                    )
-                    context.startActivity(browserIntent)
-
-                    viewModel.markEpisodeViewed(id)
-                },
-                onLongClick = { navigateToMovieDetails(it) }
+                movies = moviesProvider(),
+                shouldShowOnlyFavorites = uiState.shouldShowOnlyFavorites,
+                shouldShowViewedEpisodes = uiState.shouldShowViewedEpisodes,
+                onMovieClick = { id -> onMovieClick(id) },
+                onMovieLongClick = onMovieLongClick,
+                onFavoritesIconClick = onFavoriteIconClick,
+                onEpisodeViewedIconClick = onViewedIconClick
             )
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MoviesTopAppBar(
+    shouldShowOnlyFavorites: Boolean,
+    shouldShowViewedEpisodes: Boolean,
+    openDrawer: () -> Unit,
+    modifier: Modifier = Modifier,
+    topAppBarState: TopAppBarState = rememberTopAppBarState(),
+    scrollBehavior: TopAppBarScrollBehavior? =
+        TopAppBarDefaults.enterAlwaysScrollBehavior(topAppBarState),
+    onShouldShowOnlyFavoritesClick: () -> Unit,
+    onShouldShowViewedEpisodesClick: () -> Unit,
+) {
+    val context = LocalContext.current
+    val title = stringResource(id = R.string.movies_title)
+    CenterAlignedTopAppBar(
+        title = {
+            Text(title)
+        },
+        navigationIcon = {
+            IconButton(onClick = openDrawer) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_logo),
+                    contentDescription = stringResource(R.string.cd_open_navigation_drawer)
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = onShouldShowOnlyFavoritesClick) {
+                Icon(
+                    imageVector = if (shouldShowOnlyFavorites) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                    tint = if (shouldShowOnlyFavorites) Color.Yellow else Color.Gray,
+                    contentDescription = stringResource(R.string.cd_favorites_filter)
+                )
+            }
+            IconButton(onClick = onShouldShowViewedEpisodesClick) {
+                Icon(
+                    imageVector = Icons.Filled.Check,
+                    tint = if (shouldShowViewedEpisodes) Color.Green else Color.Gray,
+                    contentDescription = stringResource(R.string.cd_viewed_filter)
+                )
+            }
+            IconButton(onClick = {
+                Toast.makeText(
+                    context,
+                    "Search is not yet implemented in this configuration",
+                    Toast.LENGTH_LONG
+                ).show()
+            }) {
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = stringResource(R.string.cd_search)
+                )
+            }
+        },
+        scrollBehavior = scrollBehavior,
+        modifier = modifier
+    )
+}
+
 @Composable
 fun MovieList(
-    movies: List<MovieCardsView>,
+    movies: List<MovieCardModel>,
+    shouldShowOnlyFavorites: Boolean,
+    shouldShowViewedEpisodes: Boolean,
     modifier: Modifier = Modifier,
-    onClick: (Int, URI) -> Unit = { _, _ -> },
-    onLongClick: (Int) -> Unit = {},
-    viewModel: MovieCardsViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    onMovieClick: (Int) -> Unit,
+    onMovieLongClick: (Int) -> Unit,
+    onFavoritesIconClick: (Int) -> Unit,
+    onEpisodeViewedIconClick: (Int) -> Unit
 ) {
-    val uiState = viewModel.uiState.collectAsState()
-    val shouldShowOnlyFavorites = remember { uiState.value.shouldShowOnlyFavorites }
-    val shouldShowViewedEpisodes = remember { uiState.value.shouldShowViewedEpisodes }
     LazyColumn(modifier = modifier.fillMaxSize()) {
         items(items = movies, key = { listOf(it.id, it.seasonNumber) }) { movie ->
             AnimatedVisibility(
-                visible = (!shouldShowOnlyFavorites.value || movie.favoritesMark)
-                        && (shouldShowViewedEpisodes.value || !movie.viewedMark),
+                visible = (!shouldShowOnlyFavorites || movie.favoritesMark)
+                        && (shouldShowViewedEpisodes || !movie.viewedMark),
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
                 MovieItem(
                     movie = movie,
-                    onClick = onClick,
-                    onLongClick = onLongClick
+                    onClick = onMovieClick,
+                    onLongClick = onMovieLongClick,
+                    onFavoritesIconClick = onFavoritesIconClick,
+                    onEpisodeViewedIconClick = onEpisodeViewedIconClick
                 )
             }
         }
@@ -249,28 +250,26 @@ fun MovieList(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MovieItem(
-    movie: MovieCardsView,
+    movie: MovieCardModel,
     modifier: Modifier = Modifier,
-    onClick: (Int, URI) -> Unit = { _, _ -> },
-    onLongClick: (Int) -> Unit = {},
-    viewModel: MovieCardsViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    onClick: (Int) -> Unit,
+    onLongClick: (Int) -> Unit,
+    onFavoritesIconClick: (Int) -> Unit,
+    onEpisodeViewedIconClick: (Int) -> Unit,
 ) {
-    val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     Card(
         modifier = modifier
             .combinedClickable(
                 onClick = {
-                    movie.nextEpisodeId?.let { id ->
-                        movie.nextEpisodeLink?.let { onClick(id, it) }
-                            ?: Toast
-                                .makeText(
-                                    context,
-                                    "Эпизод %d не имеет ссылки".format(id),
-                                    LENGTH_SHORT
-                                )
-                                .show()
-                    } ?: onClick(movie.lastEpisodeId, movie.lastEpisodeLink)
+                    val link = movie.nextEpisodeLink ?: movie.lastEpisodeLink
+                    val browserIntent = Intent(
+                        Intent.ACTION_VIEW,
+                        link.toString().toUri()
+                    )
+                    context.startActivity(browserIntent)
+
+                    onClick(movie.nextEpisodeId ?: movie.lastEpisodeId)
                 },
                 onLongClick = { onLongClick(movie.id) }
             )
@@ -309,7 +308,7 @@ fun MovieItem(
                         Icon(
                             imageVector = if (movie.favoritesMark) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                             contentDescription = null,
-                            modifier = Modifier.clickable { viewModel.switchFavoritesMark(movieId = movie.id) },
+                            modifier = Modifier.clickable { onFavoritesIconClick(movie.id) },
                             tint = if (movie.favoritesMark) Color.Yellow else Color.Gray
                         )
                         Text(
@@ -328,6 +327,7 @@ fun MovieItem(
                                 title = movie.nextEpisodeTitle,
                                 date = movie.nextEpisodeDate,
                                 viewedMark = false,
+                                onEpisodeViewedIconClick = onEpisodeViewedIconClick,
                                 style = MaterialTheme.typography.bodySmall
                             )
                             HorizontalDivider()
@@ -340,6 +340,7 @@ fun MovieItem(
                         title = movie.lastEpisodeTitle,
                         date = movie.lastEpisodeDate,
                         viewedMark = movie.viewedMark,
+                        onEpisodeViewedIconClick = onEpisodeViewedIconClick,
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -379,8 +380,8 @@ fun EpisodeItem(
     title: String?,
     date: LocalDateTime?,
     viewedMark: Boolean,
-    style: TextStyle = LocalTextStyle.current,
-    viewModel: MovieCardsViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    onEpisodeViewedIconClick: (Int) -> Unit,
+    style: TextStyle = LocalTextStyle.current
 ) {
     Row(
         modifier = Modifier
@@ -392,7 +393,7 @@ fun EpisodeItem(
             imageVector = Icons.Default.Check,
             contentDescription = null,
             modifier = Modifier.clickable {
-                viewModel.switchEpisodeViewedMark(id)
+                onEpisodeViewedIconClick(id)
             },
             tint = if (viewedMark) Color.Green else Color.Gray
         )
@@ -467,11 +468,12 @@ fun Date(
 @Preview(locale = "ru-RU")
 @Composable
 fun MovieListPreview() {
-    MoviecheckerTheme {
+    CheckerTheme {
         MovieList(
             movies = listOf(
-                MovieCardsView(
+                MovieCardModel(
                     id = 1,
+                    seasonId = 1,
                     seasonNumber = 1,
                     title = "Некоторый сериал с длинным названием",
                     favoritesMark = false,
@@ -485,8 +487,9 @@ fun MovieListPreview() {
                     lastEpisodeLink = URI.create("stub"),
                     viewedMark = false
                 ),
-                MovieCardsView(
+                MovieCardModel(
                     id = 2,
+                    seasonId = 2,
                     seasonNumber = 2,
                     title = "Сериал 2",
                     favoritesMark = true,
@@ -500,8 +503,9 @@ fun MovieListPreview() {
                     lastEpisodeLink = URI.create("stub"),
                     viewedMark = false
                 ),
-                MovieCardsView(
+                MovieCardModel(
                     id = 3,
+                    seasonId = 3,
                     seasonNumber = 1,
                     title = "Сериал 3",
                     favoritesMark = true,
@@ -515,8 +519,9 @@ fun MovieListPreview() {
                     lastEpisodeLink = URI.create("stub"),
                     viewedMark = false
                 ),
-                MovieCardsView(
+                MovieCardModel(
                     id = 2,
+                    seasonId = 1,
                     seasonNumber = 1,
                     title = "Просмотренный сериал",
                     favoritesMark = true,
@@ -527,7 +532,13 @@ fun MovieListPreview() {
                     lastEpisodeLink = URI.create("stub"),
                     viewedMark = true
                 )
-            )
+            ),
+            shouldShowOnlyFavorites = false,
+            shouldShowViewedEpisodes = false,
+            onMovieClick = {},
+            onMovieLongClick = {},
+            onFavoritesIconClick = {},
+            onEpisodeViewedIconClick = {}
         )
     }
 }
