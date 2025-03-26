@@ -146,6 +146,7 @@ fun MoviesScreen(
                 movies = moviesProvider(),
                 shouldShowOnlyFavorites = uiState.shouldShowOnlyFavorites,
                 shouldShowViewedEpisodes = uiState.shouldShowViewedEpisodes,
+                modifier = Modifier.padding(innerPadding),
                 onMovieClick = { id -> onMovieClick(id) },
                 onMovieLongClick = onMovieLongClick,
                 onFavoritesIconClick = onFavoriteIconClick,
@@ -226,7 +227,7 @@ fun MovieList(
     onMovieClick: (Int) -> Unit,
     onMovieLongClick: (Int) -> Unit,
     onFavoritesIconClick: (Int) -> Unit,
-    onEpisodeViewedIconClick: (Int) -> Unit
+    onEpisodeViewedIconClick: (Int) -> Unit,
 ) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
         items(items = movies, key = { listOf(it.id, it.seasonNumber) }) { movie ->
