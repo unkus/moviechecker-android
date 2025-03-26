@@ -1,25 +1,26 @@
 package ru.moviechecker.ui.movie
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ru.moviechecker.MovieDetailsRoute
 import ru.moviechecker.database.episodes.EpisodeEntity
 import ru.moviechecker.database.episodes.EpisodeState
 import ru.moviechecker.database.episodes.EpisodesRepository
 import ru.moviechecker.database.movies.MovieDetails
-import ru.moviechecker.database.movies.MovieEntity
 import ru.moviechecker.database.movies.MoviesRepository
 import ru.moviechecker.database.seasons.SeasonWithEpisodes
 import ru.moviechecker.database.seasons.SeasonsRepository
-import java.net.URI
 import java.time.LocalDateTime
 
 class MovieDetailsViewModel(
@@ -29,53 +30,52 @@ class MovieDetailsViewModel(
     private val episodesRepository: EpisodesRepository
 ) : ViewModel() {
 
-    val movieId: Int = checkNotNull(savedStateHandle[MovieDetailsDestination.ID_ARG])
+    private val movieRoute = savedStateHandle.toRoute<MovieDetailsRoute>()
 
-    val movieDataUiState: StateFlow<MovieDataUiState> =
-        moviesRepository.getMovieDetailsStream(movieId)
-            .map(MovieModel::fromEntity)
-            .map { model -> MovieDataUiState(model) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000L),
-                initialValue = MovieDataUiState(MovieModel.empty)
-            )
+    private val viewModelState = MutableStateFlow(
+        MovieDetailsUiState(
+            movie = MovieModel.empty,
+            expandedSeasonNumber = 0
+        )
+    )
 
-    val seasonListUiState: StateFlow<SeasonListUiState> =
-        seasonsRepository.getSeasonsWithEpisodesByMovieIdStream(movieId)
-            .map { seasons ->
-                seasons.asFlow()
-                    .map { season ->
-                        SeasonModel.fromEntity(
-                            entity = season,
-                            episodes = season.episodes.asFlow().map(EpisodeModel::fromEntity)
-                                .toList()
+    val uiState = viewModelState
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = viewModelState.value
+        )
+
+    val seasons = seasonsRepository.getSeasonsWithEpisodesByMovieIdStream(movieRoute.id)
+        .map { entities -> entities.map(SeasonModel::fromEntity) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000L),
+            initialValue = emptyList()
+        )
+
+    init {
+        viewModelScope.launch {
+            moviesRepository.getMovieWithSiteByIdStream(movieRoute.id)
+                .collect { entity ->
+                    viewModelState.update {
+                        it.copy(
+                            movie = MovieModel.fromEntity(entity)
                         )
                     }
-                    .toList()
-            }
-            .map { models -> SeasonListUiState(models) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000L),
-                initialValue = SeasonListUiState(listOf())
-            )
+                }
+        }
+    }
 
-    val episodeListUiState: StateFlow<EpisodeListUiState> =
-        episodesRepository.getEpisodesBySeasonIdStream(seasonListUiState.value.expandedSeasonId)
-            .map { episodes ->
-                EpisodeListUiState(
-                    episodes.asFlow().map { episode -> EpisodeModel.fromEntity(episode) }.toList()
-                )
-            }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000L),
-                initialValue = EpisodeListUiState(listOf())
-            )
+    fun onRefresh(context: Context) {
 
+    }
 
-    fun switchFavoritesMark(movieId: Int) {
+    fun setExpandedSeason(seasonNumber: Int) {
+        viewModelState.update { it.copy(expandedSeasonNumber = if (it.expandedSeasonNumber == seasonNumber) 0 else seasonNumber) }
+    }
+
+    fun toggleFavoritesMark(movieId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             moviesRepository.findById(movieId)?.let { movie ->
                 movie.favoritesMark = !movie.favoritesMark
@@ -84,7 +84,7 @@ class MovieDetailsViewModel(
         }
     }
 
-    fun switchEpisodeViewedMark(episodeId: Int) {
+    fun toggleEpisodeViewedMark(episodeId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             episodesRepository.findById(episodeId)?.let { episode ->
                 episode.state = if (episode.state == EpisodeState.VIEWED) {
@@ -97,65 +97,62 @@ class MovieDetailsViewModel(
             }
         }
     }
+
+    companion object {
+        fun provideFactory(
+            savedStateHandle: SavedStateHandle,
+            moviesRepository: MoviesRepository,
+            seasonsRepository: SeasonsRepository,
+            episodesRepository: EpisodesRepository
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return MovieDetailsViewModel(
+                    savedStateHandle,
+                    moviesRepository,
+                    seasonsRepository,
+                    episodesRepository
+                ) as T
+            }
+        }
+    }
 }
 
-data class MovieDataUiState(
-    val movie: MovieModel
-)
-
-data class SeasonListUiState(
-    val seasons: List<SeasonModel>,
-    var expandedSeasonId: Int = 0
-)
-
-data class EpisodeListUiState(
-    val episodes: List<EpisodeModel>
+data class MovieDetailsUiState(
+    val movie: MovieModel,
+    var expandedSeasonNumber: Int = 0
 )
 
 data class MovieModel(
-    val id: Int = 0,
-    val site: URI,
+    val id: Int,
+    val site: String,
     val pageId: String,
     val title: String,
     val link: String? = null,
     val poster: ByteArray? = null,
-    val favoritesMark: Boolean,
-    val seasonCount: Int
+    val favoritesMark: Boolean
 ) {
     companion object Factory {
 
         val empty = MovieModel(
             id = 0,
-            site = URI.create(""),
+            site = "",
             pageId = "",
             title = "",
             link = "",
             poster = byteArrayOf(),
-            favoritesMark = false,
-            seasonCount = 0
+            favoritesMark = false
         )
 
         fun fromEntity(entity: MovieDetails): MovieModel {
             return MovieModel(
                 id = entity.id,
-                site = entity.siteAddress,
+                site = entity.address,
                 pageId = entity.pageId,
                 title = entity.title,
                 link = entity.link,
                 poster = entity.poster,
-                favoritesMark = entity.favoritesMark,
-                seasonCount = entity.seasonCount
-            )
-        }
-
-        fun toEntity(details: MovieModel): MovieEntity {
-            return MovieEntity(
-                id = details.id,
-                pageId = details.pageId,
-                title = details.title,
-                link = details.link,
-                poster = details.poster,
-                favoritesMark = details.favoritesMark
+                favoritesMark = entity.favoritesMark
             )
         }
     }
@@ -176,7 +173,6 @@ data class MovieModel(
             if (!poster.contentEquals(other.poster)) return false
         } else if (other.poster != null) return false
         if (favoritesMark != other.favoritesMark) return false
-        if (seasonCount != other.seasonCount) return false
 
         return true
     }
@@ -189,28 +185,27 @@ data class MovieModel(
         result = 31 * result + (link?.hashCode() ?: 0)
         result = 31 * result + (poster?.contentHashCode() ?: 0)
         result = 31 * result + favoritesMark.hashCode()
-        result = 31 * result + seasonCount
         return result
     }
 }
 
 data class SeasonModel(
-    val id: Int = 0,
+    val id: Int,
     val number: Int,
     val title: String? = null,
     val link: String? = null,
     val poster: ByteArray? = null,
-    val episodes: List<EpisodeModel> = listOf()
+    val episodes: List<EpisodeModel> = emptyList()
 ) {
     companion object Factory {
-        fun fromEntity(entity: SeasonWithEpisodes, episodes: List<EpisodeModel>): SeasonModel {
+        fun fromEntity(entity: SeasonWithEpisodes): SeasonModel {
             return SeasonModel(
-                id = entity.seasonEntity.id,
-                number = entity.seasonEntity.number,
-                title = entity.seasonEntity.title,
-                link = entity.seasonEntity.link,
-                poster = entity.seasonEntity.poster,
-                episodes = episodes
+                id = entity.season.id,
+                number = entity.season.number,
+                title = entity.season.title,
+                link = entity.season.link,
+                poster = entity.season.poster,
+                episodes = entity.episodes.map(EpisodeModel::fromEntity)
             )
         }
     }
@@ -246,7 +241,7 @@ data class SeasonModel(
 }
 
 data class EpisodeModel(
-    val id: Int = 0,
+    val id: Int,
     val number: Int,
     val title: String? = null,
     val link: String,

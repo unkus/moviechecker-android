@@ -149,7 +149,8 @@ abstract class CheckerDatabase : RoomDatabase() {
                 pageId = movieData.pageId,
                 title = movieData.title,
                 link = movieData.link,
-                poster = movieData.posterLink?.let { siteAddress.resolve(it).toURL()?.readBytes() }
+                poster = movieData.posterLink?.let { siteAddress.resolve(it).toURL()?.readBytes() },
+                favoritesMark = false
             )
         )
 

@@ -38,4 +38,5 @@
     <string name="cd_search">Поиск</string>
     <string name="cd_favorites_filter">Фильтр по избранным</string>
     <string name="cd_viewed_filter">Фильтр по просмотренным</string>
+    <string name="cd_back">Назад</string>
 </resources>

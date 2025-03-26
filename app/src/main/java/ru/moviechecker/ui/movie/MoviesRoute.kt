@@ -8,7 +8,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun MoviesRoute(
     viewModel: MovieCardsViewModel,
-    openDrawer: () -> Unit
+    openDrawer: () -> Unit,
+    navigateToMovieDetails: (Int) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val movies by viewModel.movies.collectAsStateWithLifecycle()
@@ -22,7 +23,7 @@ fun MoviesRoute(
         onShouldShowOnlyFavoritesIconClick = { viewModel.toggleShouldShowOnlyFavoritesFlag() },
         onShouldShowViewedEpisodesIconClick = { viewModel.toggleShouldShowViewedEpisodesFlag() },
         onMovieClick = { id -> viewModel.markEpisodeViewed(id) },
-        onMovieLongClick = { },
+        onMovieLongClick = { id -> navigateToMovieDetails(id) },
         onFavoriteIconClick = { id -> viewModel.toggleFavoritesMark(id) },
         onViewedIconClick = { id -> viewModel.toggleEpisodeViewedMark(id) },
     )

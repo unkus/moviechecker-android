@@ -4,7 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import java.net.URI
 import java.time.LocalDateTime
 
 @Entity(tableName = "episodes", indices = [Index(value = ["season_id", "number"], unique = true), Index(value = ["state"])])
