@@ -56,7 +56,7 @@ class MovieDetailsViewModel(
 
     init {
         viewModelScope.launch {
-            moviesRepository.getMovieWithSiteByIdStream(movieRoute.id)
+            moviesRepository.getMovieDetailsStream(movieRoute.id)
                 .collect { entity ->
                     viewModelState.update {
                         it.copy(

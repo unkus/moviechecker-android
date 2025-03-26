@@ -43,7 +43,7 @@ interface MovieDao {
             "WHERE movie.id = :id " +
             "ORDER BY season.number ASC " +
             "LIMIT 1")
-    fun getMovieWithSiteByIdStream(id: Int): Flow<MovieDetails>
+    fun getMovieDetailsStream(id: Int): Flow<MovieDetails>
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     fun insert(vararg movies: MovieEntity)
