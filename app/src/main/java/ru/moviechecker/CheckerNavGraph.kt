@@ -19,7 +19,7 @@ import ru.moviechecker.ui.movie.MoviesRoute
 object MoviesRoute
 
 @Serializable
-data class MovieDetailsRoute(val id: Int)
+data class MovieDetailsRoute(val movieId: Int)
 
 @Composable
 fun CheckerNavGraph(
@@ -45,14 +45,14 @@ fun CheckerNavGraph(
                 openDrawer = openDrawer,
                 navigateToMovieDetails = { movieId ->
                     navController.navigate(
-                        route = MovieDetailsRoute(id = movieId)
+                        route = MovieDetailsRoute(movieId = movieId)
                     )
                 }
             )
         }
         composable<MovieDetailsRoute> { navBackStack ->
             val movie = navBackStack.toRoute<MovieDetailsRoute>()
-            navBackStack.savedStateHandle["id"] = movie.id
+            navBackStack.savedStateHandle["id"] = movie.movieId
             val movieDetailsViewModel: MovieDetailsViewModel = viewModel(
                 factory = MovieDetailsViewModel.provideFactory(
                     savedStateHandle = navBackStack.savedStateHandle,

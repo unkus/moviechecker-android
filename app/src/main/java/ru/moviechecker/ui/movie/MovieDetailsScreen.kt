@@ -62,9 +62,10 @@ import ru.moviechecker.ui.theme.CheckerTheme
 @Composable
 fun MovieDetailsScreen(
     uiState: MovieDetailsUiState,
-    seasons: () -> List<SeasonModel>,
+    movieProvider: () -> MovieModel?,
+    seasonsProvider: () -> List<SeasonModel>,
     onRefresh: () -> Unit = {},
-    onFavoriteIconClick: () -> Unit = {},
+    onFavoriteIconClick: (Int) -> Unit = {},
     onSeasonExpanded: (Int) -> Unit = {},
     onEpisodeClick: (Int) -> Unit = {},
     onEpisodeViewedMarkIconClick: (Int) -> Unit = {},
@@ -84,47 +85,40 @@ fun MovieDetailsScreen(
         }
     ) { innerPadding ->
         LazyColumn(contentPadding = innerPadding) {
-            item {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(dimensionResource(id = R.dimen.padding_small)),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                ) {
-                    Column(
+            movieProvider()?.let { movie ->
+                item {
+                    Card(
                         modifier = Modifier
+                            .fillMaxWidth()
                             .padding(dimensionResource(id = R.dimen.padding_small)),
-                        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
-                        uiState.movie.poster?.let {
+                        Column(
+                            modifier = Modifier
+                                .padding(dimensionResource(id = R.dimen.padding_small)),
+                            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
+                        ) {
                             Poster(
-                                it,
+                                movie.poster,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .align(CenterHorizontally)
                             )
-                        } ?: seasons().firstOrNull()?.poster?.let {
-                            Poster(
-                                it,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .align(CenterHorizontally)
-                            )
+                            Row {
+                                Icon(
+                                    imageVector = if (movie.favoritesMark) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                    contentDescription = null,
+                                    modifier = Modifier.clickable { onFavoriteIconClick(movie.id) },
+                                    tint = if (movie.favoritesMark) Color.Yellow else Color.Gray
+                                )
+                                Text(text = movie.title)
+                            }
+                            Text(text = "Сайт: ${movie.site}")
                         }
-                        Row {
-                            Icon(
-                                imageVector = if (uiState.movie.favoritesMark) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                                contentDescription = null,
-                                modifier = Modifier.clickable { onFavoriteIconClick() },
-                                tint = if (uiState.movie.favoritesMark) Color.Yellow else Color.Gray
-                            )
-                            Text(text = uiState.movie.title)
-                        }
-                        Text(text = "Сайт: ${uiState.movie.site}")
                     }
                 }
             }
-            items(items = seasons(), key = { listOf(it.number) }) { season ->
+            items(items = seasonsProvider(), key = { listOf(it.number) }) { season ->
                 val rotation = animateFloatAsState(
                     targetValue = if (uiState.expandedSeasonNumber == season.number) 180f else 0f,
                     label = "expand"

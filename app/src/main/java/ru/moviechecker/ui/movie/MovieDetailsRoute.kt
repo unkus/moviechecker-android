@@ -11,15 +11,17 @@ fun MovieDetailsRoute(
     navigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val movie by viewModel.movie.collectAsStateWithLifecycle()
     val seasons by viewModel.seasons.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     MovieDetailsScreen(
         uiState = uiState,
-        seasons = { seasons },
+        movieProvider = { movie },
+        seasonsProvider = { seasons },
         onRefresh = { viewModel.onRefresh(context) },
         onSeasonExpanded = { seasonNumber -> viewModel.setExpandedSeason(seasonNumber) },
-        onFavoriteIconClick = { viewModel.toggleFavoritesMark(uiState.movie.id) },
+        onFavoriteIconClick = { id -> viewModel.toggleFavoritesMark(id) },
         onEpisodeClick = { episodeId -> viewModel.toggleEpisodeViewedMark(episodeId) },
         onEpisodeViewedMarkIconClick = { episodeId -> viewModel.toggleEpisodeViewedMark(episodeId) },
         navigateBack = navigateBack

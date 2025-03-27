@@ -30,14 +30,9 @@ class MovieDetailsViewModel(
     private val episodesRepository: EpisodesRepository
 ) : ViewModel() {
 
-    private val movieRoute = savedStateHandle.toRoute<MovieDetailsRoute>()
+    private val route = savedStateHandle.toRoute<MovieDetailsRoute>()
 
-    private val viewModelState = MutableStateFlow(
-        MovieDetailsUiState(
-            movie = MovieModel.empty,
-            expandedSeasonNumber = 0
-        )
-    )
+    private val viewModelState = MutableStateFlow(MovieDetailsUiState())
 
     val uiState = viewModelState
         .stateIn(
@@ -46,26 +41,21 @@ class MovieDetailsViewModel(
             initialValue = viewModelState.value
         )
 
-    val seasons = seasonsRepository.getSeasonsWithEpisodesByMovieIdStream(movieRoute.id)
+    val movie = moviesRepository.getMovieDetailsStream(route.movieId)
+        .map(MovieModel::fromEntity)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000L),
+            initialValue = null
+        )
+
+    val seasons = seasonsRepository.getSeasonsWithEpisodesByMovieIdStream(route.movieId)
         .map { entities -> entities.map(SeasonModel::fromEntity) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000L),
             initialValue = emptyList()
         )
-
-    init {
-        viewModelScope.launch {
-            moviesRepository.getMovieDetailsStream(movieRoute.id)
-                .collect { entity ->
-                    viewModelState.update {
-                        it.copy(
-                            movie = MovieModel.fromEntity(entity)
-                        )
-                    }
-                }
-        }
-    }
 
     fun onRefresh(context: Context) {
 
@@ -119,7 +109,6 @@ class MovieDetailsViewModel(
 }
 
 data class MovieDetailsUiState(
-    val movie: MovieModel,
     var expandedSeasonNumber: Int = 0
 )
 
@@ -128,21 +117,11 @@ data class MovieModel(
     val site: String,
     val pageId: String,
     val title: String,
-    val link: String? = null,
-    val poster: ByteArray? = null,
+    val link: String,
+    val poster: ByteArray,
     val favoritesMark: Boolean
 ) {
     companion object Factory {
-
-        val empty = MovieModel(
-            id = 0,
-            site = "",
-            pageId = "",
-            title = "",
-            link = "",
-            poster = byteArrayOf(),
-            favoritesMark = false
-        )
 
         fun fromEntity(entity: MovieDetails): MovieModel {
             return MovieModel(
@@ -168,10 +147,7 @@ data class MovieModel(
         if (pageId != other.pageId) return false
         if (title != other.title) return false
         if (link != other.link) return false
-        if (poster != null) {
-            if (other.poster == null) return false
-            if (!poster.contentEquals(other.poster)) return false
-        } else if (other.poster != null) return false
+        if (!poster.contentEquals(other.poster)) return false
         if (favoritesMark != other.favoritesMark) return false
 
         return true
@@ -182,8 +158,8 @@ data class MovieModel(
         result = 31 * result + site.hashCode()
         result = 31 * result + pageId.hashCode()
         result = 31 * result + title.hashCode()
-        result = 31 * result + (link?.hashCode() ?: 0)
-        result = 31 * result + (poster?.contentHashCode() ?: 0)
+        result = 31 * result + link.hashCode()
+        result = 31 * result + poster.contentHashCode()
         result = 31 * result + favoritesMark.hashCode()
         return result
     }
