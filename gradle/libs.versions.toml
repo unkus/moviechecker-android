@@ -4,7 +4,6 @@ androidGradlePlugin = "8.9.1"
 # @keep
 compileSdk = "35"
 # @keep
-kotlinxSerializationJson = "1.7.3"
 minSdk = "33"
 # @keep
 targetSdk = "33"
@@ -21,6 +20,7 @@ navigation = "2.8.9"
 mockk = "1.13.17"
 uiTooling = "1.7.8"
 lifecycleViewmodel = "2.8.7"
+kotlinxSerialization = "1.7.3"
 
 # tests
 #uiTestJunit4Android = "1.7.8"
@@ -56,7 +56,7 @@ androidx-work-runtime = { group = "androidx.work", name = "work-runtime-ktx", ve
 androidx-navigation-runtime = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigation" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
 
-kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 
 # Для тестов
 androidx-test-core = { group = "androidx.test", name = "core-ktx", version.ref = "androidTestCore"}
