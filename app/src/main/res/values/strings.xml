@@ -1,8 +1,6 @@
 <resources>
     <string name="app_name">Moviechecker</string>
     <string name="back_button">Back</string>
-    <string name="episode_detail_title">Details</string>
-    <string name="edit_episode_title">Edit</string>
     <string name="delete">Delete</string>
     <string name="date">Date</string>
     <string name="episode">Episode</string>
@@ -36,8 +34,10 @@
     <string name="cleanup">Cleanup</string>
     <string name="poster_error">Unable to process poster data</string>
     <string name="movies_title">Movies</string>
+    <string name="movie_details_title">Movie Details</string>
     <string name="cd_open_navigation_drawer">Open navigation drawer</string>
     <string name="cd_search">Search</string>
     <string name="cd_favorites_filter">Favorites filter</string>
     <string name="cd_viewed_filter">Viewed filter</string>
+    <string name="cd_back">Back</string>
 </resources>

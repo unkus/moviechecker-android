@@ -72,7 +72,7 @@ abstract class CheckerDatabase : RoomDatabase() {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(appContext, CheckerDatabase::class.java, "checker_db")
                     // Подгружает данные из файла
-//                        .createFromAsset("checker.db")
+                        .createFromAsset("checker.db")
                     .addCallback(object : Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
@@ -149,7 +149,8 @@ abstract class CheckerDatabase : RoomDatabase() {
                 pageId = movieData.pageId,
                 title = movieData.title,
                 link = movieData.link,
-                poster = movieData.posterLink?.let { siteAddress.resolve(it).toURL()?.readBytes() }
+                poster = movieData.posterLink?.let { siteAddress.resolve(it).toURL()?.readBytes() },
+                favoritesMark = false
             )
         )
 

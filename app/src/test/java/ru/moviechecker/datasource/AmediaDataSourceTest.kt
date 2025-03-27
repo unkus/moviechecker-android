@@ -62,7 +62,7 @@ internal class AmediaDataSourceTest {
             mojDjejmon.episode?.date
         )
         assertEquals(DataState.RELEASED, mojDjejmon.episode?.state)
-        assertEquals("/moj-djejmon/episode/13/seriya-onlayn.html", mojDjejmon.episode?.link)
+        assertEquals("/1593-moj-djejmon/episode/13/seriya-onlayn.html", mojDjejmon.episode?.link)
 
         val nevestaCharodeja = records.firstOrNull { it.movie.pageId == "nevesta-charodeja" }
         assertNotNull("Запись \"Невеста чародея\" не найдена", nevestaCharodeja)

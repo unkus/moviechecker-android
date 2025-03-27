@@ -8,4 +8,5 @@ interface MoviesRepository {
     fun updateMovie(movie: MovieEntity)
 
     fun getMovieCardsStream(): Flow<List<MovieCardsView>>
+    fun getMovieDetailsStream(id: Int): Flow<MovieDetails>
 }

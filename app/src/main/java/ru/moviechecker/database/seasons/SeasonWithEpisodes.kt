@@ -5,7 +5,7 @@ import androidx.room.Relation
 import ru.moviechecker.database.episodes.EpisodeEntity
 
 data class SeasonWithEpisodes(
-    @Embedded val seasonEntity: SeasonEntity,
+    @Embedded val season: SeasonEntity,
     @Relation(
         parentColumn = "id",
         entityColumn = "season_id"

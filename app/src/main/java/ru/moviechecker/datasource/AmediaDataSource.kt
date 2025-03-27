@@ -53,7 +53,7 @@ class AmediaDataSource : DataSource {
         val lineIterator = site.address.toURL().readText().lines().iterator()
         while (lineIterator.hasNext()) {
             try {
-                val (href, _, pageId1, seasonNumber, pageId2) = getFirstValueByRegex(
+                val (href, id, pageId1, seasonNumber, pageId2) = getFirstValueByRegex(
                     lineIterator,
                     episodeLinkRegex
                 )
@@ -108,7 +108,7 @@ class AmediaDataSource : DataSource {
 
                 val episode = EpisodeData(
                     number = episodeNumber.toInt(),
-                    link = "/${pageId1.ifBlank { pageId2 }}/episode/$episodeNumber/seriya-onlayn.html",
+                    link = "/$id-${pageId1.ifBlank { pageId2 }}${if (seasonNumber.isNotBlank()) "-$seasonNumber" else ""}/episode/$episodeNumber/seriya-onlayn.html",
                     date = releaseTime,
                     state = if (dateString == "Новая серия в") DataState.EXPECTED else DataState.RELEASED
                 )

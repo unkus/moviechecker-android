@@ -37,7 +37,7 @@ import ru.moviechecker.ui.theme.CheckerTheme
 @Composable
 fun AppDrawer(
     drawerState: DrawerState,
-    currentRoute: String,
+    currentRoute: Any,
     navigateToMovies: () -> Unit,
     closeDrawer: () -> Unit,
     modifier: Modifier = Modifier
@@ -49,7 +49,7 @@ fun AppDrawer(
         NavigationDrawerItem(
             label = { Text(stringResource(id = R.string.movies_title)) },
             icon = { Icon(Icons.AutoMirrored.Filled.List, null) },
-            selected = currentRoute == CheckerDestinations.MOVIES_ROUTE,
+            selected = currentRoute is MoviesRoute,
             onClick = { navigateToMovies(); closeDrawer() },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
@@ -63,7 +63,7 @@ fun PreviewAppDrawer() {
     CheckerTheme {
         AppDrawer(
             drawerState = rememberDrawerState(initialValue = DrawerValue.Open),
-            currentRoute = CheckerDestinations.MOVIES_ROUTE,
+            currentRoute = MoviesRoute,
             navigateToMovies = {},
             closeDrawer = { }
         )

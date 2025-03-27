@@ -3,7 +3,6 @@ package ru.moviechecker.ui.movie
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.widget.Toast
-import android.widget.Toast.LENGTH_SHORT
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -27,6 +26,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -57,7 +57,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -147,6 +146,7 @@ fun MoviesScreen(
                 movies = moviesProvider(),
                 shouldShowOnlyFavorites = uiState.shouldShowOnlyFavorites,
                 shouldShowViewedEpisodes = uiState.shouldShowViewedEpisodes,
+                modifier = Modifier.padding(innerPadding),
                 onMovieClick = { id -> onMovieClick(id) },
                 onMovieLongClick = onMovieLongClick,
                 onFavoritesIconClick = onFavoriteIconClick,
@@ -162,7 +162,6 @@ private fun MoviesTopAppBar(
     shouldShowOnlyFavorites: Boolean,
     shouldShowViewedEpisodes: Boolean,
     openDrawer: () -> Unit,
-    modifier: Modifier = Modifier,
     topAppBarState: TopAppBarState = rememberTopAppBarState(),
     scrollBehavior: TopAppBarScrollBehavior? =
         TopAppBarDefaults.enterAlwaysScrollBehavior(topAppBarState),
@@ -172,13 +171,17 @@ private fun MoviesTopAppBar(
     val context = LocalContext.current
     val title = stringResource(id = R.string.movies_title)
     CenterAlignedTopAppBar(
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            titleContentColor = MaterialTheme.colorScheme.primary,
+        ),
         title = {
             Text(title)
         },
         navigationIcon = {
             IconButton(onClick = openDrawer) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_logo),
+                    imageVector = Icons.Filled.Menu,
                     contentDescription = stringResource(R.string.cd_open_navigation_drawer)
                 )
             }
@@ -211,8 +214,7 @@ private fun MoviesTopAppBar(
                 )
             }
         },
-        scrollBehavior = scrollBehavior,
-        modifier = modifier
+        scrollBehavior = scrollBehavior
     )
 }
 
@@ -225,7 +227,7 @@ fun MovieList(
     onMovieClick: (Int) -> Unit,
     onMovieLongClick: (Int) -> Unit,
     onFavoritesIconClick: (Int) -> Unit,
-    onEpisodeViewedIconClick: (Int) -> Unit
+    onEpisodeViewedIconClick: (Int) -> Unit,
 ) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
         items(items = movies, key = { listOf(it.id, it.seasonNumber) }) { movie ->
