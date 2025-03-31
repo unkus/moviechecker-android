@@ -23,8 +23,8 @@ class AsyncRetrieveDataWorker(appContext: Context, workerParams: WorkerParameter
                 "Фильмов в базе ${database.movieDao().getCount()}"
             )
 
-            database.populateDatabase(LostfilmDataSource().retrieveData())
-            database.populateDatabase(AmediaDataSource().retrieveData())
+            database.populateDatabase(LostfilmDataSource.site, LostfilmDataSource().retrieveData())
+            database.populateDatabase(AmediaDataSource.site, AmediaDataSource().retrieveData())
 
             Result.success()
         } catch (ex: Exception) {

@@ -27,16 +27,13 @@ private const val PATTERN_SEASON_TITLE =
 
 // <div class="ftop-item__meta poster__subtitle line-clamp">Сегодня, 17:13</div>
 private const val PATTERN_DATE_TIME =
-    "<div class=\"ftop-item__meta poster__subtitle line-clamp\">(?<date>.+)(?:, | <span>)(?:(?<time>\\d{1,2}:\\d{1,2})|нестабильно)(?:</span>)?</div>"
+    "<div class=\"ftop-item__meta poster__subtitle line-clamp\">(?<date>.+)(?:, | <span>)(?<time>\\d{1,2}:\\d{1,2}|нестабильно)(?:</span>)?</div>"
 
 // <div class="animseri"><span>13</span>серия</div>
 private const val PATTERN_EPISODE_NNUMBER =
     "<div class=\"animseri\"><span>(?<episodeNumber>\\d+)?(?:-\\d+)?</span>серия</div>"
 
 class AmediaDataSource : DataSource {
-
-    private val site =
-        SiteData(URI.create("https://amedia.lol")) //SiteData(URI.create("https://amedia.online"))
 
     private val dateFormat = DateTimeFormatter.ofPattern("d-MM-yyyy")
 
@@ -65,6 +62,7 @@ class AmediaDataSource : DataSource {
                     if (seasonNumber.isNotEmpty()) seasonTitle.dropLast(seasonNumber.length + 1) else seasonTitle
 
                 val (dateString, timeString) = getFirstValueByRegex(lineIterator, dateTimeRegex)
+                Log.d(this.javaClass.simpleName, "$seasonTitle - $dateString $timeString")
 
                 // @formatter:off
                 /*
@@ -88,7 +86,6 @@ class AmediaDataSource : DataSource {
                     localDate,
                     if (timeString == "нестабильно") LocalTime.MIN else LocalTime.parse(timeString)
                 )
-                Log.d(this.javaClass.simpleName, "$dateString $timeString -> $releaseTime")
 
                 val (episodeNumber) = getFirstValueByRegex(lineIterator, episodeNumberRegex)
 
@@ -116,14 +113,14 @@ class AmediaDataSource : DataSource {
 
                 records.add(
                     DataRecord(
-                        site = site,
                         movie = movie,
                         season = season,
                         episode = episode
                     )
                 )
-            } catch (ex: NoSuchElementException) {
+            } catch (ex: Exception) {
                 // Ничего не делаем
+                Log.d(this.javaClass.simpleName, "Ошибка при парсинге: ${ex.message}")
             }
         }
 
@@ -137,7 +134,11 @@ class AmediaDataSource : DataSource {
     ): MatchResult.Destructured {
         return iterator.asSequence()
             .firstNotNullOf {
-                regex.find(it)?.let(MatchResult::destructured)
+                regex.find(it)?.destructured
             }
+    }
+
+    companion object {
+        val site: SiteData = SiteData(URI.create("https://amedia.lol")) //SiteData(URI.create("https://amedia.online"))
     }
 }

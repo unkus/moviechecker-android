@@ -12,11 +12,11 @@ class RetrieveDataWorker(appContext: Context, workerParams: WorkerParameters) :
     Worker(appContext, workerParams) {
     override fun doWork(): Result {
         Log.d(this.javaClass.simpleName, "Получаем данные")
-        return try {
-            val database = CheckerDatabase.getDatabase(applicationContext)
+        val database = CheckerDatabase.getDatabase(applicationContext)
 
-            database.populateDatabase(LostfilmDataSource().retrieveData())
-            database.populateDatabase(AmediaDataSource().retrieveData())
+        return try {
+            database.populateDatabase(LostfilmDataSource.site, LostfilmDataSource().retrieveData())
+            database.populateDatabase(AmediaDataSource.site, AmediaDataSource().retrieveData())
 
             Result.success()
         } catch (ex: Exception) {

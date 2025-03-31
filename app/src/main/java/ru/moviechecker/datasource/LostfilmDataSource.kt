@@ -35,8 +35,6 @@ private const val PATTERN_DATE =
 
 class LostfilmDataSource : DataSource {
 
-    private val site = SiteData(URI.create("https://www.lostfilm.download"))
-
     private val newMovieClassRegex = PATTERN_NEW_MOVIE_CLASS.toRegex(RegexOption.MULTILINE)
     private val ogTitleRegex = PATTERN_OG_TITLE.toRegex()
     private val ogImageRegex = PATTERN_OG_IMAGE.toRegex()
@@ -50,7 +48,7 @@ class LostfilmDataSource : DataSource {
         DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.forLanguageTag("ru-RU"))
 
     override fun retrieveData(): Collection<DataRecord> {
-        Log.i(this.javaClass.simpleName, "Получаем данные из ${site.address}")
+        Log.i(this.javaClass.simpleName, "Получаем данные от ${site.address}")
         return newMovieClassRegex.findAll(site.address.toURL().readText())
             .map { matchResult ->
                 val (href, typeString, name, season, episode) = matchResult.destructured
@@ -107,7 +105,7 @@ class LostfilmDataSource : DataSource {
                 posterLink = posterLink
             )
 
-            DataRecord(site = site, movie = movie, season = null, episode = null)
+            DataRecord(movie = movie, season = null, episode = null)
         }
     }
 
@@ -154,7 +152,7 @@ class LostfilmDataSource : DataSource {
                 state = DataState.RELEASED
             )
 
-            DataRecord(site, movie, season, episode)
+            DataRecord(movie, season, episode)
         }
     }
 
@@ -164,8 +162,12 @@ class LostfilmDataSource : DataSource {
     ): MatchResult.Destructured {
         return iterator.asSequence()
             .firstNotNullOf {
-                regex.find(it)?.let(MatchResult::destructured)
+                regex.find(it)?.destructured
             }
+    }
+
+    companion object {
+        val site: SiteData = SiteData(URI.create("https://www.lostfilm.download"))
     }
 
 }

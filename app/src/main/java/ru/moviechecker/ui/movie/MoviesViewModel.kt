@@ -113,7 +113,7 @@ class MovieCardsViewModel(
             episodesRepository.findById(episodeId)?.let { episode ->
                 episode.state = if (episode.state == EpisodeState.VIEWED) {
                     EpisodeState.RELEASED
-                } else if(episode.state == EpisodeState.RELEASED) {
+                } else if (episode.state == EpisodeState.RELEASED) {
                     EpisodeState.VIEWED
                 } else {
                     episode.state

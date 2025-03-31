@@ -100,15 +100,15 @@ abstract class CheckerDatabase : RoomDatabase() {
         }
     }
 
-    fun populateDatabase(records: Collection<DataRecord>) {
+    fun populateDatabase(site: SiteData, records: Collection<DataRecord>) {
         Log.d(this.javaClass.simpleName, "Получено ${records.size} записей")
+        val siteEntity = processSiteData(siteDao(), site)
         records.forEach { record ->
             runInTransaction {
-                val site = processSiteData(siteDao(), record.site)
-                val movie = processMovieData(movieDao(), site.id, site.address, record.movie)
+                val movieEntity = processMovieData(movieDao(), siteEntity.id, siteEntity.address, record.movie)
                 record.season?.let {
-                    val season = processSeasonData(seasonDao(), site.address, movie.id, record.season)
-                    processEpisodeData(episodeDao(), season.id, record.episode!!)
+                    val seasonEntity = processSeasonData(seasonDao(), siteEntity.address, movieEntity.id, record.season)
+                    processEpisodeData(episodeDao(), seasonEntity.id, record.episode!!)
                 }
             }
         }
