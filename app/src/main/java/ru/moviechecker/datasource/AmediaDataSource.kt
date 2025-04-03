@@ -43,9 +43,10 @@ class AmediaDataSource : DataSource {
     private val dateTimeRegex = PATTERN_DATE_TIME.toRegex()
     private val episodeNumberRegex = PATTERN_EPISODE_NNUMBER.toRegex()
 
-    override fun retrieveData(): Collection<DataRecord> {
-        Log.i(this.javaClass.simpleName, "Получаем данные от ${site.address}")
+    override val site: SiteData
+        get() = SiteData(URI.create("https://amedia.lol"))
 
+    override fun retrieveData(): Collection<DataRecord> {
         val records = mutableListOf<DataRecord>()
         val lineIterator = site.address.toURL().readText().lines().iterator()
         while (lineIterator.hasNext()) {
@@ -138,7 +139,4 @@ class AmediaDataSource : DataSource {
             }
     }
 
-    companion object {
-        val site: SiteData = SiteData(URI.create("https://amedia.lol")) //SiteData(URI.create("https://amedia.online"))
-    }
 }

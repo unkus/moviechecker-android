@@ -3,6 +3,7 @@ package ru.moviechecker.workers
 import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
+import androidx.work.Data
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -14,22 +15,23 @@ class AsyncRetrieveDataWorker(appContext: Context, workerParams: WorkerParameter
     CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-        Log.d(this.javaClass.simpleName, "Получаем данные")
-        return@withContext try {
-            val database = CheckerDatabase.getDatabase(applicationContext)
+        val database = CheckerDatabase.getDatabase(applicationContext)
+        val dataSources = listOf(LostfilmDataSource(), AmediaDataSource())
 
-            Log.d(
-                this.javaClass.simpleName,
-                "Фильмов в базе ${database.movieDao().getCount()}"
-            )
+        val errors = dataSources.mapNotNull { dataSource ->
+            Log.i(this.javaClass.simpleName, "Получаем данные от ${dataSource.site.address}")
+            try {
+                database.populateDatabase(dataSource.site, dataSource.retrieveData())
+                null
+            } catch (ex: Exception) {
+                ex.message
+            }
+        }.toList()
 
-            database.populateDatabase(LostfilmDataSource.site, LostfilmDataSource().retrieveData())
-            database.populateDatabase(AmediaDataSource.site, AmediaDataSource().retrieveData())
-
-            Result.success()
-        } catch (ex: Exception) {
-            Log.e(this.javaClass.simpleName, "Error receiving data: ${ex.localizedMessage}", ex)
-            Result.failure()
-        }
+        return@withContext if (errors.isEmpty()) Result.success() else Result.failure(
+            Data.Builder()
+                .putStringArray("errors", errors.toTypedArray())
+                .build()
+        )
     }
 }

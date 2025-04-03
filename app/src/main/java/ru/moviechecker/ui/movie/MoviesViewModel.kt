@@ -9,7 +9,6 @@ import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +21,7 @@ import ru.moviechecker.database.episodes.EpisodeState
 import ru.moviechecker.database.episodes.EpisodesRepository
 import ru.moviechecker.database.movies.MovieCardsView
 import ru.moviechecker.database.movies.MoviesRepository
-import ru.moviechecker.workers.RetrieveDataWorker
+import ru.moviechecker.workers.AsyncRetrieveDataWorker
 import java.net.URI
 import java.time.LocalDateTime
 
@@ -56,35 +55,29 @@ class MovieCardsViewModel(
     fun onRefresh(context: Context) {
         viewModelState.update { it.copy(isLoading = true) }
 
-        viewModelScope.launch {
-            val workManager = WorkManager.getInstance(context)
-            val workRequest = OneTimeWorkRequestBuilder<RetrieveDataWorker>()
-                .setConstraints(
-                    Constraints.Builder()
-                        .setRequiredNetworkType(NetworkType.CONNECTED)
-                        .setRequiresStorageNotLow(true)
-                        .build()
-                )
-                .build()
-            workManager
-                .beginUniqueWork(
-                    RetrieveDataWorker::class.java.simpleName,
-                    ExistingWorkPolicy.KEEP,
-                    workRequest
-                )
-                .enqueue()
+        val workManager = WorkManager.getInstance(context)
+        val workRequest = OneTimeWorkRequestBuilder<AsyncRetrieveDataWorker>()
+            .setConstraints(
+                Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .setRequiresStorageNotLow(true)
+                    .build()
+            )
+            .build()
+        workManager
+            .beginUniqueWork(
+                uniqueWorkName = "Проверка новых релизов",
+                existingWorkPolicy = ExistingWorkPolicy.KEEP,
+                request = workRequest
+            )
+            .enqueue()
 
+        viewModelScope.launch {
             workManager.getWorkInfoByIdFlow(workRequest.id)
                 .collect { workInfo ->
-                    workInfo?.let {
-                        Log.d(this.javaClass.simpleName, "Статус обновления: ${workInfo.state}")
-                        when (workInfo.state) {
-                            WorkInfo.State.SUCCEEDED, WorkInfo.State.FAILED, WorkInfo.State.CANCELLED -> {
-                                viewModelState.update { it.copy(isLoading = false) }
-                            }
-
-                            else -> {}
-                        }
+                    Log.d(this.javaClass.simpleName, "Статус обновления: ${workInfo?.state}")
+                    if (workInfo?.state?.isFinished == true) {
+                        viewModelState.update { it.copy(isLoading = false) }
                     }
                 }
         }

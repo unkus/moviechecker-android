@@ -47,8 +47,10 @@ class LostfilmDataSource : DataSource {
     private val dateFormat =
         DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.forLanguageTag("ru-RU"))
 
+    override val site: SiteData
+        get() = SiteData(URI.create("https://www.lostfilm.download"))
+
     override fun retrieveData(): Collection<DataRecord> {
-        Log.i(this.javaClass.simpleName, "Получаем данные от ${site.address}")
         return newMovieClassRegex.findAll(site.address.toURL().readText())
             .map { matchResult ->
                 val (href, typeString, name, season, episode) = matchResult.destructured
@@ -164,10 +166,6 @@ class LostfilmDataSource : DataSource {
             .firstNotNullOf {
                 regex.find(it)?.destructured
             }
-    }
-
-    companion object {
-        val site: SiteData = SiteData(URI.create("https://www.lostfilm.download"))
     }
 
 }

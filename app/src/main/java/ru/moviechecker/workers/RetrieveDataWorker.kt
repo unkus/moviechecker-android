@@ -2,6 +2,7 @@ package ru.moviechecker.workers
 
 import android.content.Context
 import android.util.Log
+import androidx.work.Data
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import ru.moviechecker.database.CheckerDatabase
@@ -11,19 +12,24 @@ import ru.moviechecker.datasource.LostfilmDataSource
 class RetrieveDataWorker(appContext: Context, workerParams: WorkerParameters) :
     Worker(appContext, workerParams) {
     override fun doWork(): Result {
-        Log.d(this.javaClass.simpleName, "Получаем данные")
         val database = CheckerDatabase.getDatabase(applicationContext)
+        val dataSources = listOf(LostfilmDataSource(), AmediaDataSource())
 
-        return try {
-            database.populateDatabase(LostfilmDataSource.site, LostfilmDataSource().retrieveData())
-            database.populateDatabase(AmediaDataSource.site, AmediaDataSource().retrieveData())
+        val errors = dataSources.mapNotNull { dataSource ->
+            Log.i(this.javaClass.simpleName, "Получаем данные от ${dataSource.site.address}")
+            try {
+                database.populateDatabase(dataSource.site, dataSource.retrieveData())
+                null
+            } catch (ex: Exception) {
+                ex.message
+            }
+        }.toList()
 
-            Result.success()
-        } catch (ex: Exception) {
-            Log.e(this.javaClass.simpleName, "Error receiving data: ${ex.localizedMessage}", ex)
-            Result.failure()
-        }
+        return if (errors.isEmpty()) Result.success() else Result.failure(
+            Data.Builder()
+                .putStringArray("errors", errors.toTypedArray())
+                .build()
+        )
     }
-
 
 }
