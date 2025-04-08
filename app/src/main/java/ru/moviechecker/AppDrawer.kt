@@ -38,6 +38,7 @@ import ru.moviechecker.ui.theme.CheckerTheme
 fun AppDrawer(
     drawerState: DrawerState,
     currentRoute: Any,
+    navigateToSites: () -> Unit,
     navigateToMovies: () -> Unit,
     closeDrawer: () -> Unit,
     modifier: Modifier = Modifier
@@ -46,6 +47,13 @@ fun AppDrawer(
         drawerState = drawerState,
         modifier = modifier,
     ) {
+        NavigationDrawerItem(
+            label = { Text(stringResource(id = R.string.sites_title)) },
+            icon = { Icon(Icons.AutoMirrored.Filled.List, null) },
+            selected = currentRoute is SitesRoute,
+            onClick = { navigateToSites(); closeDrawer() },
+            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+        )
         NavigationDrawerItem(
             label = { Text(stringResource(id = R.string.movies_title)) },
             icon = { Icon(Icons.AutoMirrored.Filled.List, null) },
@@ -64,7 +72,8 @@ fun PreviewAppDrawer() {
         AppDrawer(
             drawerState = rememberDrawerState(initialValue = DrawerValue.Open),
             currentRoute = MoviesRoute,
-            navigateToMovies = {},
+            navigateToSites = { },
+            navigateToMovies = { },
             closeDrawer = { }
         )
     }

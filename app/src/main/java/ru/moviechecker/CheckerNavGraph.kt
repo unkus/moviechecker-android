@@ -14,9 +14,14 @@ import ru.moviechecker.ui.movie.MovieCardsViewModel
 import ru.moviechecker.ui.movie.MovieDetailsRoute
 import ru.moviechecker.ui.movie.MovieDetailsViewModel
 import ru.moviechecker.ui.movie.MoviesRoute
+import ru.moviechecker.ui.site.SitesRoute
+import ru.moviechecker.ui.site.SitesViewModel
 
 @Serializable
-object MoviesRoute
+object SitesRoute
+
+@Serializable
+data class MoviesRoute(val siteId: Int?)
 
 @Serializable
 data class MovieDetailsRoute(val movieId: Int)
@@ -30,12 +35,31 @@ fun CheckerNavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = MoviesRoute,
+        startDestination = MoviesRoute(siteId = null),
         modifier = modifier
     ) {
-        composable<MoviesRoute> {
+        composable<SitesRoute> {
+            val sitesViewModel: SitesViewModel = viewModel(
+                factory = SitesViewModel.provideFactory(
+                    sitesRepository = appContainer.sitesRepository
+                )
+            )
+            SitesRoute(
+                viewModel = sitesViewModel,
+                openDrawer = openDrawer,
+                navigateToMovies = { siteId ->
+                    navController.navigate(
+                        route = MoviesRoute(siteId = siteId)
+                    )
+                }
+            )
+        }
+        composable<MoviesRoute> { navBackStack ->
+            val movie = navBackStack.toRoute<MoviesRoute>()
+            navBackStack.savedStateHandle["siteId"] = movie.siteId
             val moviesViewModel: MovieCardsViewModel = viewModel(
                 factory = MovieCardsViewModel.provideFactory(
+                    savedStateHandle = navBackStack.savedStateHandle,
                     moviesRepository = appContainer.moviesRepository,
                     episodesRepository = appContainer.episodesRepository
                 )
@@ -47,7 +71,8 @@ fun CheckerNavGraph(
                     navController.navigate(
                         route = MovieDetailsRoute(movieId = movieId)
                     )
-                }
+                },
+                navigateBack = { navController.navigateUp() }
             )
         }
         composable<MovieDetailsRoute> { navBackStack ->

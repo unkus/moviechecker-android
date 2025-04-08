@@ -40,4 +40,5 @@
     <string name="cd_favorites_filter">Favorites filter</string>
     <string name="cd_viewed_filter">Viewed filter</string>
     <string name="cd_back">Back</string>
+    <string name="sites_title">Sites</string>
 </resources>

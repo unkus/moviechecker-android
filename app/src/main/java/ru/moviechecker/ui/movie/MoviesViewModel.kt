@@ -2,9 +2,11 @@ package ru.moviechecker.ui.movie
 
 import android.content.Context
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
@@ -17,21 +19,26 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ru.moviechecker.MoviesRoute
 import ru.moviechecker.database.episodes.EpisodeState
 import ru.moviechecker.database.episodes.EpisodesRepository
-import ru.moviechecker.database.movies.MovieCardsView
+import ru.moviechecker.database.movies.MovieCard2
 import ru.moviechecker.database.movies.MoviesRepository
 import ru.moviechecker.workers.AsyncRetrieveDataWorker
 import java.net.URI
 import java.time.LocalDateTime
 
 class MovieCardsViewModel(
+    savedStateHandle: SavedStateHandle,
     private val moviesRepository: MoviesRepository,
     private val episodesRepository: EpisodesRepository
 ) : ViewModel() {
 
+    private val route = savedStateHandle.toRoute<MoviesRoute>()
+
     private val viewModelState = MutableStateFlow(
         MoviesUiState(
+            siteId = route.siteId,
             shouldShowOnlyFavorites = false,
             shouldShowViewedEpisodes = true
         )
@@ -44,7 +51,7 @@ class MovieCardsViewModel(
             initialValue = viewModelState.value
         )
 
-    val movies = moviesRepository.getMovieCardsStream()
+    val movies = moviesRepository.getMovieCardsStream(siteId = route.siteId)
         .map { it.map(MovieCardModel::fromEntity) }
         .stateIn(
             scope = viewModelScope,
@@ -134,18 +141,20 @@ class MovieCardsViewModel(
 
     companion object {
         fun provideFactory(
+            savedStateHandle: SavedStateHandle,
             moviesRepository: MoviesRepository,
             episodesRepository: EpisodesRepository
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return MovieCardsViewModel(moviesRepository, episodesRepository) as T
+                return MovieCardsViewModel(savedStateHandle, moviesRepository, episodesRepository) as T
             }
         }
     }
 }
 
 data class MoviesUiState(
+    val siteId: Int? = null,
     val shouldShowOnlyFavorites: Boolean = false,
     val shouldShowViewedEpisodes: Boolean = true,
     val isLoading: Boolean = false
@@ -172,7 +181,7 @@ data class MovieCardModel(
 ) {
     companion object Factory {
 
-        fun fromEntity(entity: MovieCardsView): MovieCardModel {
+        fun fromEntity(entity: MovieCard2): MovieCardModel {
             return MovieCardModel(
                 id = entity.id,
                 title = entity.title,

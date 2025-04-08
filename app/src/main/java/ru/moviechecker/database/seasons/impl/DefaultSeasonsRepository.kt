@@ -6,10 +6,10 @@ import ru.moviechecker.database.seasons.SeasonEntity
 import ru.moviechecker.database.seasons.SeasonWithEpisodes
 import ru.moviechecker.database.seasons.SeasonsRepository
 
-class DefaultSeasonsRepository(private val seasonsDao: SeasonDao) : SeasonsRepository {
-    override fun getSeasonsByMovieIdStream(movieId: Int): Flow<List<SeasonEntity>> = seasonsDao.getSeasonsByMovieIdStream(movieId)
-    override fun getSeasonsWithEpisodesByMovieIdStream(movieId: Int): Flow<List<SeasonWithEpisodes>> = seasonsDao.getSeasonsWithEpisodesByMovieIdStream(movieId)
-    override fun getNumberOfSeasonsByMovieIdStream(movieId: Int): Flow<Int> = seasonsDao.getNumberOfSeasonsByMovieId(movieId)
+class DefaultSeasonsRepository(private val seasonDao: SeasonDao) : SeasonsRepository {
+    override fun getSeasonsByMovieIdStream(movieId: Int): Flow<List<SeasonEntity>> = seasonDao.getSeasonsByMovieIdStream(movieId)
+    override fun getSeasonsWithEpisodesByMovieIdStream(movieId: Int): Flow<List<SeasonWithEpisodes>> = seasonDao.getSeasonsWithEpisodesByMovieIdStream(movieId)
+    override fun getNumberOfSeasonsByMovieIdStream(movieId: Int): Flow<Int> = seasonDao.getNumberOfSeasonsByMovieId(movieId)
 
-    override fun updateSeason(season: SeasonEntity) = seasonsDao.update(season)
+    override fun updateSeason(season: SeasonEntity) = seasonDao.update(season)
 }

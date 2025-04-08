@@ -9,7 +9,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun MoviesRoute(
     viewModel: MovieCardsViewModel,
     openDrawer: () -> Unit,
-    navigateToMovieDetails: (Int) -> Unit
+    navigateToMovieDetails: (Int) -> Unit,
+    navigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val movies by viewModel.movies.collectAsStateWithLifecycle()
@@ -26,5 +27,6 @@ fun MoviesRoute(
         onMovieLongClick = { id -> navigateToMovieDetails(id) },
         onFavoriteIconClick = { id -> viewModel.toggleFavoritesMark(id) },
         onViewedIconClick = { id -> viewModel.toggleEpisodeViewedMark(id) },
+        navigateBack = navigateBack
     )
 }

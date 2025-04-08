@@ -46,6 +46,7 @@ fun CheckerApp(
                 AppDrawer(
                     drawerState = sizeAwareDrawerState,
                     currentRoute = currentRoute,
+                    navigateToSites = navigationActions.navigateToSites,
                     navigateToMovies = navigationActions.navigateToMovies,
                     closeDrawer = { coroutineScope.launch { sizeAwareDrawerState.close() } }
                 )

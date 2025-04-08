@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
@@ -87,7 +88,8 @@ fun MoviesScreen(
     onMovieClick: (Int) -> Unit,
     onMovieLongClick: (Int) -> Unit,
     onFavoriteIconClick: (Int) -> Unit,
-    onViewedIconClick: (Int) -> Unit
+    onViewedIconClick: (Int) -> Unit,
+    navigateBack: () -> Unit = {}
 ) {
     val topAppBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
@@ -97,12 +99,14 @@ fun MoviesScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             MoviesTopAppBar(
+                isBackable = uiState.siteId != null,
                 shouldShowOnlyFavorites = uiState.shouldShowOnlyFavorites,
                 shouldShowViewedEpisodes = uiState.shouldShowViewedEpisodes,
                 openDrawer = openDrawer,
+                navigateBack = navigateBack,
                 topAppBarState = topAppBarState,
                 onShouldShowOnlyFavoritesClick = onShouldShowOnlyFavoritesIconClick,
-                onShouldShowViewedEpisodesClick = onShouldShowViewedEpisodesIconClick,
+                onShouldShowViewedEpisodesClick = onShouldShowViewedEpisodesIconClick
             )
         },
         floatingActionButton = {
@@ -159,9 +163,11 @@ fun MoviesScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MoviesTopAppBar(
+    isBackable: Boolean,
     shouldShowOnlyFavorites: Boolean,
     shouldShowViewedEpisodes: Boolean,
     openDrawer: () -> Unit,
+    navigateBack: () -> Unit = {},
     topAppBarState: TopAppBarState = rememberTopAppBarState(),
     scrollBehavior: TopAppBarScrollBehavior? =
         TopAppBarDefaults.enterAlwaysScrollBehavior(topAppBarState),
@@ -179,11 +185,20 @@ private fun MoviesTopAppBar(
             Text(title)
         },
         navigationIcon = {
-            IconButton(onClick = openDrawer) {
-                Icon(
-                    imageVector = Icons.Filled.Menu,
-                    contentDescription = stringResource(R.string.cd_open_navigation_drawer)
-                )
+            if (isBackable) {
+                IconButton(onClick = navigateBack) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.cd_back)
+                    )
+                }
+            } else {
+                IconButton(onClick = openDrawer) {
+                    Icon(
+                        imageVector = Icons.Filled.Menu,
+                        contentDescription = stringResource(R.string.cd_open_navigation_drawer)
+                    )
+                }
             }
         },
         actions = {

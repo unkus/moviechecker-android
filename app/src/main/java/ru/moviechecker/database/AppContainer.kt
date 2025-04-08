@@ -7,6 +7,8 @@ import ru.moviechecker.database.movies.impl.DefaultMoviesRepository
 import ru.moviechecker.database.movies.MoviesRepository
 import ru.moviechecker.database.seasons.impl.DefaultSeasonsRepository
 import ru.moviechecker.database.seasons.SeasonsRepository
+import ru.moviechecker.database.sites.SitesRepository
+import ru.moviechecker.database.sites.impl.DefaultSitesRepository
 
 /**
  * App container for Dependency injection.
@@ -15,6 +17,7 @@ interface AppContainer {
     val episodesRepository: EpisodesRepository
     val seasonsRepository: SeasonsRepository
     val moviesRepository: MoviesRepository
+    val sitesRepository: SitesRepository
 }
 
 /**
@@ -32,5 +35,9 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val moviesRepository: MoviesRepository by lazy {
         DefaultMoviesRepository(CheckerDatabase.getDatabase(context).movieDao())
+    }
+
+    override val sitesRepository: SitesRepository by lazy {
+        DefaultSitesRepository(CheckerDatabase.getDatabase(context).siteDao())
     }
 }
