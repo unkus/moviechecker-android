@@ -37,7 +37,7 @@ class SitesViewModel(
 data class SiteModel(
     val id: Int,
     val title: String,
-    val address: URI
+    val address: String
 ) {
     companion object Factory {
 
@@ -45,7 +45,7 @@ data class SiteModel(
             return SiteModel(
                 id = entity.id,
                 title = entity.address.toString(),
-                address = entity.address
+                address = entity.address.toString()
             )
         }
     }
