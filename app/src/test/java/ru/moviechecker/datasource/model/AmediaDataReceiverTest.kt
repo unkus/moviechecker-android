@@ -26,12 +26,12 @@ class AmediaDataReceiverTest {
     fun receivingData() {
         mockkConstructor(SiteData::class)
 
-        every { anyConstructed<SiteData>().address } returns URI.create(javaClass.getResource("/amedia.html")!!.toString())
+        every { anyConstructed<SiteData>().address } returns URI.create(javaClass.getResource("amedia/amedia.html")!!.toString())
 
         CoroutineScope(Dispatchers.IO).launch {
-            val records = AmediaDataSource().retrieveData()
-            assertNotEquals(0, records.size)
-            records.forEach { r -> println(r) }
+            val sourceData = AmediaDataSource().retrieveData()
+            assertNotEquals(0, sourceData.entries.size)
+            sourceData.entries.forEach { r -> println(r) }
         }
     }
 

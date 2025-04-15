@@ -44,7 +44,7 @@ data class SiteModel(
         fun fromEntity(entity: SiteEntity): SiteModel {
             return SiteModel(
                 id = entity.id,
-                title = entity.address.toString(),
+                title = entity.title ?: entity.address.toString(),
                 address = entity.address.toString()
             )
         }

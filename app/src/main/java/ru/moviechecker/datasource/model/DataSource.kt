@@ -1,7 +1,9 @@
 package ru.moviechecker.datasource.model
 
-interface DataSource {
-    val site: SiteData
+import java.net.URI
 
-    fun retrieveData(): Collection<DataRecord>
+interface DataSource {
+    val address: URI
+
+    fun retrieveData(): SourceData
 }

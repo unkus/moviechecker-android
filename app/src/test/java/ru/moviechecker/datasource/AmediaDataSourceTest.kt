@@ -1,16 +1,14 @@
 package ru.moviechecker.datasource
 
 import android.util.Log
-import io.mockk.EqMatcher
 import io.mockk.every
-import io.mockk.mockkConstructor
 import io.mockk.mockkStatic
+import io.mockk.spyk
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import ru.moviechecker.datasource.model.DataState
-import ru.moviechecker.datasource.model.SiteData
 import java.net.URI
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -38,15 +36,15 @@ internal class AmediaDataSourceTest {
 
     @Test
     fun retrieveData() {
-        mockkConstructor(SiteData::class)
-
-        every { constructedWith<SiteData>(EqMatcher(URI.create("https://amedia.lol"))).address } returns URI.create(
+        val dataSource = spyk(AmediaDataSource(), recordPrivateCalls = true)
+        every { dataSource.address } returns URI.create(
             javaClass.getResource("/amedia/amedia.html")!!.toString()
         )
 
-        val records = AmediaDataSource().retrieveData()
-        assertEquals("Количество полученных записей не соответствует ожиданию", 16, records.size)
-        val mojDjejmon = records.firstOrNull { it.movie.pageId == "moj-djejmon" }
+        val sourceData = AmediaDataSource().retrieveData()
+        assertEquals("Animedia Online", sourceData.site.title)
+        assertEquals("Количество полученных записей не соответствует ожиданию", 16, sourceData.entries.size)
+        val mojDjejmon = sourceData.entries.firstOrNull { it.movie.pageId == "moj-djejmon" }
         assertNotNull("Запись \"Мой Дэймон\" не найдена", mojDjejmon)
         assertEquals("Мой Дэймон", mojDjejmon!!.movie.title)
         assertEquals(1, mojDjejmon.season?.number)
@@ -64,7 +62,7 @@ internal class AmediaDataSourceTest {
         assertEquals(DataState.RELEASED, mojDjejmon.episode?.state)
         assertEquals("/1593-moj-djejmon/episode/13/seriya-onlayn.html", mojDjejmon.episode?.link)
 
-        val nevestaCharodeja = records.firstOrNull { it.movie.pageId == "nevesta-charodeja" }
+        val nevestaCharodeja = sourceData.entries.firstOrNull { it.movie.pageId == "nevesta-charodeja" }
         assertNotNull("Запись \"Невеста чародея\" не найдена", nevestaCharodeja)
         assertEquals("Невеста чародея", nevestaCharodeja!!.movie.title)
         assertEquals(2, nevestaCharodeja.season?.number)
@@ -75,7 +73,7 @@ internal class AmediaDataSourceTest {
             nevestaCharodeja.episode?.date
         )
 
-        val ubijcaGoblinov = records.firstOrNull { it.movie.pageId == "ubijca-goblinov" }
+        val ubijcaGoblinov = sourceData.entries.firstOrNull { it.movie.pageId == "ubijca-goblinov" }
         assertNotNull("Запись \"Убийца гоблинов\" не найдена", ubijcaGoblinov)
         assertEquals(DataState.EXPECTED, ubijcaGoblinov!!.episode?.state)
         assertEquals(

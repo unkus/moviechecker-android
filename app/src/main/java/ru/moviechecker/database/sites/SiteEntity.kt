@@ -9,7 +9,9 @@ import java.net.URI
 data class SiteEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val address: URI
+    val address: URI,
+    var title: String?,
+    var poster: ByteArray?
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

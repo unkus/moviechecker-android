@@ -1,18 +1,23 @@
 package ru.moviechecker.datasource
 
 import android.util.Log
-import ru.moviechecker.datasource.model.DataRecord
+import ru.moviechecker.datasource.model.SourceData
 import ru.moviechecker.datasource.model.DataSource
 import ru.moviechecker.datasource.model.DataState
 import ru.moviechecker.datasource.model.EpisodeData
 import ru.moviechecker.datasource.model.MovieData
 import ru.moviechecker.datasource.model.SeasonData
 import ru.moviechecker.datasource.model.SiteData
+import ru.moviechecker.datasource.model.SourceDataEntry
 import java.net.URI
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+
+
+// <title>Animedia Online - Смотреть аниме онлайн!</title>
+private const val PATTERN_SITE_TITLE = "<title>(?<title>.*) -.*</title>"
 
 // <a class="ftop-item d-flex has-overlay" href="/1593-moj-djejmon.html">
 private const val PATTERN_EPISODE_LINK =
@@ -37,18 +42,21 @@ class AmediaDataSource : DataSource {
 
     private val dateFormat = DateTimeFormatter.ofPattern("d-MM-yyyy")
 
+    private val siteTitleRegex = PATTERN_SITE_TITLE.toRegex()
     private val episodeLinkRegex = PATTERN_EPISODE_LINK.toRegex()
     private val seasonPosterRegex = PATTERN_IMG_SRC.toRegex()
     private val seasonTitleRegex = PATTERN_SEASON_TITLE.toRegex()
     private val dateTimeRegex = PATTERN_DATE_TIME.toRegex()
     private val episodeNumberRegex = PATTERN_EPISODE_NNUMBER.toRegex()
 
-    override val site: SiteData
-        get() = SiteData(URI.create("https://amedia.lol"))
+    override val address: URI
+        get() = URI.create("https://amedia.lol")
 
-    override fun retrieveData(): Collection<DataRecord> {
-        val records = mutableListOf<DataRecord>()
-        val lineIterator = site.address.toURL().readText().lines().iterator()
+    override fun retrieveData(): SourceData {
+        val entries = mutableListOf<SourceDataEntry>()
+        val lineIterator = address.toURL().readText().lines().iterator()
+        val (siteTitle) = getFirstValueByRegex(lineIterator, siteTitleRegex)
+
         while (lineIterator.hasNext()) {
             try {
                 val (href, id, pageId1, seasonNumber, pageId2) = getFirstValueByRegex(
@@ -112,8 +120,8 @@ class AmediaDataSource : DataSource {
                 )
                 Log.d(this.javaClass.simpleName, "episode=$episode")
 
-                records.add(
-                    DataRecord(
+                entries.add(
+                    SourceDataEntry(
                         movie = movie,
                         season = season,
                         episode = episode
@@ -125,8 +133,13 @@ class AmediaDataSource : DataSource {
             }
         }
 
-        Log.i(this.javaClass.simpleName, "данные получены от ${site.address}")
-        return records
+        Log.i(this.javaClass.simpleName, "данные получены от $address")
+        return SourceData(
+            site = SiteData(
+                title = siteTitle,
+                address = address
+            ),
+            entries = entries)
     }
 
     private fun getFirstValueByRegex(

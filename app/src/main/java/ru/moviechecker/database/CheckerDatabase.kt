@@ -14,31 +14,31 @@ import ru.moviechecker.database.episodes.EpisodeDao
 import ru.moviechecker.database.episodes.EpisodeEntity
 import ru.moviechecker.database.episodes.EpisodeState
 import ru.moviechecker.database.episodes.EpisodeView
-import ru.moviechecker.database.movies.MovieCardsView
 import ru.moviechecker.database.movies.MovieDao
 import ru.moviechecker.database.movies.MovieEntity
 import ru.moviechecker.database.seasons.SeasonDao
 import ru.moviechecker.database.seasons.SeasonEntity
 import ru.moviechecker.database.sites.SiteDao
 import ru.moviechecker.database.sites.SiteEntity
-import ru.moviechecker.datasource.model.DataRecord
 import ru.moviechecker.datasource.model.EpisodeData
 import ru.moviechecker.datasource.model.MovieData
 import ru.moviechecker.datasource.model.SeasonData
 import ru.moviechecker.datasource.model.SiteData
+import ru.moviechecker.datasource.model.SourceData
 import java.net.URI
 
 @Database(
     entities = [SiteEntity::class, MovieEntity::class, SeasonEntity::class, EpisodeEntity::class],
-    views = [EpisodeView::class, MovieCardsView::class],
-    version = 7,
+    views = [EpisodeView::class],
+    version = 8,
     autoMigrations = [
         AutoMigration(from = 1, to = 2, spec = CheckerDatabase.Ver1To2AutoMigration::class),
         AutoMigration(from = 2, to = 3),
         AutoMigration(from = 3, to = 4),
         AutoMigration(from = 4, to = 5),
         AutoMigration(from = 5, to = 6),
-        AutoMigration(from = 6, to = 7)
+        AutoMigration(from = 6, to = 7),
+        AutoMigration(from = 7, to = 8)
     ]
 )
 @TypeConverters(Converters::class)
@@ -100,14 +100,20 @@ abstract class CheckerDatabase : RoomDatabase() {
         }
     }
 
-    fun populateDatabase(site: SiteData, records: Collection<DataRecord>) {
-        Log.d(this.javaClass.simpleName, "Получено ${records.size} записей")
-        val siteEntity = processSiteData(siteDao(), site)
-        records.forEach { record ->
-            runInTransaction {
-                val movieEntity = processMovieData(movieDao(), siteEntity.id, siteEntity.address, record.movie)
+    fun populateDatabase(sourceData: SourceData) {
+        Log.d(this.javaClass.simpleName, "Получено ${sourceData.entries.size} записей")
+        runInTransaction {
+            val siteEntity = processSiteData(siteDao(), sourceData.site)
+            sourceData.entries.forEach { record ->
+                val movieEntity =
+                    processMovieData(movieDao(), siteEntity.id, siteEntity.address, record.movie)
                 record.season?.let {
-                    val seasonEntity = processSeasonData(seasonDao(), siteEntity.address, movieEntity.id, record.season)
+                    val seasonEntity = processSeasonData(
+                        seasonDao(),
+                        siteEntity.address,
+                        movieEntity.id,
+                        record.season
+                    )
                     processEpisodeData(episodeDao(), seasonEntity.id, record.episode!!)
                 }
             }
@@ -119,10 +125,21 @@ abstract class CheckerDatabase : RoomDatabase() {
         siteData: SiteData
     ): SiteEntity {
         Log.d(this.javaClass.simpleName, "Обрабатываем сайт: ${siteData.address}")
-        siteDao.getSiteByAddress(siteData.address)?.let {
-            // no data for update
-            //siteDao.update(it)
-        } ?: siteDao.insert(SiteEntity(address = siteData.address))
+        siteDao.getSiteByAddress(siteData.address)?.let { entity ->
+            entity.title = siteData.title
+            entity.poster = entity.poster ?: siteData.posterLink?.let { data ->
+                siteData.address.resolve(data).toURL()?.readBytes()
+            }
+            siteDao.update(entity)
+        } ?: siteDao.insert(
+            SiteEntity(
+                title = siteData.title,
+                poster = siteData.posterLink?.let {
+                    siteData.address.resolve(it).toURL()?.readBytes()
+                },
+                address = siteData.address
+            )
+        )
         return siteDao.getSiteByAddress(siteData.address)!!
     }
 

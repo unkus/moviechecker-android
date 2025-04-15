@@ -2,7 +2,6 @@ package ru.moviechecker.database.movies.impl
 
 import kotlinx.coroutines.flow.Flow
 import ru.moviechecker.database.movies.MovieCard2
-import ru.moviechecker.database.movies.MovieCardsView
 import ru.moviechecker.database.movies.MovieDao
 import ru.moviechecker.database.movies.MovieEntity
 import ru.moviechecker.database.movies.MovieDetails

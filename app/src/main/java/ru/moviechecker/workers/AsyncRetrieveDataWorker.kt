@@ -19,9 +19,9 @@ class AsyncRetrieveDataWorker(appContext: Context, workerParams: WorkerParameter
         val dataSources = listOf(LostfilmDataSource(), AmediaDataSource())
 
         val errors = dataSources.mapNotNull { dataSource ->
-            Log.i(this.javaClass.simpleName, "Получаем данные от ${dataSource.site.address}")
+            Log.i(this.javaClass.simpleName, "Получаем данные от ${dataSource.address}")
             try {
-                database.populateDatabase(dataSource.site, dataSource.retrieveData())
+                database.populateDatabase(dataSource.retrieveData())
                 null
             } catch (ex: Exception) {
                 ex.message
