@@ -21,6 +21,7 @@ import java.util.Locale
 // <a class="new-movie" href="/series/Euphoria/additional/episode_1/" title="Эйфория">
 // <a class="new-movie" href="/movies/Mufasa_The_Lion_King" title="Муфаса: Король Лев">
 // <a class="new-movie" href="/series/The_Head/season_3/" title="Голова">
+// <a class="new-movie" href="/series/SurrealEstate /season_3/episode_3/" title="Сюрриэлторы">
 private const val PATTERN_NEW_MOVIE_CLASS =
     "<a class=\"new-movie\" href=\"(?<href>/(?<type>series|movies)/(?<name>[^/]+)(?:/season_(?<season>\\d+)|/additional)?(?:/episode_(?<episode>\\d+))?)/?\" title=\"(?<title>.+)\">"
 
@@ -62,18 +63,20 @@ class LostfilmDataSource : DataSource {
             .map { matchResult ->
                 val (href, typeString, name, season, episode) = matchResult.destructured
                 val type = EntryType.valueOf(typeString.uppercase())
+                val hrefNormalized = href.replace(" ", "")
+                val nameNormalized = name.trim()
                 when (type) {
                     EntryType.MOVIES -> {
-                        parseMovie(pageId = name, href = href)
+                        parseMovie(pageId = nameNormalized, href = hrefNormalized)
                     }
 
                     EntryType.SERIES -> {
                         if (episode.isNotBlank()) {
                             parseSeries(
-                                pageId = name,
+                                pageId = nameNormalized,
                                 seasonNumber = if (season.isBlank()) 999 else season.toInt(),
                                 episodeNumber = episode.toInt(),
-                                href = href
+                                href = hrefNormalized
                             )
                         } else {
                             // только сезоны нам не нужны

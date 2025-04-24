@@ -52,6 +52,10 @@ internal class LostfilmDataSourceTest {
         every {
             dataSource invoke "resolveLink" withArguments listOf("/movies/Mufasa_The_Lion_King")
         } returns javaClass.getResource("/lostfilm/MufasaTheLionKing.html")
+        // Битый url ?
+        every {
+            dataSource invoke "resolveLink" withArguments listOf("/series/SurrealEstate/season_3/episode_3")
+        } returns javaClass.getResource("/lostfilm/SurrealEstate_3_3.html")
 
         // заглушки
         every {
@@ -80,7 +84,7 @@ internal class LostfilmDataSourceTest {
         assertEquals("LostFilm.TV", sourceData.site.title)
         assertEquals(
             "Количество полученных записей не соответствует ожиданию",
-            3,
+            4,
             sourceData.entries.size
         )
         val mufasaTheLionKing =
@@ -150,5 +154,12 @@ internal class LostfilmDataSourceTest {
             LocalDateTime.of(LocalDate.of(2025, 2, 23), LocalTime.MIN),
             severance.episode?.date
         )
+
+        val surrealEstate = sourceData.entries.firstOrNull { it.movie.pageId == "SurrealEstate" }
+        assertNotNull("Запись \"Сюрриэлторы\" не найдена", surrealEstate)
+        assertEquals("Сюрриэлторы", surrealEstate!!.movie.title)
+        assertEquals("/series/SurrealEstate", surrealEstate.movie.link)
+        assertEquals("/series/SurrealEstate/season_3/episode_3", surrealEstate.episode?.link)
+
     }
 }
