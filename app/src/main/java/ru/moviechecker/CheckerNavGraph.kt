@@ -60,6 +60,7 @@ fun CheckerNavGraph(
             val moviesViewModel: MovieCardsViewModel = viewModel(
                 factory = MovieCardsViewModel.provideFactory(
                     savedStateHandle = navBackStack.savedStateHandle,
+                    sitesRepository = appContainer.sitesRepository,
                     moviesRepository = appContainer.moviesRepository,
                     episodesRepository = appContainer.episodesRepository
                 )

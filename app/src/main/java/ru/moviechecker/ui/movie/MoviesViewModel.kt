@@ -15,6 +15,7 @@ import androidx.work.WorkManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -24,25 +25,28 @@ import ru.moviechecker.database.episodes.EpisodeState
 import ru.moviechecker.database.episodes.EpisodesRepository
 import ru.moviechecker.database.movies.MovieCard2
 import ru.moviechecker.database.movies.MoviesRepository
+import ru.moviechecker.database.sites.SiteEntity
+import ru.moviechecker.database.sites.SitesRepository
 import ru.moviechecker.workers.AsyncRetrieveDataWorker
 import java.net.URI
 import java.time.LocalDateTime
 
 class MovieCardsViewModel(
     savedStateHandle: SavedStateHandle,
+    private val sitesRepository: SitesRepository,
     private val moviesRepository: MoviesRepository,
     private val episodesRepository: EpisodesRepository
 ) : ViewModel() {
 
     private val route = savedStateHandle.toRoute<MoviesRoute>()
 
-    private val viewModelState = MutableStateFlow(
-        MoviesUiState(
-            siteId = route.siteId,
-            shouldShowOnlyFavorites = false,
-            shouldShowViewedEpisodes = true
+    private val viewModelState: MutableStateFlow<MoviesUiState>
+        get() = MutableStateFlow(
+            MoviesUiState(
+                shouldShowOnlyFavorites = false,
+                shouldShowViewedEpisodes = true
+            )
         )
-    )
 
     val uiState = viewModelState
         .stateIn(
@@ -50,6 +54,19 @@ class MovieCardsViewModel(
             started = SharingStarted.Eagerly,
             initialValue = viewModelState.value
         )
+
+    // FIXME: какая-то фигня - переделать
+    val site = if (route.siteId != null) sitesRepository.getByIdStream(id = route.siteId)
+        .map { site -> SiteModel.fromEntity(site) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000L),
+            initialValue = SiteModel(title = null)
+        ) else flowOf<SiteModel>().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000L),
+        initialValue = SiteModel(title = null)
+    )
 
     val movies = moviesRepository.getMovieCardsStream(siteId = route.siteId)
         .map { it.map(MovieCardModel::fromEntity) }
@@ -142,23 +159,40 @@ class MovieCardsViewModel(
     companion object {
         fun provideFactory(
             savedStateHandle: SavedStateHandle,
+            sitesRepository: SitesRepository,
             moviesRepository: MoviesRepository,
             episodesRepository: EpisodesRepository
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return MovieCardsViewModel(savedStateHandle, moviesRepository, episodesRepository) as T
+                return MovieCardsViewModel(
+                    savedStateHandle,
+                    sitesRepository,
+                    moviesRepository,
+                    episodesRepository
+                ) as T
             }
         }
     }
 }
 
 data class MoviesUiState(
-    val siteId: Int? = null,
+    val siteTitle: String? = null,
     val shouldShowOnlyFavorites: Boolean = false,
     val shouldShowViewedEpisodes: Boolean = true,
     val isLoading: Boolean = false
 )
+
+data class SiteModel(
+    val title: String?
+) {
+    companion object Factory {
+
+        fun fromEntity(entity: SiteEntity): SiteModel {
+            return SiteModel(entity.title)
+        }
+    }
+}
 
 data class MovieCardModel(
     val id: Int,

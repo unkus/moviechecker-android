@@ -11,11 +11,15 @@ import java.net.URI
 
 @Dao
 interface SiteDao {
+
     @Query("SELECT * FROM sites s WHERE s.address = :address")
     fun getSiteByAddress(address: URI): SiteEntity?
 
     @Query("SELECT * FROM sites")
     fun getAllStream(): Flow<List<SiteEntity>>
+
+    @Query("SELECT * FROM sites s WHERE s.id = :id")
+    fun getSiteByIdStream(id: Int): Flow<SiteEntity>
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     fun insert(vararg sites: SiteEntity)

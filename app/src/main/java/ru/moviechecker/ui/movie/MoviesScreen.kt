@@ -80,6 +80,7 @@ import java.time.format.FormatStyle
 @Composable
 fun MoviesScreen(
     uiState: MoviesUiState,
+    site: String?,
     moviesProvider: () -> List<MovieCardModel>,
     openDrawer: () -> Unit,
     onRefresh: () -> Unit,
@@ -99,7 +100,7 @@ fun MoviesScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             MoviesTopAppBar(
-                isBackable = uiState.siteId != null,
+                siteTitle = site,
                 shouldShowOnlyFavorites = uiState.shouldShowOnlyFavorites,
                 shouldShowViewedEpisodes = uiState.shouldShowViewedEpisodes,
                 openDrawer = openDrawer,
@@ -163,7 +164,7 @@ fun MoviesScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MoviesTopAppBar(
-    isBackable: Boolean,
+    siteTitle: String?,
     shouldShowOnlyFavorites: Boolean,
     shouldShowViewedEpisodes: Boolean,
     openDrawer: () -> Unit,
@@ -182,23 +183,26 @@ private fun MoviesTopAppBar(
             titleContentColor = MaterialTheme.colorScheme.primary,
         ),
         title = {
-            Text(title)
+            Column {
+                Text(text = title, style = MaterialTheme.typography.titleLarge)
+                siteTitle?.let {
+                    Text(text = siteTitle, style = MaterialTheme.typography.titleSmall)
+                }
+            }
         },
         navigationIcon = {
-            if (isBackable) {
+            siteTitle?.let {
                 IconButton(onClick = navigateBack) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.cd_back)
                     )
                 }
-            } else {
-                IconButton(onClick = openDrawer) {
-                    Icon(
-                        imageVector = Icons.Filled.Menu,
-                        contentDescription = stringResource(R.string.cd_open_navigation_drawer)
-                    )
-                }
+            } ?: IconButton(onClick = openDrawer) {
+                Icon(
+                    imageVector = Icons.Filled.Menu,
+                    contentDescription = stringResource(R.string.cd_open_navigation_drawer)
+                )
             }
         },
         actions = {
@@ -494,6 +498,7 @@ fun MovieListPreview() {
                     seasonNumber = 1,
                     title = "Некоторый сериал с длинным названием",
                     favoritesMark = false,
+                    nextEpisodeId = 1,
                     nextEpisodeNumber = 1,
                     nextEpisodeDate = LocalDateTime.now(),
                     nextEpisodeTitle = "Некоторый эпизод с длинным названием",
@@ -510,10 +515,11 @@ fun MovieListPreview() {
                     seasonNumber = 2,
                     title = "Сериал 2",
                     favoritesMark = true,
+                    nextEpisodeId = 1,
                     nextEpisodeNumber = 1,
                     nextEpisodeDate = LocalDateTime.now().minusDays(6),
                     nextEpisodeTitle = "Следующий эпизод",
-                    lastEpisodeId = 1, // stub
+                    lastEpisodeId = 2, // stub
                     lastEpisodeNumber = 2,
                     lastEpisodeDate = LocalDateTime.now().minusDays(5),
                     lastEpisodeTitle = "Последний эпизод",
@@ -526,10 +532,11 @@ fun MovieListPreview() {
                     seasonNumber = 1,
                     title = "Сериал 3",
                     favoritesMark = true,
+                    nextEpisodeId = 1,
                     nextEpisodeNumber = 1,
                     nextEpisodeDate = LocalDateTime.now().minusDays(6),
                     nextEpisodeTitle = "Следующий эпизод",
-                    lastEpisodeId = 1, // stub
+                    lastEpisodeId = 3, // stub
                     lastEpisodeNumber = 3,
                     lastEpisodeDate = LocalDateTime.now().minusDays(4),
                     lastEpisodeTitle = "Последний эпизод",
