@@ -45,11 +45,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.TopAppBarState
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -93,6 +91,7 @@ fun MoviesScreen(
     navigateBack: () -> Unit = {}
 ) {
     val topAppBarState = rememberTopAppBarState()
+    val refreshState = rememberPullToRefreshState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
     val context = LocalContext.current
 
@@ -131,27 +130,16 @@ fun MoviesScreen(
             }
         }
     ) { innerPadding ->
-        val refreshState = rememberPullToRefreshState()
-
         PullToRefreshBox(
             isRefreshing = uiState.isLoading,
             onRefresh = onRefresh,
             state = refreshState,
-            indicator = {
-                Indicator(
-                    modifier = Modifier
-                        .padding(innerPadding)
-                        .align(Alignment.TopCenter),
-                    isRefreshing = uiState.isLoading,
-                    state = refreshState
-                )
-            }
+            modifier = Modifier.padding(innerPadding)
         ) {
             MovieList(
                 movies = moviesProvider(),
                 shouldShowOnlyFavorites = uiState.shouldShowOnlyFavorites,
                 shouldShowViewedEpisodes = uiState.shouldShowViewedEpisodes,
-                modifier = Modifier.padding(innerPadding),
                 onMovieClick = { id -> onMovieClick(id) },
                 onMovieLongClick = onMovieLongClick,
                 onFavoritesIconClick = onFavoriteIconClick,

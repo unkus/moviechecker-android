@@ -15,6 +15,7 @@ import androidx.work.WorkManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -40,7 +41,8 @@ class MovieCardsViewModel(
 
     private val route = savedStateHandle.toRoute<MoviesRoute>()
 
-    private val viewModelState: MutableStateFlow<MoviesUiState>
+    private val _isLoading = MutableStateFlow(false)
+    private val _viewModelState: MutableStateFlow<MoviesUiState>
         get() = MutableStateFlow(
             MoviesUiState(
                 shouldShowOnlyFavorites = false,
@@ -48,11 +50,18 @@ class MovieCardsViewModel(
             )
         )
 
-    val uiState = viewModelState
+    val uiState = _viewModelState
+        .combine(_isLoading) { state, isLoading ->
+            MoviesUiState(
+                shouldShowViewedEpisodes = state.shouldShowViewedEpisodes,
+                shouldShowOnlyFavorites = state.shouldShowOnlyFavorites,
+                isLoading = isLoading
+            )
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
-            initialValue = viewModelState.value
+            initialValue = _viewModelState.value
         )
 
     // FIXME: какая-то фигня - переделать
@@ -77,7 +86,7 @@ class MovieCardsViewModel(
         )
 
     fun onRefresh(context: Context) {
-        viewModelState.update { it.copy(isLoading = true) }
+        _isLoading.update { true }
 
         val workManager = WorkManager.getInstance(context)
         val workRequest = OneTimeWorkRequestBuilder<AsyncRetrieveDataWorker>()
@@ -99,9 +108,10 @@ class MovieCardsViewModel(
         viewModelScope.launch {
             workManager.getWorkInfoByIdFlow(workRequest.id)
                 .collect { workInfo ->
-                    Log.d(this.javaClass.simpleName, "Статус обновления: ${workInfo?.state}")
+                    Log.d(this.javaClass.simpleName, "Получили статус обновления: ${workInfo?.state}")
                     if (workInfo?.state?.isFinished == true) {
-                        viewModelState.update { it.copy(isLoading = false) }
+                        Log.d(this.javaClass.simpleName, "Обновление закончено")
+                        _isLoading.update { false }
                     }
                 }
         }
@@ -141,7 +151,7 @@ class MovieCardsViewModel(
     }
 
     fun toggleShouldShowOnlyFavoritesFlag() {
-        viewModelState.update {
+        _viewModelState.update {
             it.copy(
                 shouldShowOnlyFavorites = !it.shouldShowOnlyFavorites
             )
@@ -149,7 +159,7 @@ class MovieCardsViewModel(
     }
 
     fun toggleShouldShowViewedEpisodesFlag() {
-        viewModelState.update {
+        _viewModelState.update {
             it.copy(
                 shouldShowViewedEpisodes = !it.shouldShowViewedEpisodes
             )
@@ -177,7 +187,6 @@ class MovieCardsViewModel(
 }
 
 data class MoviesUiState(
-    val siteTitle: String? = null,
     val shouldShowOnlyFavorites: Boolean = false,
     val shouldShowViewedEpisodes: Boolean = true,
     val isLoading: Boolean = false
