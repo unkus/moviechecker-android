@@ -9,7 +9,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun MoviesRoute(
     viewModel: MovieCardsViewModel,
     openDrawer: () -> Unit,
-    navigateToMovieDetails: (Int) -> Unit,
+    navigateToMovieDetails: (movieId: Int) -> Unit,
     navigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

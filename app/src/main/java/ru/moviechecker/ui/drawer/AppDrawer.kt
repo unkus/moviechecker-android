@@ -39,7 +39,7 @@ fun AppDrawer(
     drawerState: DrawerState,
     currentRoute: Any,
     navigateToSites: () -> Unit,
-    navigateToMovies: () -> Unit,
+    navigateToMovies: (siteId: Int?) -> Unit,
     closeDrawer: () -> Unit,
     modifier: Modifier = Modifier
 ) {

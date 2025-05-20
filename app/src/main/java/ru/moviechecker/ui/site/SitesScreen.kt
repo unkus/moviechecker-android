@@ -48,7 +48,7 @@ import ru.moviechecker.ui.theme.CheckerTheme
 fun SitesScreen(
     sitesProvider: () -> List<SiteModel>,
     openDrawer: () -> Unit,
-    onSiteClick: (Int) -> Unit
+    onSiteClick: (siteId: Int) -> Unit
 ) {
     val topAppBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)

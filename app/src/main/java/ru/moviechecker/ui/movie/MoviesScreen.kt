@@ -83,10 +83,10 @@ fun MoviesScreen(
     onRefresh: () -> Unit,
     onShouldShowOnlyFavoritesIconClick: () -> Unit,
     onShouldShowViewedEpisodesIconClick: () -> Unit,
-    onMovieClick: (Int) -> Unit,
-    onMovieLongClick: (Int) -> Unit,
-    onFavoriteIconClick: (Int) -> Unit,
-    onViewedIconClick: (Int) -> Unit,
+    onMovieClick: (movieId: Int) -> Unit,
+    onMovieLongClick: (movieId: Int) -> Unit,
+    onFavoriteIconClick: (movieId: Int) -> Unit,
+    onViewedIconClick: (episodeId: Int) -> Unit,
     navigateBack: () -> Unit = {}
 ) {
     val topAppBarState = rememberTopAppBarState()
@@ -230,10 +230,10 @@ fun MovieList(
     shouldShowOnlyFavorites: Boolean,
     shouldShowViewedEpisodes: Boolean,
     modifier: Modifier = Modifier,
-    onMovieClick: (Int) -> Unit,
-    onMovieLongClick: (Int) -> Unit,
-    onFavoritesIconClick: (Int) -> Unit,
-    onEpisodeViewedIconClick: (Int) -> Unit,
+    onMovieClick: (movieId: Int) -> Unit,
+    onMovieLongClick: (movieId: Int) -> Unit,
+    onFavoritesIconClick: (movieId: Int) -> Unit,
+    onEpisodeViewedIconClick: (episodeId: Int) -> Unit,
 ) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
         items(items = movies, key = { listOf(it.id, it.seasonNumber) }) { movie ->
@@ -260,10 +260,10 @@ fun MovieList(
 fun MovieItem(
     movie: MovieCardModel,
     modifier: Modifier = Modifier,
-    onClick: (Int) -> Unit,
-    onLongClick: (Int) -> Unit,
-    onFavoritesIconClick: (Int) -> Unit,
-    onEpisodeViewedIconClick: (Int) -> Unit,
+    onClick: (movieId: Int) -> Unit,
+    onLongClick: (movieId: Int) -> Unit,
+    onFavoritesIconClick: (movieId: Int) -> Unit,
+    onEpisodeViewedIconClick: (episodeId: Int) -> Unit,
 ) {
     val context = LocalContext.current
     Card(
@@ -388,7 +388,7 @@ fun EpisodeItem(
     title: String?,
     date: LocalDateTime?,
     viewedMark: Boolean,
-    onEpisodeViewedIconClick: (Int) -> Unit,
+    onEpisodeViewedIconClick: (episodeId: Int) -> Unit,
     style: TextStyle = LocalTextStyle.current
 ) {
     Row(

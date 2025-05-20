@@ -13,8 +13,8 @@ class CheckerNavigationActions(navController: NavHostController) {
             restoreState = true
         }
     }
-    val navigateToMovies: () -> Unit = {
-        navController.navigate(route = MoviesRoute(siteId = null)) {
+    val navigateToMovies: (siteId: Int?) -> Unit = { siteId ->
+        navController.navigate(route = MoviesRoute(siteId = siteId)) {
             popUpTo(navController.graph.findStartDestination().id) {
                 saveState = true
             }

@@ -65,10 +65,10 @@ fun MovieDetailsScreen(
     movieProvider: () -> MovieModel?,
     seasonsProvider: () -> List<SeasonModel>,
     onRefresh: () -> Unit = {},
-    onFavoriteIconClick: (Int) -> Unit = {},
-    onSeasonExpanded: (Int) -> Unit = {},
-    onEpisodeClick: (Int) -> Unit = {},
-    onEpisodeViewedMarkIconClick: (Int) -> Unit = {},
+    onFavoriteIconClick: (movieId: Int) -> Unit = {},
+    onSeasonExpanded: (number: Int) -> Unit = {},
+    onEpisodeClick: (episodeId: Int) -> Unit = {},
+    onEpisodeViewedMarkIconClick: (episodeId: Int) -> Unit = {},
     navigateBack: () -> Unit = {}
 ) {
     val topAppBarState = rememberTopAppBarState()
@@ -220,8 +220,8 @@ private fun MovieDetailsTopAppBar(
 @Composable
 private fun EpisodeItem(
     episode: EpisodeModel,
-    onClick: (Int) -> Unit = {},
-    onViewedMarkIconClick: (Int) -> Unit = {}
+    onClick: (episodeId: Int) -> Unit = {},
+    onViewedMarkIconClick: (episodeId: Int) -> Unit = {}
 ) {
     Card(
         modifier = Modifier
