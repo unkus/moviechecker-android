@@ -78,7 +78,6 @@ import java.time.format.FormatStyle
 @Composable
 fun MoviesScreen(
     uiState: MoviesUiState,
-    site: String?,
     moviesProvider: () -> List<MovieCardModel>,
     openDrawer: () -> Unit,
     onRefresh: () -> Unit,
@@ -99,7 +98,7 @@ fun MoviesScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             MoviesTopAppBar(
-                siteTitle = site,
+                siteTitle = uiState.siteTitle,
                 shouldShowOnlyFavorites = uiState.shouldShowOnlyFavorites,
                 shouldShowViewedEpisodes = uiState.shouldShowViewedEpisodes,
                 openDrawer = openDrawer,

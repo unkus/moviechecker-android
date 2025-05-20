@@ -13,13 +13,11 @@ fun MoviesRoute(
     navigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val site by viewModel.site.collectAsStateWithLifecycle()
     val movies by viewModel.movies.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     MoviesScreen(
         uiState = uiState,
-        site = site.title,
         moviesProvider = { movies },
         openDrawer = openDrawer,
         onRefresh = { viewModel.onRefresh(context) },

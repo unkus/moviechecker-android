@@ -41,21 +41,29 @@ class MovieCardsViewModel(
 
     private val route = savedStateHandle.toRoute<MoviesRoute>()
 
-    private val _isLoading = MutableStateFlow(false)
-    private val _viewModelState: MutableStateFlow<MoviesUiState>
-        get() = MutableStateFlow(
-            MoviesUiState(
-                shouldShowOnlyFavorites = false,
-                shouldShowViewedEpisodes = true
-            )
+    private val _viewModelState = MutableStateFlow(
+        MoviesUiState(
+            shouldShowOnlyFavorites = false,
+            shouldShowViewedEpisodes = true,
+            isLoading = false,
+            siteTitle = null
         )
+    )
 
     val uiState = _viewModelState
-        .combine(_isLoading) { state, isLoading ->
+        .combine(
+            if (route.siteId != null) {
+                sitesRepository.getByIdStream(id = route.siteId)
+                    .map { site -> SiteModel.fromEntity(site) }
+            } else {
+                flowOf(SiteModel(title = null))
+            }
+        ) { state, site ->
             MoviesUiState(
                 shouldShowViewedEpisodes = state.shouldShowViewedEpisodes,
                 shouldShowOnlyFavorites = state.shouldShowOnlyFavorites,
-                isLoading = isLoading
+                isLoading = state.isLoading,
+                siteTitle = site.title
             )
         }
         .stateIn(
@@ -63,19 +71,6 @@ class MovieCardsViewModel(
             started = SharingStarted.Eagerly,
             initialValue = _viewModelState.value
         )
-
-    // FIXME: какая-то фигня - переделать
-    val site = if (route.siteId != null) sitesRepository.getByIdStream(id = route.siteId)
-        .map { site -> SiteModel.fromEntity(site) }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = SiteModel(title = null)
-        ) else flowOf<SiteModel>().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000L),
-        initialValue = SiteModel(title = null)
-    )
 
     val movies = moviesRepository.getMovieCardsStream(siteId = route.siteId)
         .map { it.map(MovieCardModel::fromEntity) }
@@ -86,7 +81,7 @@ class MovieCardsViewModel(
         )
 
     fun onRefresh(context: Context) {
-        _isLoading.update { true }
+        _viewModelState.update { it.copy(isLoading = true) }
 
         val workManager = WorkManager.getInstance(context)
         val workRequest = OneTimeWorkRequestBuilder<AsyncRetrieveDataWorker>()
@@ -108,10 +103,13 @@ class MovieCardsViewModel(
         viewModelScope.launch {
             workManager.getWorkInfoByIdFlow(workRequest.id)
                 .collect { workInfo ->
-                    Log.d(this.javaClass.simpleName, "Получили статус обновления: ${workInfo?.state}")
+                    Log.d(
+                        this.javaClass.simpleName,
+                        "Получили статус обновления: ${workInfo?.state}"
+                    )
                     if (workInfo?.state?.isFinished == true) {
                         Log.d(this.javaClass.simpleName, "Обновление закончено")
-                        _isLoading.update { false }
+                        _viewModelState.update { it.copy(isLoading = false) }
                     }
                 }
         }
@@ -189,7 +187,8 @@ class MovieCardsViewModel(
 data class MoviesUiState(
     val shouldShowOnlyFavorites: Boolean = false,
     val shouldShowViewedEpisodes: Boolean = true,
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val siteTitle: String? = null
 )
 
 data class SiteModel(
