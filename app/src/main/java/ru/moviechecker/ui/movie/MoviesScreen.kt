@@ -34,7 +34,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
@@ -255,7 +254,6 @@ fun MovieList(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MovieItem(
     movie: MovieCardModel,
@@ -320,33 +318,35 @@ fun MovieItem(
                             tint = if (movie.favoritesMark) Color.Yellow else Color.Gray
                         )
                         Text(
-                            text = movie.title,
+                            text = if (movie.seasonNumber == 1
+                                || movie.title.endsWith(movie.seasonNumber.toString())) movie.title else
+                                stringResource(
+                                    R.string.item_title,
+                                    movie.title,
+                                    movie.seasonNumber,
+                                    ""
+                                ),
                             modifier = Modifier.weight(1f),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                     }
 
-                    movie.nextEpisodeNumber?.let { nextEpisodeNumber ->
-                        if (nextEpisodeNumber < movie.lastEpisodeNumber) {
-                            EpisodeItem(
-                                id = movie.nextEpisodeId!!,
-                                number = movie.nextEpisodeNumber,
-                                title = movie.nextEpisodeTitle,
-                                date = movie.nextEpisodeDate,
-                                viewedMark = false,
-                                onEpisodeViewedIconClick = onEpisodeViewedIconClick,
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                            HorizontalDivider()
+                    val highlighted = movie.nextEpisodeId?.let {
+                        if (movie.favoritesMark) {
+                            !movie.viewedMark
+                        } else {
+                            movie.nextEpisodeNumber == 1
                         }
-                    }
-
+                    } ?: false
                     EpisodeItem(
-                        id = movie.lastEpisodeId,
-                        number = movie.lastEpisodeNumber,
-                        title = movie.lastEpisodeTitle,
+                        id = movie.nextEpisodeId ?: movie.lastEpisodeId,
+                        number = movie.nextEpisodeNumber ?: movie.lastEpisodeNumber,
+                        title = movie.nextEpisodeTitle ?: movie.lastEpisodeTitle,
                         date = movie.lastEpisodeDate,
+                        last = movie.lastEpisodeNumber == (movie.nextEpisodeNumber
+                            ?: movie.lastEpisodeNumber),
+                        highlighted = highlighted,
                         viewedMark = movie.viewedMark,
                         onEpisodeViewedIconClick = onEpisodeViewedIconClick,
                         style = MaterialTheme.typography.bodySmall
@@ -386,11 +386,17 @@ fun EpisodeItem(
     id: Int,
     number: Int,
     title: String?,
-    date: LocalDateTime?,
+    date: LocalDateTime,
+    last: Boolean = true,
+    highlighted: Boolean = false,
     viewedMark: Boolean,
     onEpisodeViewedIconClick: (episodeId: Int) -> Unit,
     style: TextStyle = LocalTextStyle.current
 ) {
+    val text = title?.let {
+        stringResource(R.string.item_title, title, number, if (last) "" else "+")
+    } ?: stringResource(R.string.episode_title, number, if (last) "" else "+")
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -405,29 +411,18 @@ fun EpisodeItem(
             },
             tint = if (viewedMark) Color.Green else Color.Gray
         )
-        title?.let { title ->
-            Text(
-                text = stringResource(
-                    R.string.episode_serial_number_titled, title,
-                    number
-                ),
-                modifier = Modifier.weight(1f),
-                color = if (number == 1) Color.Green else Color.Gray,
-                style = style
-            )
-        } ?: Text(
-            text = stringResource(R.string.episode_serial_number, number),
+
+        Text(
+            text = text,
             modifier = Modifier.weight(1f),
-            color = if (number == 1) Color.Green else Color.Gray,
+            color = if (highlighted) Color.Green else Color.Gray,
             style = style
         )
 
-        date?.let {
-            Date(
-                date,
-                style = style
-            )
-        }
+        Date(
+            date,
+            style = style
+        )
     }
 }
 
@@ -489,7 +484,7 @@ fun MovieListPreview() {
                     nextEpisodeNumber = 1,
                     nextEpisodeDate = LocalDateTime.now(),
                     nextEpisodeTitle = "Некоторый эпизод с длинным названием",
-                    lastEpisodeId = 1, // stub
+                    lastEpisodeId = 1,
                     lastEpisodeNumber = 1,
                     lastEpisodeTitle = "Некоторый эпизод с длинным названием",
                     lastEpisodeDate = LocalDateTime.now(),
@@ -500,13 +495,13 @@ fun MovieListPreview() {
                     id = 2,
                     seasonId = 2,
                     seasonNumber = 2,
-                    title = "Сериал 2",
+                    title = "Все новые серии в избранном подсвечены",
                     favoritesMark = true,
-                    nextEpisodeId = 1,
-                    nextEpisodeNumber = 1,
-                    nextEpisodeDate = LocalDateTime.now().minusDays(6),
-                    nextEpisodeTitle = "Следующий эпизод",
-                    lastEpisodeId = 2, // stub
+                    nextEpisodeId = 2,
+                    nextEpisodeNumber = 2,
+                    nextEpisodeDate = LocalDateTime.now().minusDays(5),
+                    nextEpisodeTitle = "Последний эпизод",
+                    lastEpisodeId = 2,
                     lastEpisodeNumber = 2,
                     lastEpisodeDate = LocalDateTime.now().minusDays(5),
                     lastEpisodeTitle = "Последний эпизод",
@@ -516,27 +511,55 @@ fun MovieListPreview() {
                 MovieCardModel(
                     id = 3,
                     seasonId = 3,
-                    seasonNumber = 1,
-                    title = "Сериал 3",
+                    seasonNumber = 2,
+                    title = "Все новые серии в избранном подсвечены",
                     favoritesMark = true,
+                    nextEpisodeId = 2,
+                    nextEpisodeNumber = 2,
+                    nextEpisodeDate = LocalDateTime.now().minusDays(4),
+                    lastEpisodeId = 2,
+                    lastEpisodeNumber = 2,
+                    lastEpisodeDate = LocalDateTime.now().minusDays(4),
+                    lastEpisodeLink = URI.create("stub"),
+                    viewedMark = true
+                ),
+                MovieCardModel(
+                    id = 4,
+                    seasonId = 4,
+                    seasonNumber = 1,
+                    title = "Только первая серия не в избранном подсвечена",
+                    favoritesMark = false,
                     nextEpisodeId = 1,
                     nextEpisodeNumber = 1,
                     nextEpisodeDate = LocalDateTime.now().minusDays(6),
-                    nextEpisodeTitle = "Следующий эпизод",
-                    lastEpisodeId = 3, // stub
+                    lastEpisodeId = 3,
                     lastEpisodeNumber = 3,
                     lastEpisodeDate = LocalDateTime.now().minusDays(4),
-                    lastEpisodeTitle = "Последний эпизод",
                     lastEpisodeLink = URI.create("stub"),
                     viewedMark = false
                 ),
                 MovieCardModel(
-                    id = 2,
-                    seasonId = 1,
+                    id = 5,
+                    seasonId = 5,
+                    seasonNumber = 1,
+                    title = "Только первая серия не в избранном подсвечена",
+                    favoritesMark = false,
+                    nextEpisodeId = 1,
+                    nextEpisodeNumber = 2,
+                    nextEpisodeDate = LocalDateTime.now().minusDays(6),
+                    lastEpisodeId = 3,
+                    lastEpisodeNumber = 3,
+                    lastEpisodeDate = LocalDateTime.now().minusDays(4),
+                    lastEpisodeLink = URI.create("stub"),
+                    viewedMark = false
+                ),
+                MovieCardModel(
+                    id = 6,
+                    seasonId = 6,
                     seasonNumber = 1,
                     title = "Просмотренный сериал",
-                    favoritesMark = true,
-                    lastEpisodeId = 1, // stub
+                    favoritesMark = false,
+                    lastEpisodeId = 1,
                     lastEpisodeNumber = 10,
                     lastEpisodeTitle = "Последний просмотренный эпизод",
                     lastEpisodeDate = LocalDateTime.now().minusDays(15),
@@ -545,7 +568,7 @@ fun MovieListPreview() {
                 )
             ),
             shouldShowOnlyFavorites = false,
-            shouldShowViewedEpisodes = false,
+            shouldShowViewedEpisodes = true,
             onMovieClick = {},
             onMovieLongClick = {},
             onFavoritesIconClick = {},

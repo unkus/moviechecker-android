@@ -27,9 +27,8 @@
     <string name="today_unstable">Сегодня, не стабильно</string>
     <string name="tomorrow_time">Завтра %s</string>
     <string name="yesterday_time">Вчера %s</string>
-    <string name="season_serial_number">Сезон №%d</string>
-    <string name="episode_serial_number">Серия №%d</string>
-    <string name="episode_serial_number_titled">%s (%d)</string>
+    <string name="season_title">Сезон №%d%s</string>
+    <string name="episode_title">Серия №%d%s</string>
     <string name="cleanup">Очистка</string>
     <string name="poster_error">"Не могу отобразить постер"</string>
     <string name="movies_title">Фильмы/Сериалы</string>

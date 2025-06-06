@@ -28,9 +28,9 @@
     <string name="yesterday_time">Yesterday %s</string>
     <string name="date_time" formatted="false" translatable="false">%s %s</string>
     <string name="edit_button_text" translatable="false">…</string>
-    <string name="season_serial_number">Season #%d</string>
-    <string name="episode_serial_number">Episode #%d</string>
-    <string name="episode_serial_number_titled">%s (%d)</string>
+    <string name="item_title" translatable="false">%s (%d%s)</string>
+    <string name="season_title">Season #%d %s</string>
+    <string name="episode_title">Episode #%d %s</string>
     <string name="cleanup">Cleanup</string>
     <string name="poster_error">Unable to process poster data</string>
     <string name="movies_title">Movies</string>
