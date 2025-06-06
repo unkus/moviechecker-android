@@ -80,8 +80,16 @@ class MovieCardsViewModel(
             initialValue = emptyList()
         )
 
+    private val _errors = MutableStateFlow(emptyList<String>())
+    val errors = _errors.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = emptyList()
+    )
+
     fun onRefresh(context: Context) {
         _viewModelState.update { it.copy(isLoading = true) }
+        _errors.update { emptyList() }
 
         val workManager = WorkManager.getInstance(context)
         val workRequest = OneTimeWorkRequestBuilder<AsyncRetrieveDataWorker>()
@@ -108,7 +116,20 @@ class MovieCardsViewModel(
                         "Получили статус обновления: ${workInfo?.state}"
                     )
                     if (workInfo?.state?.isFinished == true) {
-                        Log.d(this.javaClass.simpleName, "Обновление закончено")
+                        if (WorkInfo.State.FAILED == workInfo.state) {
+                            Log.d(
+                                this.javaClass.simpleName,
+                                "Обновление закончилось с ошибкой: ${
+                                    workInfo.outputData.getStringArray("errors")
+                                }"
+                            )
+                            workInfo.outputData.getStringArray("errors")?.let { newErrors ->
+                                _errors.update { newErrors.asList() }
+                            }
+
+                        } else {
+                            Log.d(this.javaClass.simpleName, "Обновление закончено")
+                        }
                         _viewModelState.update { it.copy(isLoading = false) }
                     }
                 }

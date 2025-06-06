@@ -24,7 +24,8 @@ class AsyncRetrieveDataWorker(appContext: Context, workerParams: WorkerParameter
                 database.populateDatabase(dataSource.retrieveData())
                 null
             } catch (ex: Exception) {
-                ex.message
+                Log.w(this.javaClass.simpleName, "Не удалось получить данные от ${dataSource.address}", ex);
+                "Не удалось получить данные от ${dataSource.address}"
             }
         }.toList()
 

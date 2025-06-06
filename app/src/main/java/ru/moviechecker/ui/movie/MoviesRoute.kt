@@ -1,5 +1,6 @@
 package ru.moviechecker.ui.movie
 
+import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
@@ -14,7 +15,12 @@ fun MoviesRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val movies by viewModel.movies.collectAsStateWithLifecycle()
+    val errors by viewModel.errors.collectAsStateWithLifecycle()
     val context = LocalContext.current
+
+    if (errors.isNotEmpty()) {
+        errors.forEach { Toast.makeText(context, it, Toast.LENGTH_LONG).show() }
+    }
 
     MoviesScreen(
         uiState = uiState,
