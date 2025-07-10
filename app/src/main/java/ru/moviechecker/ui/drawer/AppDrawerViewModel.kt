@@ -1,4 +1,4 @@
-package ru.moviechecker.ui.site
+package ru.moviechecker.ui.drawer
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -8,14 +8,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import ru.moviechecker.database.sites.SiteEntity
 import ru.moviechecker.database.sites.SitesRepository
-import java.net.URI
 
-class SitesViewModel(
-    sitesRepository: SitesRepository
+class AppDrawerViewModel(
+    private val sitesRepository: SitesRepository
 ) : ViewModel() {
 
     val sites = sitesRepository.getAllStream()
-        .map { it.map(SiteModel::fromEntity) }
+        .map { entities -> entities.map(SiteModel::fromEntity) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000L),
@@ -28,7 +27,7 @@ class SitesViewModel(
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return SitesViewModel(sitesRepository) as T
+                return AppDrawerViewModel(sitesRepository) as T
             }
         }
     }
@@ -36,22 +35,13 @@ class SitesViewModel(
 
 data class SiteModel(
     val id: Int,
-    val mnemonic: String,
-    var title: String,
-    var address: String,
-    var useMirror: Boolean = false,
-    var mirror: String? = null
+    val title: String
 ) {
     companion object Factory {
-
         fun fromEntity(entity: SiteEntity): SiteModel {
             return SiteModel(
                 id = entity.id,
-                mnemonic = entity.mnemonic,
-                title = entity.title ?: entity.mnemonic,
-                address = entity.address,
-                useMirror = entity.useMirror,
-                mirror = entity.mirror
+                title = entity.title ?: entity.address.toString()
             )
         }
     }

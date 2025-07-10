@@ -25,7 +25,8 @@ import java.util.Locale
 private const val PATTERN_NEW_MOVIE_CLASS =
     "<a class=\"new-movie\" href=\"(?<href>/(?<type>series|movies)/(?<name>[^/]+)(?:/season_(?<season>\\d+)|/additional)?(?:/episode_(?<episode>\\d+))?)/?\" title=\"(?<title>.+)\">"
 
-private const val PATTERN_OG_SITE_NAME = "<meta property='og:site_name' content=\"(?<siteName>.+)\" />"
+private const val PATTERN_OG_SITE_NAME =
+    "<meta property='og:site_name' content=\"(?<siteName>.+)\" />"
 private const val PATTERN_OG_TITLE = "<meta property='og:title' content=\"(?<title>.+)\" />"
 private const val PATTERN_OG_IMAGE = "<meta property='og:image' content=\"(?<image>.+)\" />"
 private const val PATTERN_OG_DESCRIPTION =
@@ -51,11 +52,20 @@ class LostfilmDataSource : DataSource {
     private val dateFormat =
         DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.forLanguageTag("ru-RU"))
 
+    override val mnemonic: String
+        get() = "lostfilm"
     override val address: URI
-        get() = URI.create("https://www.lostfilm.download")
+        get() = URI.create("https://www.lostfilm.tv")
 
-    override fun retrieveData(): SourceData {
-        val content = address.toURL().readText()
+    override fun retrieveData(mirror: URI?): SourceData {
+        val content = (mirror ?: address).toURL()
+            .openConnection()
+            .apply {
+                connectTimeout = 1000
+                readTimeout = 3000
+            }
+            .getInputStream()
+            .use { it.readBytes().toString(Charsets.UTF_8) }
 
         val (siteTitle) = siteTitleRegex.find(content)!!.destructured
 
@@ -67,12 +77,17 @@ class LostfilmDataSource : DataSource {
                 val nameNormalized = name.trim()
                 when (type) {
                     EntryType.MOVIES -> {
-                        parseMovie(pageId = nameNormalized, href = hrefNormalized)
+                        parseMovie(
+                            address = mirror ?: address,
+                            pageId = nameNormalized,
+                            href = hrefNormalized
+                        )
                     }
 
                     EntryType.SERIES -> {
                         if (episode.isNotBlank()) {
                             parseSeries(
+                                address = mirror ?: address,
                                 pageId = nameNormalized,
                                 seasonNumber = if (season.isBlank()) 999 else season.toInt(),
                                 episodeNumber = episode.toInt(),
@@ -95,6 +110,7 @@ class LostfilmDataSource : DataSource {
 
         return SourceData(
             site = SiteData(
+                mnemonic = mnemonic,
                 title = siteTitle,
                 address = address
             ),
@@ -102,17 +118,26 @@ class LostfilmDataSource : DataSource {
         )
     }
 
-    private fun resolveLink(href: String): URL? {
+    private fun resolveLink(address: URI, href: String): URL? {
         return address.resolve(href).toURL()
     }
 
     private fun parseMovie(
+        address: URI,
         pageId: String,
         href: String
     ): SourceDataEntry? {
         Log.d(this.javaClass.simpleName, "Парсим фильм $pageId ($href)")
-        return resolveLink(href)?.let { url ->
-            val lineIterator = url.readText().lines().iterator()
+        return resolveLink(address, href)?.let { url ->
+            val lineIterator = url.openConnection()
+                .apply {
+                    connectTimeout = 1000
+                    readTimeout = 3000
+                }
+                .getInputStream()
+                .use { it.readBytes().toString(Charsets.UTF_8) }
+                .lines()
+                .iterator()
             val (title) = getFirstValueByRegex(lineIterator, ogTitleRegex)
             val (posterLink) = getFirstValueByRegex(lineIterator, ogImageRegex)
 //            val (description) = getFirstValueByRegex(lineIterator, ogDescriptionRegex)
@@ -132,14 +157,23 @@ class LostfilmDataSource : DataSource {
     }
 
     private fun parseSeries(
+        address: URI,
         pageId: String,
         seasonNumber: Int,
         episodeNumber: Int,
         href: String
     ): SourceDataEntry? {
         Log.d(this.javaClass.simpleName, "Парсим эпизод $pageId (${href})")
-        return resolveLink(href)?.let { url ->
-            val lineIterator = url.readText().lines().iterator()
+        return resolveLink(address, href)?.let { url ->
+            val lineIterator = url.openConnection()
+                .apply {
+                    connectTimeout = 1000
+                    readTimeout = 3000
+                }
+                .getInputStream()
+                .use { it.readBytes().toString(Charsets.UTF_8) }
+                .lines()
+                .iterator()
             val (seriesTitle) = getFirstValueByRegex(lineIterator, ogTitleRegex)
             val (seriesPosterLink) = getFirstValueByRegex(lineIterator, ogImageRegex)
 //            val (episodeDescription) = getFirstValueByRegex(

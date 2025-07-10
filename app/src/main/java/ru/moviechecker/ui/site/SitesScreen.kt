@@ -172,8 +172,8 @@ fun SitesScreenPreview() {
             openDrawer = {},
             sitesProvider = {
                 listOf(
-                    SiteModel(id = 1, title = "Site 1", address = "http://site1.ru"),
-                    SiteModel(id = 2, title = "Site 2", address = "http://site2.ru")
+                    SiteModel(id = 1, mnemonic = "site_1", title = "Site 1", address = "http://site1.ru"),
+                    SiteModel(id = 2, mnemonic = "site_2", title = "Site 2", address = "http://site2.ru")
                 )
             }
         ) { }

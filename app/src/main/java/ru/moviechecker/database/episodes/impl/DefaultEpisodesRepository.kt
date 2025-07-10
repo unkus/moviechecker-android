@@ -4,15 +4,11 @@ import kotlinx.coroutines.flow.Flow
 import ru.moviechecker.database.episodes.EpisodeDao
 import ru.moviechecker.database.episodes.EpisodeEntity
 import ru.moviechecker.database.episodes.EpisodesRepository
-import ru.moviechecker.database.episodes.IEpisodeView
 
 class DefaultEpisodesRepository(private val episodeDao: EpisodeDao) : EpisodesRepository {
     override fun getAllStream(): Flow<List<EpisodeEntity>> = episodeDao.getAllEpisodesStream()
     override fun getByIdStream(id: Int): Flow<EpisodeEntity> = episodeDao.getEpisodeById(id)
 
-    override fun getAllEpisodesViewStream(): Flow<List<IEpisodeView>> = episodeDao.getAllEpisodesViewStream()
-    override fun getExpectedEpisodesViewStream(): Flow<List<IEpisodeView>> = episodeDao.getExpectedEpisodesViewStream()
-    override fun getReleasedEpisodesViewStream(): Flow<List<IEpisodeView>> = episodeDao.getReleasedEpisodesViewStream()
     override fun getEpisodesBySeasonIdStream(seasonId: Int): Flow<List<EpisodeEntity>> = episodeDao.getEpisodesBySeasonId(seasonId)
     override fun getEpisodesBySeasonIdStream(seasonIds: List<Int>): Flow<List<EpisodeEntity>> = episodeDao.getEpisodesBySeasonId(seasonIds)
 

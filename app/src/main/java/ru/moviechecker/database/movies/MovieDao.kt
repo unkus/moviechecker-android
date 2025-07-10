@@ -27,7 +27,7 @@ interface MovieDao {
     fun getMovieBySiteIdAndPageId(siteId: Int, pageId: String): MovieEntity?
 
     @Query("SELECT movie.id, " +
-            "season.id 'season_id', season.number 'season_number'," +
+            "season.number 'season_number'," +
             "CASE WHEN season.title IS NOT NULL THEN season.title ELSE movie.title || ' (' || season.number || ')' END AS 'title', " +
             "CASE WHEN season.poster IS NOT NULL THEN season.poster ELSE movie.poster END AS 'poster', " +
             "movie.favorites_mark, " +
@@ -55,7 +55,6 @@ interface MovieDao {
     @Query("SELECT * FROM movies WHERE id = :id")
     fun getMovieByIdStream(id: Int): Flow<MovieEntity>
 
-    @Transaction
     @Query(
         "SELECT movie.id, " +
                 "movie.site_id, " +

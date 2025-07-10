@@ -40,7 +40,8 @@ class MovieCardsViewModel(
     private val episodesRepository: EpisodesRepository
 ) : ViewModel() {
 
-    private val route = savedStateHandle.toRoute<MoviesRoute>()
+    private val route: MoviesRoute = savedStateHandle.toRoute()
+    private val site = route.siteId?.let { sitesRepository.getByIdStream(it) }
 
     private val _viewModelState = MutableStateFlow(
         MoviesUiState(
@@ -52,19 +53,12 @@ class MovieCardsViewModel(
     )
 
     val uiState = _viewModelState
-        .combine(
-            if (route.siteId != null) {
-                sitesRepository.getByIdStream(id = route.siteId)
-                    .map { site -> SiteModel.fromEntity(site) }
-            } else {
-                flowOf(SiteModel(title = null))
-            }
-        ) { state, site ->
+        .combine(site?.map { site -> site.title } ?: flowOf(null)) { state, siteTitle ->
             MoviesUiState(
                 shouldShowViewedEpisodes = state.shouldShowViewedEpisodes,
                 shouldShowOnlyFavorites = state.shouldShowOnlyFavorites,
                 isLoading = state.isLoading,
-                siteTitle = site.title
+                siteTitle = siteTitle
             )
         }
         .stateIn(
@@ -103,7 +97,7 @@ class MovieCardsViewModel(
             .build()
         workManager
             .beginUniqueWork(
-                uniqueWorkName = "Проверка новых релизов",
+                uniqueWorkName = AsyncRetrieveDataWorker.NAME,
                 existingWorkPolicy = ExistingWorkPolicy.KEEP,
                 request = workRequest
             )
@@ -116,22 +110,24 @@ class MovieCardsViewModel(
                         this.javaClass.simpleName,
                         "Получили статус обновления: ${workInfo?.state}"
                     )
-                    if (workInfo?.state?.isFinished == true) {
-                        if (WorkInfo.State.FAILED == workInfo.state) {
-                            Log.d(
-                                this.javaClass.simpleName,
-                                "Обновление закончилось с ошибкой: ${
-                                    workInfo.outputData.getStringArray("errors")
-                                }"
-                            )
-                            workInfo.outputData.getStringArray("errors")?.let { newErrors ->
-                                _errors.update { newErrors.asList() }
-                            }
+                    workInfo?.let { info ->
+                        if (info.state.isFinished) {
+                            if (WorkInfo.State.FAILED == info.state) {
+                                Log.d(
+                                    this.javaClass.simpleName,
+                                    "Обновление закончилось с ошибкой: ${
+                                        workInfo.outputData.getStringArray("errors")
+                                    }"
+                                )
+                                info.outputData.getStringArray("errors")?.let { newErrors ->
+                                    _errors.update { newErrors.asList() }
+                                }
 
-                        } else {
-                            Log.d(this.javaClass.simpleName, "Обновление закончено")
+                            } else {
+                                Log.d(this.javaClass.simpleName, "Обновление закончено")
+                            }
+                            _viewModelState.update { it.copy(isLoading = false) }
                         }
-                        _viewModelState.update { it.copy(isLoading = false) }
                     }
                 }
         }

@@ -11,10 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import ru.moviechecker.database.AppContainer
+import ru.moviechecker.ui.drawer.AppDrawer
+import ru.moviechecker.ui.drawer.AppDrawerViewModel
 import ru.moviechecker.ui.theme.CheckerTheme
 
 /**
@@ -41,6 +44,12 @@ fun CheckerApp(
         val isExpandedScreen = widthSizeClass == WindowWidthSizeClass.Expanded
         val sizeAwareDrawerState = rememberSizeAwareDrawerState(isExpandedScreen)
 
+        val appDrawerViewModel: AppDrawerViewModel = viewModel(
+            factory = AppDrawerViewModel.provideFactory(
+                sitesRepository = appContainer.sitesRepository
+            )
+        )
+
         ModalNavigationDrawer(
             drawerContent = {
                 AppDrawer(
@@ -48,7 +57,8 @@ fun CheckerApp(
                     currentRoute = currentRoute,
                     navigateToSites = navigationActions.navigateToSites,
                     navigateToMovies = navigationActions.navigateToMovies,
-                    closeDrawer = { coroutineScope.launch { sizeAwareDrawerState.close() } }
+                    closeDrawer = { coroutineScope.launch { sizeAwareDrawerState.close() } },
+                    viewModel = appDrawerViewModel
                 )
             },
             drawerState = sizeAwareDrawerState,

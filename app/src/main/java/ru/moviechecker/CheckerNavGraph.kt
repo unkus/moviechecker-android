@@ -1,5 +1,6 @@
 package ru.moviechecker
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -55,8 +56,8 @@ fun CheckerNavGraph(
             )
         }
         composable<MoviesRoute> { navBackStack ->
-            val movie = navBackStack.toRoute<MoviesRoute>()
-            navBackStack.savedStateHandle["siteId"] = movie.siteId
+            val route = navBackStack.toRoute<MoviesRoute>()
+            navBackStack.savedStateHandle["siteId"] = route.siteId
             val moviesViewModel: MovieCardsViewModel = viewModel(
                 factory = MovieCardsViewModel.provideFactory(
                     savedStateHandle = navBackStack.savedStateHandle,

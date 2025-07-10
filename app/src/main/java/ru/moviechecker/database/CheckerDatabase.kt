@@ -4,16 +4,15 @@ import android.content.Context
 import android.util.Log
 import androidx.room.AutoMigration
 import androidx.room.Database
-import androidx.room.RenameColumn
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.room.migration.AutoMigrationSpec
 import androidx.sqlite.db.SupportSQLiteDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import ru.moviechecker.database.episodes.EpisodeDao
 import ru.moviechecker.database.episodes.EpisodeEntity
 import ru.moviechecker.database.episodes.EpisodeState
-import ru.moviechecker.database.episodes.EpisodeView
 import ru.moviechecker.database.movies.MovieDao
 import ru.moviechecker.database.movies.MovieEntity
 import ru.moviechecker.database.seasons.SeasonDao
@@ -25,38 +24,27 @@ import ru.moviechecker.datasource.model.MovieData
 import ru.moviechecker.datasource.model.SeasonData
 import ru.moviechecker.datasource.model.SiteData
 import ru.moviechecker.datasource.model.SourceData
+import java.net.SocketTimeoutException
 import java.net.URI
 
 @Database(
     entities = [SiteEntity::class, MovieEntity::class, SeasonEntity::class, EpisodeEntity::class],
-    views = [EpisodeView::class],
-    version = 8,
+    views = [],
+    version = 10,
     autoMigrations = [
-        AutoMigration(from = 1, to = 2, spec = CheckerDatabase.Ver1To2AutoMigration::class),
+        AutoMigration(from = 1, to = 2, spec = Ver1To2AutoMigration::class),
         AutoMigration(from = 2, to = 3),
         AutoMigration(from = 3, to = 4),
         AutoMigration(from = 4, to = 5),
         AutoMigration(from = 5, to = 6),
         AutoMigration(from = 6, to = 7),
-        AutoMigration(from = 7, to = 8)
+        AutoMigration(from = 7, to = 8),
+        AutoMigration(from = 8, to = 9, Ver8To9AutoMigration::class),
+        AutoMigration(from = 9, to = 10),
     ]
 )
 @TypeConverters(Converters::class)
 abstract class CheckerDatabase : RoomDatabase() {
-
-    @RenameColumn.Entries(
-        RenameColumn(
-            tableName = "movies",
-            fromColumnName = "poster_link",
-            toColumnName = "poster"
-        ),
-        RenameColumn(
-            tableName = "seasons",
-            fromColumnName = "poster_link",
-            toColumnName = "poster"
-        )
-    )
-    class Ver1To2AutoMigration : AutoMigrationSpec
 
     abstract fun siteDao(): SiteDao
     abstract fun movieDao(): MovieDao
@@ -72,7 +60,7 @@ abstract class CheckerDatabase : RoomDatabase() {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(appContext, CheckerDatabase::class.java, "checker_db")
                     // Подгружает данные из файла
-//                        .createFromAsset("checker.db")
+//                    .createFromAsset("checker_db.db")
                     .addCallback(object : Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
@@ -83,13 +71,13 @@ abstract class CheckerDatabase : RoomDatabase() {
                             super.onOpen(db)
                             Log.d(this.javaClass.simpleName, "База данных открыта")
 
-//                            WorkManager.getInstance(appContext)
-//                                .beginUniqueWork(
-//                                    RetrieveDataWorker::class.java.simpleName,
-//                                    ExistingWorkPolicy.KEEP,
-//                                    OneTimeWorkRequest.from(RetrieveDataWorker::class.java)
-//                                )
-//                                .enqueue()
+                            //                            WorkManager.getInstance(appContext)
+                            //                                .beginUniqueWork(
+                            //                                    RetrieveDataWorker::class.java.simpleName,
+                            //                                    ExistingWorkPolicy.KEEP,
+                            //                                    OneTimeWorkRequest.from(RetrieveDataWorker::class.java)
+                            //                                )
+                            //                                .enqueue()
                         }
                     })
                     .build()
@@ -105,12 +93,16 @@ abstract class CheckerDatabase : RoomDatabase() {
         runInTransaction {
             val siteEntity = processSiteData(siteDao(), sourceData.site)
             sourceData.entries.forEach { record ->
+                val siteUri = URI.create(if (siteEntity.useMirror) siteEntity.mirror else siteEntity.address)
                 val movieEntity =
-                    processMovieData(movieDao(), siteEntity.id, siteEntity.address, record.movie)
+                    processMovieData(movieDao(),
+                        siteEntity.id,
+                        siteUri,
+                        record.movie)
                 record.season?.let {
                     val seasonEntity = processSeasonData(
                         seasonDao(),
-                        siteEntity.address,
+                        siteUri,
                         movieEntity.id,
                         record.season
                     )
@@ -124,23 +116,25 @@ abstract class CheckerDatabase : RoomDatabase() {
         siteDao: SiteDao,
         siteData: SiteData
     ): SiteEntity {
-        Log.d(this.javaClass.simpleName, "Обрабатываем сайт: ${siteData.address}")
-        siteDao.getSiteByAddress(siteData.address)?.let { entity ->
+        Log.d(this.javaClass.simpleName, "Обрабатываем: ${siteData.mnemonic}")
+        siteDao.getSiteByMnemonic(siteData.mnemonic)?.let { entity ->
             entity.title = siteData.title
+            entity.address = siteData.address.toString()
             entity.poster = entity.poster ?: siteData.posterLink?.let { data ->
                 siteData.address.resolve(data).toURL()?.readBytes()
             }
             siteDao.update(entity)
         } ?: siteDao.insert(
             SiteEntity(
+                mnemonic = siteData.mnemonic,
                 title = siteData.title,
                 poster = siteData.posterLink?.let {
                     siteData.address.resolve(it).toURL()?.readBytes()
                 },
-                address = siteData.address
+                address = siteData.address.toString()
             )
         )
-        return siteDao.getSiteByAddress(siteData.address)!!
+        return siteDao.getSiteByMnemonic(siteData.mnemonic)!!
     }
 
     private fun processMovieData(
@@ -156,8 +150,8 @@ abstract class CheckerDatabase : RoomDatabase() {
         movieDao.getMovieBySiteIdAndPageId(siteId, movieData.pageId)?.let { entity ->
             entity.title = movieData.title
             entity.link = movieData.link
-            entity.poster = entity.poster ?: movieData.posterLink?.let { data ->
-                siteAddress.resolve(data).toURL()?.readBytes()
+            entity.poster = entity.poster ?: movieData.posterLink?.let { link ->
+                getPoster(siteAddress.resolve(link))
             }
             movieDao.update(entity)
         } ?: movieDao.insert(
@@ -166,12 +160,29 @@ abstract class CheckerDatabase : RoomDatabase() {
                 pageId = movieData.pageId,
                 title = movieData.title,
                 link = movieData.link,
-                poster = movieData.posterLink?.let { siteAddress.resolve(it).toURL()?.readBytes() },
+                poster = movieData.posterLink?.let { link ->
+                    getPoster(siteAddress.resolve(link))
+                },
                 favoritesMark = false
             )
         )
 
         return movieDao.getMovieBySiteIdAndPageId(siteId, movieData.pageId)!!
+    }
+
+    private fun getPoster(link: URI): ByteArray? = runBlocking(Dispatchers.IO) {
+        try {
+            link.toURL()
+                .openConnection()
+                .apply {
+                    connectTimeout = 1000
+                    readTimeout = 3000
+                }
+                .getInputStream()
+                .readBytes()
+        } catch (ex: SocketTimeoutException) {
+            null
+        }
     }
 
     private fun processSeasonData(

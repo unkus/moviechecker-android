@@ -41,4 +41,8 @@
     <string name="cd_viewed_filter">Viewed filter</string>
     <string name="cd_back">Back</string>
     <string name="sites_title">Sites</string>
+    <string name="driwer_item_sites_title">Sites</string>
+    <string name="driwer_item_movies_title">All sites</string>
+    <string name="driwer_item_favorites_title">Favorites</string>
+    <string name="driwer_title">Menu</string>
 </resources>

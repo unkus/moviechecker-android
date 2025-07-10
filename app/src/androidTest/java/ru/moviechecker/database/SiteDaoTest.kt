@@ -11,7 +11,6 @@ import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import ru.moviechecker.database.CheckerDatabase
 import ru.moviechecker.database.sites.SiteDao
 import ru.moviechecker.database.sites.SiteEntity
 import java.net.URI
@@ -22,9 +21,9 @@ class SiteDaoTest {
     private lateinit var siteDao: SiteDao
     private lateinit var checkerDatabase: CheckerDatabase
 
-    val site1 = SiteEntity(1, URI.create("http://site1"))
-    val site2 = SiteEntity(2, URI.create("http://site2"))
-    val site3 = SiteEntity(3, URI.create("http://site3"))
+    val site1 = SiteEntity(1, "site1", address = URI.create("http://site1"))
+    val site2 = SiteEntity(2, "site2", address = URI.create("http://site2"))
+    val site3 = SiteEntity(3, "site3", address = URI.create("http://site3"))
 
     @Before
     fun createDb() {
@@ -43,7 +42,7 @@ class SiteDaoTest {
     @Test
     fun daoGetSiteByAddress_returnsSiteFromDB() = runBlocking {
         siteDao.insert(site1, site2, site3)
-        siteDao.getSiteByAddress(URI.create("http://site2"))?.let {
+        siteDao.getSiteByMnemonic("site2")?.let {
             assertNotNull(it)
             assertEquals(site2, it)
         } ?: fail("Site not found")

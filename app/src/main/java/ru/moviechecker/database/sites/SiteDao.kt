@@ -7,13 +7,12 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
-import java.net.URI
 
 @Dao
 interface SiteDao {
 
-    @Query("SELECT * FROM sites s WHERE s.address = :address")
-    fun getSiteByAddress(address: URI): SiteEntity?
+    @Query("SELECT * FROM sites s WHERE s.mnemonic = :mnemonic")
+    fun getSiteByMnemonic(mnemonic: String): SiteEntity?
 
     @Query("SELECT * FROM sites")
     fun getAllStream(): Flow<List<SiteEntity>>

@@ -49,12 +49,22 @@ class AmediaDataSource : DataSource {
     private val dateTimeRegex = PATTERN_DATE_TIME.toRegex()
     private val episodeNumberRegex = PATTERN_EPISODE_NNUMBER.toRegex()
 
+    override val mnemonic: String
+        get() = "amedia"
     override val address: URI
-        get() = URI.create("https://amedia.lol")
+        get() = URI.create("https://amedia.online")
 
-    override fun retrieveData(): SourceData {
+    override fun retrieveData(mirror: URI?): SourceData {
         val entries = mutableListOf<SourceDataEntry>()
-        val lineIterator = address.toURL().readText().lines().iterator()
+        val lineIterator = (mirror?:address).toURL().openConnection()
+            .apply {
+                connectTimeout = 1000
+                readTimeout = 3000
+            }
+            .getInputStream()
+            .use { it.readBytes().toString(Charsets.UTF_8) }
+            .lines()
+            .iterator()
         val (siteTitle) = getFirstValueByRegex(lineIterator, siteTitleRegex)
 
         while (lineIterator.hasNext()) {
@@ -133,9 +143,9 @@ class AmediaDataSource : DataSource {
             }
         }
 
-        Log.i(this.javaClass.simpleName, "данные получены от $address")
         return SourceData(
             site = SiteData(
+                mnemonic = mnemonic,
                 title = siteTitle,
                 address = address
             ),

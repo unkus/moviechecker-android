@@ -39,4 +39,8 @@
     <string name="cd_viewed_filter">Фильтр по просмотренным</string>
     <string name="cd_back">Назад</string>
     <string name="sites_title">Сайты</string>
+    <string name="driwer_item_sites_title">Сайты</string>
+    <string name="driwer_item_movies_title">Все сайты</string>
+    <string name="driwer_item_favorites_title">Избранное</string>
+    <string name="driwer_title">Меню</string>
 </resources>
