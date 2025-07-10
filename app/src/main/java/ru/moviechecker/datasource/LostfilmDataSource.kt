@@ -34,7 +34,7 @@ private const val PATTERN_SEASON_POSTER_LINK = "<img src=\"(?<link>.+)\" class=\
 private const val PATTERN_EPISODE_TITLE_RU = "<h1 class=\"title-ru\">(?<title>.+)</h1>"
 private const val PATTERN_EPISODE_TITLE_EN = "<div class=\"title-en\">(?<title>.+)</div>"
 private const val PATTERN_DATE =
-    "<span data-proper=\"0\" data-released=\"(?<date>.+)\">.*</span> г.<br/>"
+    "<span data-proper=\".+\" data-released=\"(?<date>.+?)\">.*</span>"
 
 class LostfilmDataSource : DataSource {
 
