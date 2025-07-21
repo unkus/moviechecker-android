@@ -1,6 +1,5 @@
 package ru.moviechecker
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -15,11 +14,16 @@ import ru.moviechecker.ui.movie.MovieCardsViewModel
 import ru.moviechecker.ui.movie.MovieDetailsRoute
 import ru.moviechecker.ui.movie.MovieDetailsViewModel
 import ru.moviechecker.ui.movie.MoviesRoute
+import ru.moviechecker.ui.site.SiteDetailsRoute
+import ru.moviechecker.ui.site.SiteDetailsViewModel
 import ru.moviechecker.ui.site.SitesRoute
 import ru.moviechecker.ui.site.SitesViewModel
 
 @Serializable
 object SitesRoute
+
+@Serializable
+data class SiteDetailsRoute(val siteId: Int)
 
 @Serializable
 data class MoviesRoute(val siteId: Int?)
@@ -48,11 +52,23 @@ fun CheckerNavGraph(
             SitesRoute(
                 viewModel = sitesViewModel,
                 openDrawer = openDrawer,
-                navigateToMovies = { siteId ->
+                navigateToSiteDetails = { siteId ->
                     navController.navigate(
-                        route = MoviesRoute(siteId = siteId)
+                        route = SiteDetailsRoute(siteId = siteId)
                     )
                 }
+            )
+        }
+        composable<SiteDetailsRoute> { navBackStack ->
+            val siteDetailsViewModel: SiteDetailsViewModel = viewModel(
+                factory = SiteDetailsViewModel.provideFactory(
+                    savedStateHandle = navBackStack.savedStateHandle,
+                    sitesRepository = appContainer.sitesRepository
+                )
+            )
+            SiteDetailsRoute(
+                viewModel = siteDetailsViewModel,
+                navigateBack = { navController.navigateUp() }
             )
         }
         composable<MoviesRoute> { navBackStack ->

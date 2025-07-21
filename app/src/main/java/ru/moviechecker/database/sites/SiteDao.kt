@@ -20,6 +20,9 @@ interface SiteDao {
     @Query("SELECT * FROM sites s WHERE s.id = :id")
     fun getSiteByIdStream(id: Int): Flow<SiteEntity>
 
+    @Query("SELECT * FROM sites s WHERE s.id = :id")
+    fun getSiteById(id: Int): SiteEntity?
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     fun insert(vararg sites: SiteEntity)
     @Update

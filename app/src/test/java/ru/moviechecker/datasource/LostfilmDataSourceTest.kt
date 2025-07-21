@@ -37,50 +37,49 @@ internal class LostfilmDataSourceTest {
     @Test
     fun retrieveData() {
         val dataSource = spyk(LostfilmDataSource(), recordPrivateCalls = true)
-        every { dataSource.address } returns javaClass.getResource("/lostfilm/lostfilm.html")!!
-            .toURI()
+        val address = javaClass.getResource("/lostfilm/lostfilm.html")!!.toURI()
 
         // пример страницы эпизода
         every {
-            dataSource invoke "resolveLink" withArguments listOf("/series/Severance/season_2/episode_6")
+            dataSource invoke "resolveLink" withArguments listOf(address, "/series/Severance/season_2/episode_6")
         } returns javaClass.getResource("/lostfilm/Severance_2_6.html")
         // пример страницы спец эпизода
         every {
-            dataSource invoke "resolveLink" withArguments listOf("/series/Euphoria/additional/episode_1")
+            dataSource invoke "resolveLink" withArguments listOf(address, "/series/Euphoria/additional/episode_1")
         } returns javaClass.getResource("/lostfilm/Euphoria_999_1.html")
         // Пример страницы фильма
         every {
-            dataSource invoke "resolveLink" withArguments listOf("/movies/Mufasa_The_Lion_King")
+            dataSource invoke "resolveLink" withArguments listOf(address, "/movies/Mufasa_The_Lion_King")
         } returns javaClass.getResource("/lostfilm/MufasaTheLionKing.html")
         // Битый url ?
         every {
-            dataSource invoke "resolveLink" withArguments listOf("/series/SurrealEstate/season_3/episode_3")
+            dataSource invoke "resolveLink" withArguments listOf(address, "/series/SurrealEstate/season_3/episode_3")
         } returns javaClass.getResource("/lostfilm/SurrealEstate_3_3.html")
 
         // заглушки
         every {
-            dataSource invoke "resolveLink" withArguments listOf("/series/Yellowjackets/season_3/episode_3")
+            dataSource invoke "resolveLink" withArguments listOf(address, "/series/Yellowjackets/season_3/episode_3")
         } returns null
         every {
-            dataSource invoke "resolveLink" withArguments listOf("/series/Zero_Day/season_1/episode_1")
+            dataSource invoke "resolveLink" withArguments listOf(address, "/series/Zero_Day/season_1/episode_1")
         } returns null
         every {
-            dataSource invoke "resolveLink" withArguments listOf("/series/A_Thousand_Blows/season_1/episode_1")
+            dataSource invoke "resolveLink" withArguments listOf(address, "/series/A_Thousand_Blows/season_1/episode_1")
         } returns null
         every {
-            dataSource invoke "resolveLink" withArguments listOf("/series/Your_Friendly_Neighborhood_Spider_Man/season_1/episode_10")
+            dataSource invoke "resolveLink" withArguments listOf(address, "/series/Your_Friendly_Neighborhood_Spider_Man/season_1/episode_10")
         } returns null
         every {
-            dataSource invoke "resolveLink" withArguments listOf("/series/Invincible/season_3/episode_5")
+            dataSource invoke "resolveLink" withArguments listOf(address, "/series/Invincible/season_3/episode_5")
         } returns null
         every {
-            dataSource invoke "resolveLink" withArguments listOf("/series/Reacher/season_3/episode_1")
+            dataSource invoke "resolveLink" withArguments listOf(address, "/series/Reacher/season_3/episode_1")
         } returns null
         every {
-            dataSource invoke "resolveLink" withArguments listOf("/series/Your_Friendly_Neighborhood_Spider_Man/season_1/episode_9")
+            dataSource invoke "resolveLink" withArguments listOf(address, "/series/Your_Friendly_Neighborhood_Spider_Man/season_1/episode_9")
         } returns null
 
-        val sourceData = dataSource.retrieveData()
+        val sourceData = dataSource.retrieveData(address)
         assertEquals("LostFilm.TV", sourceData.site.title)
         assertEquals(
             "Количество полученных записей не соответствует ожиданию",

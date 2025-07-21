@@ -8,13 +8,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun SitesRoute(
     viewModel: SitesViewModel,
     openDrawer: () -> Unit,
-    navigateToMovies: (siteId: Int) -> Unit
+    navigateToSiteDetails: (siteId: Int) -> Unit
 ) {
     val sites by viewModel.sites.collectAsStateWithLifecycle()
 
     SitesScreen(
         sitesProvider = { sites },
         openDrawer = openDrawer,
-        onSiteClick = { id -> navigateToMovies(id) }
+        onSiteClick = { id -> navigateToSiteDetails(id) }
     )
 }

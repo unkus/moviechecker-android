@@ -3,13 +3,11 @@ package ru.moviechecker.datasource
 import android.util.Log
 import io.mockk.every
 import io.mockk.mockkStatic
-import io.mockk.spyk
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import ru.moviechecker.datasource.model.DataState
-import java.net.URI
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -36,12 +34,7 @@ internal class AmediaDataSourceTest {
 
     @Test
     fun retrieveData() {
-        val dataSource = spyk(AmediaDataSource(), recordPrivateCalls = true)
-        every { dataSource.address } returns URI.create(
-            javaClass.getResource("/amedia/amedia.html")!!.toString()
-        )
-
-        val sourceData = AmediaDataSource().retrieveData()
+        val sourceData = AmediaDataSource().retrieveData(javaClass.getResource("/amedia/amedia.html")!!.toURI())
         assertEquals("Animedia Online", sourceData.site.title)
         assertEquals("Количество полученных записей не соответствует ожиданию", 16, sourceData.entries.size)
         val mojDjejmon = sourceData.entries.firstOrNull { it.movie.pageId == "moj-djejmon" }
