@@ -28,18 +28,18 @@ interface MovieDao {
 
     @Query("SELECT movie.id, " +
             "season.number 'season_number'," +
-            "CASE WHEN season.title IS NOT NULL THEN season.title ELSE movie.title || ' (' || season.number || ')' END AS 'title', " +
+            "CASE WHEN season.title IS NOT NULL THEN season.title ELSE movie.title END AS 'title', " +
             "CASE WHEN season.poster IS NOT NULL THEN season.poster ELSE movie.poster END AS 'poster', " +
             "movie.favorites_mark, " +
             "next_episode.id 'next_episode_id', " +
             "next_episode.number 'next_episode_number', " +
             "next_episode.title 'next_episode_title', " +
-            "site.address || next_episode.link 'next_episode_link', " +
+            "CASE WHEN site.mirror IS NOT NULL AND site.use_mirror THEN site.mirror ELSE site.address END || next_episode.link 'next_episode_link', " +
             "next_episode.date 'next_episode_date', " +
             "last_episode.id 'last_episode_id', " +
             "last_episode.number 'last_episode_number', " +
             "last_episode.title 'last_episode_title', " +
-            "site.address || last_episode.link 'last_episode_link', " +
+            "CASE WHEN site.mirror IS NOT NULL AND site.use_mirror THEN site.mirror ELSE site.address END || last_episode.link 'last_episode_link', " +
             "last_episode.date 'last_episode_date', " +
             "CASE WHEN last_episode.state = 'VIEWED' THEN true ELSE false END AS 'viewed_mark' " +
             "FROM movies movie " +
