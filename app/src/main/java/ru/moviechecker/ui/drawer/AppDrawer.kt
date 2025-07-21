@@ -83,7 +83,7 @@ fun AppDrawerScreen(
     ) {
         LazyColumn {
             item {
-                Text(stringResource(id = R.string.driwer_title), modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleLarge)
+                Text(stringResource(id = R.string.driwer_item_menu_title), modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleLarge)
                 HorizontalDivider()
                 NavigationDrawerItem(
                     label = { Text(stringResource(id = R.string.driwer_item_sites_title)) },
@@ -93,9 +93,9 @@ fun AppDrawerScreen(
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                Text("Movies", modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleLarge)
+                Text(stringResource(R.string.driwer_item_movies_title), modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleLarge)
                 NavigationDrawerItem(
-                    label = { Text(stringResource(id = R.string.driwer_item_movies_title)) },
+                    label = { Text(stringResource(id = R.string.driwer_item_all_sites_title)) },
                     icon = { Icon(Icons.AutoMirrored.Filled.List, null) },
                     selected = currentRoute is MoviesRoute,
                     onClick = { navigateToMovies(null); closeDrawer() },
