@@ -193,7 +193,7 @@ abstract class CheckerDatabase : RoomDatabase() {
     ): SeasonEntity {
         Log.d(
             this.javaClass.simpleName,
-            "Обрабатываем сезон: ${seasonData.title}(${seasonData.number})"
+            "Обрабатываем сезон: ${seasonData.number}"
         )
         seasonDao.getSeasonByMovieIdAndNumber(movieId, seasonData.number)?.let { entity ->
             entity.title = seasonData.title
@@ -222,7 +222,7 @@ abstract class CheckerDatabase : RoomDatabase() {
     ) {
         Log.d(
             this.javaClass.simpleName,
-            "Обрабатываем эпизод: ${episodeData.title}(${episodeData.number})"
+            "Обрабатываем эпизод: ${episodeData.title} (${episodeData.number})"
         )
         episodeDao.getBySeasonIdAndNumber(seasonId, episodeData.number)?.let { entity ->
             entity.title = episodeData.title

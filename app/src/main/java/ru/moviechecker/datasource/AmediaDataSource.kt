@@ -27,8 +27,8 @@ private const val PATTERN_EPISODE_LINK =
 private const val PATTERN_IMG_SRC = "<img src=\"(?<imgSrc>.*)\" alt=\".*\""
 
 // <div class="ftop-item__title  line-clamp">Мой Дэймон </div>
-private const val PATTERN_SEASON_TITLE =
-    "<div class=\"ftop-item__title +line-clamp\">(?<title>.*[^ ]) ?</div>"
+private const val PATTERN_TITLE =
+    "<div class=\"ftop-item__title +line-clamp\">(?<title>.*)</div>"
 
 // <div class="ftop-item__meta poster__subtitle line-clamp">Сегодня, 17:13</div>
 private const val PATTERN_DATE_TIME =
@@ -44,8 +44,8 @@ class AmediaDataSource : DataSource {
 
     private val siteTitleRegex = PATTERN_SITE_TITLE.toRegex()
     private val episodeLinkRegex = PATTERN_EPISODE_LINK.toRegex()
-    private val seasonPosterRegex = PATTERN_IMG_SRC.toRegex()
-    private val seasonTitleRegex = PATTERN_SEASON_TITLE.toRegex()
+    private val posterRegex = PATTERN_IMG_SRC.toRegex()
+    private val titleRegex = PATTERN_TITLE.toRegex()
     private val dateTimeRegex = PATTERN_DATE_TIME.toRegex()
     private val episodeNumberRegex = PATTERN_EPISODE_NNUMBER.toRegex()
 
@@ -74,11 +74,13 @@ class AmediaDataSource : DataSource {
                     episodeLinkRegex
                 )
 
-                val (imgSrc) = getFirstValueByRegex(lineIterator, seasonPosterRegex)
+                val (imgSrc) = getFirstValueByRegex(lineIterator, posterRegex)
 
-                val (seasonTitle) = getFirstValueByRegex(lineIterator, seasonTitleRegex)
+                val (parsedTitle) = getFirstValueByRegex(lineIterator, titleRegex)
+                val seasonTitle = parsedTitle.trim()
                 val movieTitle =
-                    if (seasonNumber.isNotEmpty()) seasonTitle.dropLast(seasonNumber.length + 1) else seasonTitle
+                    if (seasonNumber.isNotEmpty()) seasonTitle.dropLast(seasonNumber.length + 1)
+                        .trim() else seasonTitle
 
                 val (dateString, timeString) = getFirstValueByRegex(lineIterator, dateTimeRegex)
                 Log.d(this.javaClass.simpleName, "$seasonTitle - $dateString $timeString")
@@ -116,7 +118,7 @@ class AmediaDataSource : DataSource {
 
                 val season = SeasonData(
                     number = seasonNumber.ifBlank { "1" }.toInt(),
-                    title = seasonTitle,
+                    title = if (seasonTitle.startsWith(movieTitle)) null else seasonTitle,
                     link = href,
                     posterLink = imgSrc
                 )

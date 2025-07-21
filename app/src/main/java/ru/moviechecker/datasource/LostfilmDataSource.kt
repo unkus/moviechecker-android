@@ -194,6 +194,8 @@ class LostfilmDataSource : DataSource {
 
             val season = SeasonData(
                 number = seasonNumber,
+                //у сезонов нет своего названия
+                //title = seriesTitle,
                 link = href.split("/").take(4).joinToString(separator = "/"),
                 posterLink = seasonPosterLink
             )

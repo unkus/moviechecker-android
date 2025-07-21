@@ -28,9 +28,11 @@
     <string name="yesterday_time">Yesterday %s</string>
     <string name="date_time" formatted="false" translatable="false">%s %s</string>
     <string name="edit_button_text" translatable="false">…</string>
-    <string name="item_title" translatable="false">%s (%d%s)</string>
-    <string name="season_title">Season #%d %s</string>
-    <string name="episode_title">Episode #%d %s</string>
+    <string name="item_title" translatable="false">%s %d%s</string>
+    <string name="named_item_title" translatable="false">%s (%d%s)</string>
+    <string name="site_title">Site %d</string>
+    <string name="season_title">Season #%d%s</string>
+    <string name="episode_title">Episode #%d%s</string>
     <string name="cleanup">Cleanup</string>
     <string name="poster_error">Unable to process poster data</string>
     <string name="movies_title">Movies</string>
@@ -42,7 +44,13 @@
     <string name="cd_back">Back</string>
     <string name="sites_title">Sites</string>
     <string name="driwer_item_sites_title">Sites</string>
-    <string name="driwer_item_movies_title">All sites</string>
+    <string name="driwer_item_movies_title">Movies/Episodes</string>
+    <string name="driwer_item_all_sites_title">All sites</string>
     <string name="driwer_item_favorites_title">Favorites</string>
-    <string name="driwer_title">Menu</string>
+    <string name="driwer_item_menu_title">Menu</string>
+    <string name="site_mnemonic_label">Mnemonic</string>
+    <string name="site_title_label">Title</string>
+    <string name="site_address_label">Address</string>
+    <string name="site_mirror_label">Mirror</string>
+    <string name="site_use_mirror_label">Use mirror</string>
 </resources>

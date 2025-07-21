@@ -73,7 +73,6 @@ fun MovieDetailsScreen(
 ) {
     val topAppBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
-    val context = LocalContext.current
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -113,7 +112,7 @@ fun MovieDetailsScreen(
                                 )
                                 Text(text = movie.title)
                             }
-                            Text(text = "Сайт: ${movie.site}")
+                            Text(text = stringResource(R.string.sites_title, movie.site))
                         }
                     }
                 }
@@ -147,7 +146,7 @@ fun MovieDetailsScreen(
                                 } else {
                                     Text(text = "$title ${season.number}")
                                 }
-                            } ?: Text(text = "Сезон ${season.number}")
+                            } ?: Text(text = stringResource(R.string.season_title, season.number, ""))
                             Row(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
@@ -274,10 +273,10 @@ private fun Poster(
     )
 }
 
-@Preview("Drawer contents")
-@Preview("Drawer contents (dark)", uiMode = UI_MODE_NIGHT_YES)
+@Preview("Movie details")
+@Preview("Movie details (dark)", uiMode = UI_MODE_NIGHT_YES)
 @Composable
-fun PreviewAppDrawer() {
+fun PreviewMovieDetailsScreen() {
     CheckerTheme {
 //        MovieDetailsScreen(
 //            uiState = MovieDetailsUiState(

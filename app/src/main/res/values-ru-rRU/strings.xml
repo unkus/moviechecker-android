@@ -27,6 +27,7 @@
     <string name="today_unstable">Сегодня, не стабильно</string>
     <string name="tomorrow_time">Завтра %s</string>
     <string name="yesterday_time">Вчера %s</string>
+    <string name="site_title">Сайт %s</string>
     <string name="season_title">Сезон №%d%s</string>
     <string name="episode_title">Серия №%d%s</string>
     <string name="cleanup">Очистка</string>
@@ -40,7 +41,13 @@
     <string name="cd_back">Назад</string>
     <string name="sites_title">Сайты</string>
     <string name="driwer_item_sites_title">Сайты</string>
-    <string name="driwer_item_movies_title">Все сайты</string>
+    <string name="driwer_item_movies_title">Фильмы/Эпизоды</string>
+    <string name="driwer_item_all_sites_title">Все сайты</string>
     <string name="driwer_item_favorites_title">Избранное</string>
-    <string name="driwer_title">Меню</string>
+    <string name="driwer_item_menu_title">Меню</string>
+    <string name="site_mnemonic_label">Мнемоника</string>
+    <string name="site_title_label">Название</string>
+    <string name="site_address_label">Адрес</string>
+    <string name="site_mirror_label">Зеркало</string>
+    <string name="site_use_mirror_label">Использовать зеркало</string>
 </resources>

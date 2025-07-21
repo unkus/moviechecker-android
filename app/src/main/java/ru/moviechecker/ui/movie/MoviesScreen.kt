@@ -317,15 +317,9 @@ fun MovieItem(
                             modifier = Modifier.clickable { onFavoritesIconClick(movie.id) },
                             tint = if (movie.favoritesMark) Color.Yellow else Color.Gray
                         )
+                        val lastSeason = true // TODO: lastSeasonId == (nextSeasonId ?: lastSeasonId)
                         Text(
-                            text = if (movie.seasonNumber == 1
-                                || movie.title.endsWith(movie.seasonNumber.toString())) movie.title else
-                                stringResource(
-                                    R.string.item_title,
-                                    movie.title,
-                                    movie.seasonNumber,
-                                    ""
-                                ),
+                            text = if (movie.seasonNumber == 1) movie.title else stringResource(R.string.item_title, movie.title, movie.seasonNumber, if (lastSeason) "" else "+"),
                             modifier = Modifier.weight(1f),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
@@ -394,7 +388,7 @@ fun EpisodeItem(
     style: TextStyle = LocalTextStyle.current
 ) {
     val text = title?.let {
-        stringResource(R.string.item_title, title, number, if (last) "" else "+")
+        stringResource(R.string.named_item_title, title, number, if (last) "" else "+")
     } ?: stringResource(R.string.episode_title, number, if (last) "" else "+")
 
     Row(
