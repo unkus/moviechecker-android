@@ -7,6 +7,7 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import ru.moviechecker.database.CheckerDatabase
 import ru.moviechecker.datasource.AmediaDataSource
+import ru.moviechecker.datasource.LostfilmDataSource
 import java.net.URI
 import java.util.stream.Collectors.toList
 
@@ -14,7 +15,7 @@ class RetrieveDataWorker(appContext: Context, workerParams: WorkerParameters) :
     Worker(appContext, workerParams) {
     override fun doWork(): Result {
         val database = CheckerDatabase.getDatabase(applicationContext)
-        val dataSources = listOf(AmediaDataSource())
+        val dataSources = listOf(AmediaDataSource(), LostfilmDataSource())
 
         val errors = dataSources.parallelStream()
             .map { dataSource ->

@@ -17,7 +17,7 @@ class AsyncRetrieveDataWorker(appContext: Context, workerParams: WorkerParameter
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         val database = CheckerDatabase.getDatabase(applicationContext)
-        val dataSources = listOf(LostfilmDataSource(), AmediaDataSource())
+        val dataSources = listOf(AmediaDataSource(), LostfilmDataSource())
 
         val errors = dataSources
             .mapNotNull { dataSource ->
