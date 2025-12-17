@@ -12,10 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -32,10 +28,12 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -106,7 +104,7 @@ fun SitesScreen(
                                             context.startActivity(browserIntent)
                                         }) {
                                         Icon(
-                                            imageVector = Icons.Default.Home,
+                                            imageVector = ImageVector.vectorResource(R.drawable.home_24px),
                                             contentDescription = stringResource(R.string.cd_open_navigation_drawer)
                                         )
                                     }
@@ -141,7 +139,7 @@ private fun SitesTopAppBar(
         navigationIcon = {
             IconButton(onClick = openDrawer) {
                 Icon(
-                    imageVector = Icons.Filled.Menu,
+                    imageVector = ImageVector.vectorResource(R.drawable.menu_24px),
                     contentDescription = stringResource(R.string.cd_open_navigation_drawer)
                 )
             }
@@ -155,7 +153,7 @@ private fun SitesTopAppBar(
                 ).show()
             }) {
                 Icon(
-                    imageVector = Icons.Filled.Search,
+                    imageVector = ImageVector.vectorResource(R.drawable.search_24px),
                     contentDescription = stringResource(R.string.cd_search)
                 )
             }

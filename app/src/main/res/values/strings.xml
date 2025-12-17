@@ -53,4 +53,6 @@
     <string name="site_address_label">Address</string>
     <string name="site_mirror_label">Mirror</string>
     <string name="site_use_mirror_label">Use mirror</string>
+    <string name="default_episode_title">Episode %d</string>
+    <string name="episode_title_with_number" translatable="false">%s (%d)</string>
 </resources>

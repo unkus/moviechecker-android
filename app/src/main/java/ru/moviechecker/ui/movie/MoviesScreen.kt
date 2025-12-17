@@ -21,14 +21,6 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -51,11 +43,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -122,7 +116,7 @@ fun MoviesScreen(
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
             ) {
                 Icon(
-                    imageVector = Icons.Default.Delete,
+                    imageVector = ImageVector.vectorResource(R.drawable.delete_24px),
                     contentDescription = stringResource(R.string.cleanup)
                 )
             }
@@ -180,13 +174,13 @@ private fun MoviesTopAppBar(
             siteTitle?.let {
                 IconButton(onClick = navigateBack) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        imageVector = ImageVector.vectorResource(R.drawable.arrow_back_24px),
                         contentDescription = stringResource(R.string.cd_back)
                     )
                 }
             } ?: IconButton(onClick = openDrawer) {
                 Icon(
-                    imageVector = Icons.Filled.Menu,
+                    imageVector = ImageVector.vectorResource(R.drawable.menu_24px),
                     contentDescription = stringResource(R.string.cd_open_navigation_drawer)
                 )
             }
@@ -194,14 +188,16 @@ private fun MoviesTopAppBar(
         actions = {
             IconButton(onClick = onShouldShowOnlyFavoritesClick) {
                 Icon(
-                    imageVector = if (shouldShowOnlyFavorites) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                    imageVector = if (shouldShowOnlyFavorites) ImageVector.vectorResource(
+                        R.drawable.favorite_24px_filled
+                    ) else ImageVector.vectorResource(R.drawable.favorite_24px),
                     tint = if (shouldShowOnlyFavorites) Color.Yellow else Color.Gray,
                     contentDescription = stringResource(R.string.cd_favorites_filter)
                 )
             }
             IconButton(onClick = onShouldShowViewedEpisodesClick) {
                 Icon(
-                    imageVector = Icons.Filled.Check,
+                    imageVector = ImageVector.vectorResource(R.drawable.check_24px),
                     tint = if (shouldShowViewedEpisodes) Color.Green else Color.Gray,
                     contentDescription = stringResource(R.string.cd_viewed_filter)
                 )
@@ -214,7 +210,7 @@ private fun MoviesTopAppBar(
                 ).show()
             }) {
                 Icon(
-                    imageVector = Icons.Filled.Search,
+                    imageVector = ImageVector.vectorResource(R.drawable.search_24px),
                     contentDescription = stringResource(R.string.cd_search)
                 )
             }
@@ -299,7 +295,7 @@ fun MovieItem(
                         movie.poster?.let {
                             Poster(
                                 it,
-                                modifier = Modifier.width(Icons.Default.Favorite.defaultWidth * 2)
+                                modifier = Modifier.width(ImageVector.vectorResource(R.drawable.favorite_24px).defaultWidth * 2)
                             )
                         }
                     }
@@ -312,27 +308,36 @@ fun MovieItem(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Icon(
-                            imageVector = if (movie.favoritesMark) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            imageVector = if (movie.favoritesMark) ImageVector.vectorResource(
+                                R.drawable.favorite_24px_filled
+                            ) else ImageVector.vectorResource(R.drawable.favorite_24px),
                             contentDescription = null,
                             modifier = Modifier.clickable { onFavoritesIconClick(movie.id) },
                             tint = if (movie.favoritesMark) Color.Yellow else Color.Gray
                         )
                         val lastSeason = true // TODO: lastSeasonId == (nextSeasonId ?: lastSeasonId)
                         Text(
-                            text = if (movie.seasonNumber == 1) movie.title else stringResource(R.string.item_title, movie.title, movie.seasonNumber, if (lastSeason) "" else "+"),
+                            text = if (movie.seasonNumber == 1) movie.title else stringResource(
+                                R.string.item_title,
+                                movie.title,
+                                movie.seasonNumber,
+                                if (lastSeason) "" else "+"
+                            ),
                             modifier = Modifier.weight(1f),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                     }
 
-                    val highlighted = movie.nextEpisodeId?.let {
-                        if (movie.favoritesMark) {
-                            !movie.viewedMark
-                        } else {
-                            movie.nextEpisodeNumber == 1
+                    val highlighted = movie.nextEpisodeId
+                        ?.let {
+                            if (movie.favoritesMark) {
+                                !movie.viewedMark
+                            } else {
+                                movie.nextEpisodeNumber == 1
+                            }
                         }
-                    } ?: false
+                        ?: false
                     EpisodeItem(
                         id = movie.nextEpisodeId ?: movie.lastEpisodeId,
                         number = movie.nextEpisodeNumber ?: movie.lastEpisodeNumber,
@@ -398,7 +403,7 @@ fun EpisodeItem(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Icon(
-            imageVector = Icons.Default.Check,
+            imageVector = ImageVector.vectorResource(R.drawable.check_24px),
             contentDescription = null,
             modifier = Modifier.clickable {
                 onEpisodeViewedIconClick(id)

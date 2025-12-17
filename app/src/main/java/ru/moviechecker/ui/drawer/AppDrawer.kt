@@ -20,8 +20,6 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.HorizontalDivider
@@ -35,7 +33,9 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -87,7 +87,7 @@ fun AppDrawerScreen(
                 HorizontalDivider()
                 NavigationDrawerItem(
                     label = { Text(stringResource(id = R.string.driwer_item_sites_title)) },
-                    icon = { Icon(Icons.AutoMirrored.Filled.List, null) },
+                    icon = { Icon(imageVector = ImageVector.vectorResource(R.drawable.list_24px), contentDescription = null) },
                     selected = currentRoute is SitesRoute,
                     onClick = { navigateToSites(); closeDrawer() },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -96,7 +96,7 @@ fun AppDrawerScreen(
                 Text(stringResource(R.string.driwer_item_movies_title), modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleLarge)
                 NavigationDrawerItem(
                     label = { Text(stringResource(id = R.string.driwer_item_all_sites_title)) },
-                    icon = { Icon(Icons.AutoMirrored.Filled.List, null) },
+                    icon = { Icon(imageVector = ImageVector.vectorResource(R.drawable.list_24px), contentDescription = null) },
                     selected = currentRoute is MoviesRoute,
                     onClick = { navigateToMovies(null); closeDrawer() },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -105,7 +105,7 @@ fun AppDrawerScreen(
             items(items = sitesProvider(), key = { it.id }) { site ->
                 NavigationDrawerItem(
                     label = { Text(site.title) },
-                    icon = { Icon(Icons.AutoMirrored.Filled.List, null) },
+                    icon = { Icon(imageVector = ImageVector.vectorResource(R.drawable.list_24px), contentDescription = null) },
                     selected = currentRoute is MoviesRoute,
                     onClick = { navigateToMovies(site.id); closeDrawer() },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)

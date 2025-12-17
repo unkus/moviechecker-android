@@ -19,12 +19,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -47,11 +41,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.moviechecker.R
@@ -105,7 +100,9 @@ fun MovieDetailsScreen(
                             )
                             Row {
                                 Icon(
-                                    imageVector = if (movie.favoritesMark) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                    imageVector = if (movie.favoritesMark) ImageVector.vectorResource(
+                                        R.drawable.favorite_24px_filled
+                                    ) else ImageVector.vectorResource(R.drawable.favorite_24px),
                                     contentDescription = null,
                                     modifier = Modifier.clickable { onFavoriteIconClick(movie.id) },
                                     tint = if (movie.favoritesMark) Color.Yellow else Color.Gray
@@ -140,13 +137,21 @@ fun MovieDetailsScreen(
                             )
                         }
                         Column {
-                            season.title?.let { title ->
-                                if (title.endsWith(season.number.toString())) {
-                                    Text(text = title)
-                                } else {
-                                    Text(text = "$title ${season.number}")
+                            season.title
+                                ?.let { title ->
+                                    if (title.endsWith(season.number.toString())) {
+                                        Text(text = title)
+                                    } else {
+                                        Text(text = "$title ${season.number}")
+                                    }
                                 }
-                            } ?: Text(text = stringResource(R.string.season_title, season.number, ""))
+                                ?: Text(
+                                    text = stringResource(
+                                        R.string.season_title,
+                                        season.number,
+                                        ""
+                                    )
+                                )
                             Row(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
@@ -155,7 +160,7 @@ fun MovieDetailsScreen(
                                     modifier = Modifier.weight(1f)
                                 )
                                 Image(
-                                    imageVector = Icons.Default.KeyboardArrowUp,
+                                    imageVector = ImageVector.vectorResource(R.drawable.keyboard_arrow_up_24px),
                                     contentDescription = null,
                                     modifier = Modifier
                                         .align(CenterVertically)
@@ -207,7 +212,7 @@ private fun MovieDetailsTopAppBar(
         navigationIcon = {
             IconButton(onClick = navigateBack) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    imageVector = ImageVector.vectorResource(R.drawable.arrow_back_24px),
                     contentDescription = stringResource(R.string.cd_back)
                 )
             }
@@ -231,20 +236,28 @@ private fun EpisodeItem(
     ) {
         Row {
             Icon(
-                imageVector = Icons.Default.Check,
+                imageVector = ImageVector.vectorResource(R.drawable.check_24px),
                 contentDescription = null,
                 modifier = Modifier.clickable {
                     onViewedMarkIconClick(episode.id)
                 },
                 tint = if (episode.state == EpisodeState.VIEWED) Color.Green else Color.Gray
             )
-            episode.title?.let { title ->
-                if (title.endsWith(episode.number.toString())) {
-                    Text(text = title)
-                } else {
-                    Text(text = "$title ${episode.number}")
+            episode.title
+                ?.let { title ->
+                    if (title.endsWith(episode.number.toString())) {
+                        Text(text = title)
+                    } else {
+                        Text(
+                            text = stringResource(
+                                R.string.episode_title_with_number,
+                                title,
+                                episode.number
+                            )
+                        )
+                    }
                 }
-            } ?: Text(text = "Серия ${episode.number}")
+                ?: Text(text = stringResource(R.string.default_episode_title, episode.number))
         }
     }
 }

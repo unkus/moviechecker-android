@@ -50,4 +50,5 @@
     <string name="site_address_label">Адрес</string>
     <string name="site_mirror_label">Зеркало</string>
     <string name="site_use_mirror_label">Использовать зеркало</string>
+    <string name="default_episode_title">Серия ${episode.number}</string>
 </resources>

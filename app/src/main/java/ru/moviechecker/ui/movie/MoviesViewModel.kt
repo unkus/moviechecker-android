@@ -113,15 +113,14 @@ class MovieCardsViewModel(
                     workInfo?.let { info ->
                         if (info.state.isFinished) {
                             if (WorkInfo.State.FAILED == info.state) {
-                                Log.d(
-                                    this.javaClass.simpleName,
-                                    "Обновление закончилось с ошибкой: ${
-                                        workInfo.outputData.getStringArray("errors")
-                                    }"
-                                )
-                                info.outputData.getStringArray("errors")?.let { newErrors ->
-                                    _errors.update { newErrors.asList() }
-                                }
+                                info.outputData.getStringArray("errors")
+                                    ?.let { newErrors ->
+                                        Log.d(
+                                            this.javaClass.simpleName,
+                                            "Обновление закончилось с ошибкой: ${newErrors.asList()}"
+                                        )
+                                        _errors.update { newErrors.asList() }
+                                    }
 
                             } else {
                                 Log.d(this.javaClass.simpleName, "Обновление закончено")
