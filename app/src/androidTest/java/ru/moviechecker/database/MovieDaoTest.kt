@@ -38,8 +38,8 @@ class MovieDaoTest {
     private lateinit var episodeDao: EpisodeDao
     private lateinit var checkerDatabase: CheckerDatabase
 
-    private val site1 = SiteEntity(1, URI.create("http://1.site"))
-    private val site2 = SiteEntity(2, URI.create("http://2.site"))
+    private val site1 = SiteEntity(1, mnemonic = "", "http://1.site", title = "Сайт 1", poster = null, mirror = null)
+    private val site2 = SiteEntity(2, mnemonic = "", "http://2.site", title = "Сайт 2", poster = null, mirror = null)
 
     private val movie1 = MovieEntity(1, 1, "movie1", "title1", favoritesMark = false)
     private val movie2 = MovieEntity(

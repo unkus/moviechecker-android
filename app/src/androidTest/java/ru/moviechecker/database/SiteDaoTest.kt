@@ -21,9 +21,9 @@ class SiteDaoTest {
     private lateinit var siteDao: SiteDao
     private lateinit var checkerDatabase: CheckerDatabase
 
-    val site1 = SiteEntity(1, "site1", address = URI.create("http://site1"))
-    val site2 = SiteEntity(2, "site2", address = URI.create("http://site2"))
-    val site3 = SiteEntity(3, "site3", address = URI.create("http://site3"))
+    val site1 = SiteEntity(1, "site1", address = "http://site1", title = "Сайт 1", poster = null, useMirror = false, mirror = null)
+    val site2 = SiteEntity(2, "site2", address = "http://site2", title = "Сайт 2", poster = null, useMirror = false, mirror = null)
+    val site3 = SiteEntity(3, "site3", address = "http://site3", title = "Сайт 3", poster = null, useMirror = false, mirror = null)
 
     @Before
     fun createDb() {
