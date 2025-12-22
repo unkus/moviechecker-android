@@ -30,7 +30,7 @@ import java.net.URI
 @Database(
     entities = [SiteEntity::class, MovieEntity::class, SeasonEntity::class, EpisodeEntity::class],
     views = [],
-    version = 10,
+    version = 12,
     autoMigrations = [
         AutoMigration(from = 1, to = 2, spec = Ver1To2AutoMigration::class),
         AutoMigration(from = 2, to = 3),
@@ -41,6 +41,8 @@ import java.net.URI
         AutoMigration(from = 7, to = 8),
         AutoMigration(from = 8, to = 9, Ver8To9AutoMigration::class),
         AutoMigration(from = 9, to = 10),
+        AutoMigration(from = 10, to = 11),
+        AutoMigration(from = 11, to = 12),
     ]
 )
 @TypeConverters(Converters::class)
@@ -93,12 +95,15 @@ abstract class CheckerDatabase : RoomDatabase() {
         runInTransaction {
             val siteEntity = processSiteData(siteDao(), sourceData.site)
             sourceData.entries.forEach { record ->
-                val siteUri = URI.create(if (siteEntity.useMirror) siteEntity.mirror else siteEntity.address)
+                val siteUri =
+                    URI.create(if (siteEntity.useMirror) siteEntity.mirror else siteEntity.address)
                 val movieEntity =
-                    processMovieData(movieDao(),
+                    processMovieData(
+                        movieDao(),
                         siteEntity.id,
                         siteUri,
-                        record.movie)
+                        record.movie
+                    )
                 record.season?.let {
                     val seasonEntity = processSeasonData(
                         seasonDao(),
@@ -117,23 +122,25 @@ abstract class CheckerDatabase : RoomDatabase() {
         siteData: SiteData
     ): SiteEntity {
         Log.d(this.javaClass.simpleName, "Обрабатываем: ${siteData.mnemonic}")
-        siteDao.getSiteByMnemonic(siteData.mnemonic)?.let { entity ->
-            entity.title = siteData.title
-            entity.address = siteData.address.toString()
-            entity.poster = entity.poster ?: siteData.posterLink?.let { data ->
-                siteData.address.resolve(data).toURL()?.readBytes()
+        siteDao.getSiteByMnemonic(siteData.mnemonic)
+            ?.let { entity ->
+                entity.title = siteData.title
+                entity.address = siteData.address.toString()
+                entity.poster = entity.poster ?: siteData.posterLink?.let { link ->
+                    getPoster(siteData.address.resolve(link))
+                }
+                siteDao.update(entity)
             }
-            siteDao.update(entity)
-        } ?: siteDao.insert(
-            SiteEntity(
-                mnemonic = siteData.mnemonic,
-                title = siteData.title,
-                poster = siteData.posterLink?.let {
-                    siteData.address.resolve(it).toURL()?.readBytes()
-                },
-                address = siteData.address.toString()
+            ?: siteDao.insert(
+                SiteEntity(
+                    mnemonic = siteData.mnemonic,
+                    title = siteData.title,
+                    poster = siteData.posterLink?.let { link ->
+                        getPoster(siteData.address.resolve(link))
+                    },
+                    address = siteData.address.toString()
+                )
             )
-        )
         return siteDao.getSiteByMnemonic(siteData.mnemonic)!!
     }
 
@@ -147,25 +154,27 @@ abstract class CheckerDatabase : RoomDatabase() {
             this.javaClass.simpleName,
             "Обрабатываем фильм: ${movieData.title}(${movieData.pageId})"
         )
-        movieDao.getMovieBySiteIdAndPageId(siteId, movieData.pageId)?.let { entity ->
-            entity.title = movieData.title
-            entity.link = movieData.link
-            entity.poster = entity.poster ?: movieData.posterLink?.let { link ->
-                getPoster(siteAddress.resolve(link))
-            }
-            movieDao.update(entity)
-        } ?: movieDao.insert(
-            MovieEntity(
-                siteId = siteId,
-                pageId = movieData.pageId,
-                title = movieData.title,
-                link = movieData.link,
-                poster = movieData.posterLink?.let { link ->
+        movieDao.getMovieBySiteIdAndPageId(siteId, movieData.pageId)
+            ?.let { entity ->
+                entity.title = movieData.title
+                entity.link = movieData.link
+                entity.poster = entity.poster ?: movieData.posterLink?.let { link ->
                     getPoster(siteAddress.resolve(link))
-                },
-                favoritesMark = false
+                }
+                movieDao.update(entity)
+            }
+            ?: movieDao.insert(
+                MovieEntity(
+                    siteId = siteId,
+                    pageId = movieData.pageId,
+                    title = movieData.title,
+                    link = movieData.link,
+                    poster = movieData.posterLink?.let { link ->
+                        getPoster(siteAddress.resolve(link))
+                    },
+                    favoritesMark = false
+                )
             )
-        )
 
         return movieDao.getMovieBySiteIdAndPageId(siteId, movieData.pageId)!!
     }
@@ -195,22 +204,26 @@ abstract class CheckerDatabase : RoomDatabase() {
             this.javaClass.simpleName,
             "Обрабатываем сезон: ${seasonData.number}"
         )
-        seasonDao.getSeasonByMovieIdAndNumber(movieId, seasonData.number)?.let { entity ->
-            entity.title = seasonData.title
-            entity.link = seasonData.link
-            entity.poster = entity.poster ?: seasonData.posterLink?.let { data ->
-                siteAddress.resolve(data).toURL()?.readBytes()
+        seasonDao.getSeasonByMovieIdAndNumber(movieId, seasonData.number)
+            ?.let { entity ->
+                entity.title = seasonData.title
+                entity.link = seasonData.link
+                entity.poster = entity.poster ?: seasonData.posterLink?.let { link ->
+                    getPoster(siteAddress.resolve(link))
+                }
+                seasonDao.update(entity)
             }
-            seasonDao.update(entity)
-        } ?: seasonDao.insert(
-            SeasonEntity(
-                movieId = movieId,
-                number = seasonData.number,
-                title = seasonData.title,
-                link = seasonData.link,
-                poster = seasonData.posterLink?.let { siteAddress.resolve(it).toURL()?.readBytes() }
+            ?: seasonDao.insert(
+                SeasonEntity(
+                    movieId = movieId,
+                    number = seasonData.number,
+                    title = seasonData.title,
+                    link = seasonData.link,
+                    poster = seasonData.posterLink?.let { link ->
+                        getPoster(siteAddress.resolve(link))
+                    }
+                )
             )
-        )
 
         return seasonDao.getSeasonByMovieIdAndNumber(movieId, seasonData.number)!!
     }
@@ -224,24 +237,51 @@ abstract class CheckerDatabase : RoomDatabase() {
             this.javaClass.simpleName,
             "Обрабатываем эпизод: ${episodeData.title} (${episodeData.number})"
         )
-        episodeDao.getBySeasonIdAndNumber(seasonId, episodeData.number)?.let { entity ->
-            entity.title = episodeData.title
-            entity.link = episodeData.link
-            if (entity.state != EpisodeState.VIEWED) {
-                entity.state = EpisodeState.valueOf(episodeData.state.name)
-            }
-            entity.date = episodeData.date
-            episodeDao.update(entity)
-        } ?: episodeDao.insert(
-            EpisodeEntity(
-                seasonId = seasonId,
-                number = episodeData.number,
-                title = episodeData.title,
-                link = episodeData.link,
-                state = EpisodeState.valueOf(episodeData.state.name),
-                date = episodeData.date
-            )
+        val newEpisode = EpisodeEntity(
+            seasonId = seasonId,
+            number = episodeData.number,
+            title = episodeData.title,
+            link = episodeData.link,
+            state = EpisodeState.valueOf(episodeData.state.name),
+            date = episodeData.date
         )
+        episodeDao.getLastBySeasonId(seasonId)
+            ?.let { lastEpisode ->
+                if (newEpisode.number == lastEpisode.number) {
+                    lastEpisode.title = episodeData.title
+                    lastEpisode.link = episodeData.link
+                    if (lastEpisode.state != EpisodeState.VIEWED) {
+                        lastEpisode.state = EpisodeState.valueOf(episodeData.state.name)
+                    }
+                    lastEpisode.date = episodeData.date
+                    episodeDao.update(lastEpisode)
+                } else if (newEpisode.number > lastEpisode.number) {
+                    if (newEpisode.number - lastEpisode.number > 1) {
+                        addMissedEpisodes(episodeDao, lastEpisode.number + 1, newEpisode)
+                    }
+                    episodeDao.insert(newEpisode)
+                }
+            }
+            ?: episodeDao.insert(newEpisode)
+    }
+
+    private fun addMissedEpisodes(
+        episodeDao: EpisodeDao,
+        lastEpisodeNumber: Int,
+        currentEpisode: EpisodeEntity
+    ) {
+        for (number in lastEpisodeNumber until currentEpisode.number) {
+            episodeDao.insert(
+                EpisodeEntity(
+                    seasonId = currentEpisode.seasonId,
+                    number = number,
+                    link = currentEpisode.link,
+                    state = EpisodeState.valueOf(currentEpisode.state.name),
+                    // TODO: Подумать над тем какую дату ставить
+                    date = currentEpisode.date
+                )
+            )
+        }
     }
 
     fun cleanupData() {

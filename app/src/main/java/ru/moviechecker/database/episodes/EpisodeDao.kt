@@ -23,8 +23,8 @@ interface EpisodeDao {
 
     @Query("SELECT * FROM episodes e WHERE e.id = :id")
     fun getById(id: Int): EpisodeEntity?
-    @Query("SELECT * FROM episodes e WHERE e.season_id = :seasonId AND e.number = :number")
-    fun getBySeasonIdAndNumber(seasonId: Int, number: Int): EpisodeEntity?
+    @Query("SELECT * FROM episodes e WHERE e.season_id = :seasonId ORDER BY e.number DESC LIMIT 1")
+    fun getLastBySeasonId(seasonId: Int): EpisodeEntity?
     @Query("SELECT * FROM episodes e WHERE e.state = :state ORDER BY e.season_id, e.number ASC")
     fun getByStateSortByNumberAsc(state: EpisodeState): List<EpisodeEntity>
 

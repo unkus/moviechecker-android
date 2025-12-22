@@ -39,45 +39,10 @@ internal class LostfilmDataSourceTest {
         val dataSource = spyk(LostfilmDataSource(), recordPrivateCalls = true)
         val address = javaClass.getResource("/lostfilm/lostfilm.html")!!.toURI()
 
-        // пример страницы эпизода
-        every {
-            dataSource invoke "resolveLink" withArguments listOf(address, "/series/Severance/season_2/episode_6")
-        } returns javaClass.getResource("/lostfilm/Severance_2_6.html")
-        // пример страницы спец эпизода
-        every {
-            dataSource invoke "resolveLink" withArguments listOf(address, "/series/Euphoria/additional/episode_1")
-        } returns javaClass.getResource("/lostfilm/Euphoria_999_1.html")
-        // Пример страницы фильма
-        every {
-            dataSource invoke "resolveLink" withArguments listOf(address, "/movies/Mufasa_The_Lion_King")
-        } returns javaClass.getResource("/lostfilm/MufasaTheLionKing.html")
-        // Битый url ?
-        every {
-            dataSource invoke "resolveLink" withArguments listOf(address, "/series/SurrealEstate/season_3/episode_3")
-        } returns javaClass.getResource("/lostfilm/SurrealEstate_3_3.html")
-
         // заглушки
         every {
-            dataSource invoke "resolveLink" withArguments listOf(address, "/series/Yellowjackets/season_3/episode_3")
-        } returns null
-        every {
-            dataSource invoke "resolveLink" withArguments listOf(address, "/series/Zero_Day/season_1/episode_1")
-        } returns null
-        every {
-            dataSource invoke "resolveLink" withArguments listOf(address, "/series/A_Thousand_Blows/season_1/episode_1")
-        } returns null
-        every {
-            dataSource invoke "resolveLink" withArguments listOf(address, "/series/Your_Friendly_Neighborhood_Spider_Man/season_1/episode_10")
-        } returns null
-        every {
-            dataSource invoke "resolveLink" withArguments listOf(address, "/series/Invincible/season_3/episode_5")
-        } returns null
-        every {
-            dataSource invoke "resolveLink" withArguments listOf(address, "/series/Reacher/season_3/episode_1")
-        } returns null
-        every {
-            dataSource invoke "resolveLink" withArguments listOf(address, "/series/Your_Friendly_Neighborhood_Spider_Man/season_1/episode_9")
-        } returns null
+            dataSource invoke "resolveLink" withArguments listOf(address, any() as String)
+        } answers { javaClass.getResource("/lostfilm${secondArg<String>()}.html") }
 
         val sourceData = dataSource.retrieveData(address)
         assertEquals("LostFilm.TV", sourceData.site.title)
@@ -92,7 +57,7 @@ internal class LostfilmDataSourceTest {
         assertEquals("Муфаса: Король Лев", mufasaTheLionKing!!.movie.title)
         assertEquals("/movies/Mufasa_The_Lion_King", mufasaTheLionKing.movie.link)
         assertEquals(
-            "https://static.lostfilm.top/Images/878/Posters/poster.jpg",
+            "/Static/Images/878/Posters/poster.jpg",
             mufasaTheLionKing.movie.posterLink
         )
         assertNull(mufasaTheLionKing.season)
@@ -103,14 +68,14 @@ internal class LostfilmDataSourceTest {
         assertEquals("Эйфория", euphoria!!.movie.title)
         assertEquals("/series/Euphoria", euphoria.movie.link)
         assertEquals(
-            "https://static.lostfilm.top/Images/915/Posters/e_999_1.jpg",
+            "/Static/Images/915/Posters/e_999_1.jpg",
             euphoria.movie.posterLink
         )
         assertEquals(999, euphoria.season?.number)
         assertNull(euphoria.season?.title)
         assertEquals("/series/Euphoria/additional", euphoria.season?.link)
         assertEquals(
-            "//static.lostfilm.top/Images/915/Posters/icon.jpg",
+            "/Static/Images/915/Posters/icon.jpg",
             euphoria.season?.posterLink
         )
         assertEquals(1, euphoria.episode?.number)
@@ -131,14 +96,14 @@ internal class LostfilmDataSourceTest {
         assertEquals("Разделение", severance!!.movie.title)
         assertEquals("/series/Severance", severance.movie.link)
         assertEquals(
-            "https://static.lostfilm.top/Images/651/Posters/e_2_6.jpg",
+            "/Static/Images/651/Posters/e_2_6.jpg",
             severance.movie.posterLink
         )
         assertEquals(2, severance.season?.number)
         assertNull(severance.season?.title)
         assertEquals("/series/Severance/season_2", severance.season?.link)
         assertEquals(
-            "//static.lostfilm.top/Images/651/Posters/icon_s2.jpg",
+            "/Static/Images/651/Posters/icon_s2.jpg",
             severance.season?.posterLink
         )
         assertEquals(6, severance.episode?.number)
@@ -159,6 +124,5 @@ internal class LostfilmDataSourceTest {
         assertEquals("Сюрриэлторы", surrealEstate!!.movie.title)
         assertEquals("/series/SurrealEstate", surrealEstate.movie.link)
         assertEquals("/series/SurrealEstate/season_3/episode_3", surrealEstate.episode?.link)
-
     }
 }

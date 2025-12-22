@@ -28,7 +28,7 @@ private const val PATTERN_NEW_MOVIE_CLASS =
 private const val PATTERN_OG_SITE_NAME =
     "<meta property='og:site_name' content=\"(?<siteName>.+)\" />"
 private const val PATTERN_OG_TITLE = "<meta property='og:title' content=\"(?<title>.+)\" />"
-private const val PATTERN_OG_IMAGE = "<meta property='og:image' content=\"(?<image>.+)\" />"
+private const val PATTERN_OG_IMAGE = "<meta property='og:image' content=\"https:(?<image>.+)\" />"
 private const val PATTERN_OG_DESCRIPTION =
     "<meta property=\"og:description\" content=\"(?<description>.+)\" />"
 private const val PATTERN_SEASON_POSTER_LINK = "<img src=\"(?<link>.+)\" class=\"thumb\" />"
@@ -112,7 +112,8 @@ class LostfilmDataSource : DataSource {
             site = SiteData(
                 mnemonic = mnemonic,
                 title = siteTitle,
-                address = address
+                address = address,
+                posterLink = null
             ),
             entries = entries
         )

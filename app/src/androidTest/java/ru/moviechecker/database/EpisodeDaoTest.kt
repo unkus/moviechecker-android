@@ -91,10 +91,10 @@ class EpisodeDaoTest {
     @Test
     fun daoGetEpisodeBySeasonIdAndNumber_getsEpisodeBySeasonIdAndNumberFromDB() = runBlocking {
         episodeDao.insert(episode1, episode2, episode3)
-        episodeDao.getBySeasonIdAndNumber(2, 2)?.let {
+        episodeDao.getLastBySeasonId(2)?.let {
             fail("Some episode found but not expected")
         }
-        episodeDao.getBySeasonIdAndNumber(1, 2)?.let {
+        episodeDao.getLastBySeasonId(1)?.let {
             assertEquals(episode2, it)
         } ?: fail("Episode not found")
     }
