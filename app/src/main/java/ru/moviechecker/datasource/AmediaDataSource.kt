@@ -155,10 +155,8 @@ class AmediaDataSource : DataSource {
                 title = siteTitle,
                 address = address
             ),
-            entries = entries)
             entries = entries
         )
-    }
     }
 
     private fun getFirstValueByRegex(
