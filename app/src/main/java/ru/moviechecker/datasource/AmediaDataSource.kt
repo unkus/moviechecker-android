@@ -56,7 +56,7 @@ class AmediaDataSource : DataSource {
 
     override fun retrieveData(mirror: URI?): SourceData {
         val entries = mutableListOf<SourceDataEntry>()
-        val lineIterator = (mirror?:address).toURL().openConnection()
+        val lineIterator = (mirror ?: address).toURL().openConnection()
             .apply {
                 connectTimeout = 1000
                 readTimeout = 3000
@@ -97,16 +97,20 @@ class AmediaDataSource : DataSource {
                  *
                  */
                 // @formatter:on
+                val time =
+                    if (timeString == "нестабильно") LocalTime.MIN else LocalTime.parse(timeString)
                 val localDate = when (dateString) {
-                    "Новая серия в" -> LocalDate.now()
-                    "Сегодня" -> LocalDate.now()
-                    "Вчера" -> LocalDate.now().minusDays(1)
+                    "Новая серия в", "Сегодня" -> if (LocalDateTime.now().with(time)
+                            .isBefore(LocalDateTime.now())
+                    ) LocalDate.now() else LocalDate.now().minusDays(1)
+
+                    "Вчера" -> if (LocalDateTime.now().minusDays(1).with(time)
+                            .isBefore(LocalDateTime.now().minusDays(1))
+                    ) LocalDate.now().minusDays(1) else LocalDate.now().minusDays(2)
+
                     else -> LocalDate.parse(dateString, dateFormat)
                 }
-                val releaseTime = LocalDateTime.of(
-                    localDate,
-                    if (timeString == "нестабильно") LocalTime.MIN else LocalTime.parse(timeString)
-                )
+                val releaseTime = LocalDateTime.of(localDate, time)
 
                 val (episodeNumber) = getFirstValueByRegex(lineIterator, episodeNumberRegex)
 
@@ -152,6 +156,9 @@ class AmediaDataSource : DataSource {
                 address = address
             ),
             entries = entries)
+            entries = entries
+        )
+    }
     }
 
     private fun getFirstValueByRegex(
