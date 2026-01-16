@@ -1,13 +1,13 @@
 package ru.moviechecker.datasource
 
 import android.util.Log
-import ru.moviechecker.datasource.model.SourceData
 import ru.moviechecker.datasource.model.DataSource
 import ru.moviechecker.datasource.model.DataState
 import ru.moviechecker.datasource.model.EpisodeData
 import ru.moviechecker.datasource.model.MovieData
 import ru.moviechecker.datasource.model.SeasonData
 import ru.moviechecker.datasource.model.SiteData
+import ru.moviechecker.datasource.model.SourceData
 import ru.moviechecker.datasource.model.SourceDataEntry
 import java.net.URI
 import java.time.LocalDate
@@ -97,19 +97,18 @@ class AmediaDataSource : DataSource {
                  *
                  */
                 // @formatter:on
-                val time =
-                    if (timeString == "нестабильно") LocalTime.MIN else LocalTime.parse(timeString)
                 val localDate = when (dateString) {
-                    "Новая серия в", "Сегодня" -> if (LocalDateTime.now().with(time)
-                            .isBefore(LocalDateTime.now())
-                    ) LocalDate.now() else LocalDate.now().minusDays(1)
+                    // FIXME: На сайте запаздывает, примерно на 1 час, смена "сегодня" на "вчера" относительно UTC +3. Хотя само время стоит верно.
+                    "Новая серия в", "Сегодня" -> if (LocalTime.now().hour > 1) LocalDate.now()
+                    else LocalDate.now().minusDays(1)
 
-                    "Вчера" -> if (LocalDateTime.now().minusDays(1).with(time)
-                            .isBefore(LocalDateTime.now().minusDays(1))
-                    ) LocalDate.now().minusDays(1) else LocalDate.now().minusDays(2)
+                    "Вчера" -> if (LocalTime.now().hour > 1) LocalDate.now().minusDays(1)
+                    else LocalDate.now().minusDays(2)
 
                     else -> LocalDate.parse(dateString, dateFormat)
                 }
+                val time =
+                    if (timeString == "нестабильно") LocalTime.MIN else LocalTime.parse(timeString)
                 val releaseTime = LocalDateTime.of(localDate, time)
 
                 val (episodeNumber) = getFirstValueByRegex(lineIterator, episodeNumberRegex)

@@ -52,17 +52,10 @@ internal class AmediaDataSourceTest {
             mojDjejmon.season?.posterLink
         )
         assertEquals(13, mojDjejmon.episode?.number)
-        if (LocalTime.now().isAfter(LocalTime.of(17, 13))) {
-            assertEquals(
-                LocalDateTime.of(LocalDate.now(), LocalTime.of(17, 13)),
-                mojDjejmon.episode?.date
-            )
-        } else {
-            assertEquals(
-                LocalDateTime.of(LocalDate.now().minusDays(1), LocalTime.of(17, 13)),
-                mojDjejmon.episode?.date
-            )
-        }
+        assertEquals(
+            LocalDateTime.of(LocalDate.now(), LocalTime.of(17, 13)),
+            mojDjejmon.episode?.date
+        )
         assertEquals(DataState.RELEASED, mojDjejmon.episode?.state)
         assertEquals("/1593-moj-djejmon/episode/13/seriya-onlayn.html", mojDjejmon.episode?.link)
 
@@ -72,32 +65,19 @@ internal class AmediaDataSourceTest {
         assertEquals("Невеста чародея", nevestaCharodeja!!.movie.title)
         assertEquals(2, nevestaCharodeja.season?.number)
         assertEquals("/1362-nevesta-charodeja-2.html", nevestaCharodeja.season?.link)
-        if (LocalTime.now().isAfter(LocalTime.of(21, 51))) {
-            assertEquals(
-                LocalDateTime.of(LocalDate.now().minusDays(1), LocalTime.of(21, 51)),
-                nevestaCharodeja.episode?.date
-            )
-        } else {
-            assertEquals(
-                LocalDateTime.of(LocalDate.now().minusDays(2), LocalTime.of(21, 51)),
-                nevestaCharodeja.episode?.date
-            )
-        }
+        assertEquals(
+            LocalDateTime.of(LocalDate.now().minusDays(1), LocalTime.of(21, 51)),
+            nevestaCharodeja.episode?.date
+        )
 
         val ubijcaGoblinov = sourceData.entries.firstOrNull { it.movie.pageId == "ubijca-goblinov" }
         assertNotNull("Запись \"Убийца гоблинов\" не найдена", ubijcaGoblinov)
         assertEquals(DataState.EXPECTED, ubijcaGoblinov!!.episode?.state)
-        if (LocalTime.now().isAfter(LocalTime.of(21, 51))) {
-            assertEquals(
-                LocalDateTime.of(LocalDate.now(), LocalTime.of(19, 0)),
-                ubijcaGoblinov.episode?.date
-            )
-        } else {
-            assertEquals(
-                LocalDateTime.of(LocalDate.now().minusDays(1), LocalTime.of(19, 0)),
-                ubijcaGoblinov.episode?.date
-            )
-        }
+        assertEquals(
+            LocalDateTime.of(LocalDate.now(), LocalTime.of(19, 0)),
+            ubijcaGoblinov.episode?.date
+        )
+
         // TODO: найти более старые записи чем вчера и выходящие нестабильно
 
     }
