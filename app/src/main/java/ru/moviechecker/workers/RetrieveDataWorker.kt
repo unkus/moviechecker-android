@@ -19,9 +19,8 @@ class RetrieveDataWorker(appContext: Context, workerParams: WorkerParameters) :
 
         val errors = dataSources.parallelStream()
             .map { dataSource ->
-                val site = database.siteDao()
-                    .getSiteByMnemonic(dataSource.mnemonic)
-                val address = URI.create(if(site?.useMirror == true) site.mirror else site?.address) ?: dataSource.address
+                val site = database.siteDao().getSiteByMnemonic(dataSource.mnemonic)
+                val address = site?.let { if (it.useMirror) URI.create(it.mirror) else URI.create(it.address) } ?: dataSource.address
                 Log.i(this.javaClass.simpleName, "Получаем данные для ${dataSource.mnemonic} от $address")
                 try {
                     database.populateDatabase(dataSource.retrieveData(address))
