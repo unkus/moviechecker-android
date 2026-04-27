@@ -564,6 +564,21 @@ fun MovieListPreview() {
                     lastEpisodeDate = LocalDateTime.now().minusDays(15),
                     lastEpisodeLink = URI.create("stub"),
                     viewedMark = true
+                ),
+                MovieCardModel(
+                    id = 7,
+                    seasonId = 4,
+                    seasonNumber = 1,
+                    title = "Непросмотренная серия в избранном подсвечена",
+                    favoritesMark = true,
+                    nextEpisodeId = 1,
+                    nextEpisodeNumber = 1,
+                    nextEpisodeDate = LocalDateTime.now().minusDays(6),
+                    lastEpisodeId = 3,
+                    lastEpisodeNumber = 3,
+                    lastEpisodeDate = LocalDateTime.now().minusDays(4),
+                    lastEpisodeLink = URI.create("stub"),
+                    viewedMark = false
                 )
             ),
             shouldShowOnlyFavorites = false,

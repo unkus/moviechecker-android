@@ -124,18 +124,9 @@ fun MovieDetailsScreen(
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(
-                            dimensionResource(
-                                id = R.dimen.padding_small
-                            )
-                        )
+                        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
                     ) {
-                        season.poster?.let {
-                            Poster(
-                                it,
-                                modifier = Modifier.width(60.dp)
-                            )
-                        }
+                        season.poster?.let { Poster(it, modifier = Modifier.width(60.dp)) }
                         Column {
                             season.title
                                 ?.let { title ->

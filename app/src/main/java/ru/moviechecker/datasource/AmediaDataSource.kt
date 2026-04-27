@@ -98,12 +98,10 @@ class AmediaDataSource : DataSource {
                  */
                 // @formatter:on
                 val localDate = when (dateString) {
-                    // FIXME: На сайте запаздывает, примерно на 1 час, смена "сегодня" на "вчера" относительно UTC +3. Хотя само время стоит верно.
-                    "Новая серия в", "Сегодня" -> if (LocalTime.now().hour > 1) LocalDate.now()
-                    else LocalDate.now().minusDays(1)
+                    // FIXME: На сайте запаздывает смена "сегодня" на "вчера" относительно UTC +3. Хотя само время стоит верно.
+                    "Новая серия в", "Сегодня" -> LocalDate.now()
 
-                    "Вчера" -> if (LocalTime.now().hour > 1) LocalDate.now().minusDays(1)
-                    else LocalDate.now().minusDays(2)
+                    "Вчера" -> LocalDate.now().minusDays(1)
 
                     else -> LocalDate.parse(dateString, dateFormat)
                 }
