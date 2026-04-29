@@ -42,7 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.moviechecker.MoviesRoute
 import ru.moviechecker.R
 import ru.moviechecker.SitesRoute
-import ru.moviechecker.ui.theme.CheckerTheme
+import ru.moviechecker.ui.theme.MoviecheckerTheme
 
 @Composable
 fun AppDrawer(
@@ -119,7 +119,7 @@ fun AppDrawerScreen(
 @Preview(name = "Drawer contents (dark)", locale = "ru", uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun PreviewAppDrawer() {
-    CheckerTheme {
+    MoviecheckerTheme {
         AppDrawerScreen(
             drawerState = rememberDrawerState(initialValue = DrawerValue.Open),
             currentRoute = MoviesRoute,

@@ -26,7 +26,7 @@ object SitesRoute
 data class SiteDetailsRoute(val siteId: Int)
 
 @Serializable
-data class MoviesRoute(val siteId: Int?)
+data class MoviesRoute(val siteId: Int? = null)
 
 @Serializable
 data class MovieDetailsRoute(val movieId: Int)
@@ -40,7 +40,7 @@ fun CheckerNavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = MoviesRoute(siteId = null),
+        startDestination = MoviesRoute(),
         modifier = modifier
     ) {
         composable<SitesRoute> {

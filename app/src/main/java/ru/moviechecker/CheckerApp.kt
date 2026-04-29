@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 import ru.moviechecker.database.AppContainer
 import ru.moviechecker.ui.drawer.AppDrawer
 import ru.moviechecker.ui.drawer.AppDrawerViewModel
-import ru.moviechecker.ui.theme.CheckerTheme
+import ru.moviechecker.ui.theme.MoviecheckerTheme
 
 /**
  * Top level composable that represents screens for the application.
@@ -29,7 +29,7 @@ fun CheckerApp(
     appContainer: AppContainer,
     widthSizeClass: WindowWidthSizeClass
 ) {
-    CheckerTheme {
+    MoviecheckerTheme {
         val navController = rememberNavController()
         val navigationActions = remember(navController) {
             CheckerNavigationActions(navController)

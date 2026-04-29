@@ -39,7 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import ru.moviechecker.R
-import ru.moviechecker.ui.theme.CheckerTheme
+import ru.moviechecker.ui.theme.MoviecheckerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -165,7 +165,7 @@ private fun SitesTopAppBar(
 @Preview(locale = "ru-RU")
 @Composable
 fun SitesScreenPreview() {
-    CheckerTheme {
+    MoviecheckerTheme {
         SitesScreen(
             openDrawer = {},
             sitesProvider = {

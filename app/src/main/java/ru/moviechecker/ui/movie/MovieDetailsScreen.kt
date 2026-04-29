@@ -51,7 +51,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.moviechecker.R
 import ru.moviechecker.database.episodes.EpisodeState
-import ru.moviechecker.ui.theme.CheckerTheme
+import ru.moviechecker.ui.theme.MoviecheckerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -281,7 +281,7 @@ private fun Poster(
 @Preview("Movie details (dark)", uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun PreviewMovieDetailsScreen() {
-    CheckerTheme {
+    MoviecheckerTheme {
 //        MovieDetailsScreen(
 //            uiState = MovieDetailsUiState(
 //                movie = MovieModel(

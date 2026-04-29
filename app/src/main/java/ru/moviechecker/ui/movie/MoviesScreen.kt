@@ -6,7 +6,6 @@ import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -59,7 +58,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import ru.moviechecker.R
-import ru.moviechecker.ui.theme.CheckerTheme
+import ru.moviechecker.ui.theme.MoviecheckerTheme
 import ru.moviechecker.workers.AsyncCleanupDataWorker
 import java.net.URI
 import java.time.LocalDate
@@ -470,7 +469,7 @@ fun Date(
 @Preview(locale = "ru-RU")
 @Composable
 fun MovieListPreview() {
-    CheckerTheme {
+    MoviecheckerTheme {
         MovieList(
             movies = listOf(
                 MovieCardModel(
