@@ -1,25 +1,25 @@
 [versions]
 # AGP and tools should be updated together
-androidGradlePlugin = "8.13.2"
+androidGradlePlugin = "9.2.0"
 # @keep
-compileSdk = "36"
+compileSdk = "37"
 # @keep
 minSdk = "33"
 # @keep
 targetSdk = "33"
 
-runtimeAndroid = "1.10.0"
+runtimeAndroid = "1.11.0"
 material3 = "1.4.0"
-androidCore = "1.17.0"
-kotlin = "2.3.0"
-workRuntime = "2.11.0"
+androidCore = "1.18.0"
+kotlin = "2.3.21"
+workRuntime = "2.11.2"
 room = "2.8.4"
-ksp = "2.3.3"
-navigation = "2.9.6"
-mockk = "1.14.7"
-uiTooling = "1.10.0"
+ksp = "2.3.5"
+navigation = "2.9.8"
+mockk = "1.14.9"
+uiTooling = "1.11.0"
 lifecycleViewmodel = "2.10.0"
-kotlinxSerialization = "1.9.0"
+kotlinxSerialization = "1.11.0"
 
 # tests
 androidTestRunner = "1.7.0"
@@ -52,13 +52,17 @@ androidx-work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref
 
 androidx-navigation-runtime = { module = "androidx.navigation:navigation-runtime-ktx", version.ref = "navigation" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
+androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
+androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
+androidx-navigation-testing = { module = "androidx.navigation:navigation-testing", version.ref = "navigation" }
+androidx-navigation-dynamic-features-fragment = { module = "androidx.navigation:navigation-dynamic-features-fragment", version.ref = "navigation" }
 
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 
 # Для тестов
-androidx-test-core = { module = "androidx.test:core-ktx", version.ref = "androidTestCore"}
-androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidTestRunner"}
-androidx-test-ext-junit = { module = "androidx.test.ext:junit-ktx", version.ref = "androidTestExtJunit"}
+androidx-test-core = { module = "androidx.test:core-ktx", version.ref = "androidTestCore" }
+androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidTestRunner" }
+androidx-test-ext-junit = { module = "androidx.test.ext:junit-ktx", version.ref = "androidTestExtJunit" }
 
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
@@ -68,7 +72,6 @@ material = { module = "com.google.android.material:material", version.ref = "mat
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 android-test = { id = "com.android.test", version.ref = "androidGradlePlugin" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
