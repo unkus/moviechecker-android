@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -9,36 +7,29 @@ plugins {
 }
 
 android {
-    compileSdk = libs.versions.compileSdk.get().toInt()
+    namespace = "ru.moviechecker"
+    compileSdk = 37
+    buildToolsVersion = "36.1.0"
 
     defaultConfig {
         applicationId = "ru.moviechecker"
-        minSdk = libs.versions.minSdk.get().toInt()
-        targetSdk = libs.versions.targetSdk.get().toInt()
+        minSdk = 33
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
-
-    buildFeatures {
-        compose = true
-    }
-
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-    namespace = "ru.moviechecker"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -51,17 +42,9 @@ room {
     schemaDirectory("$projectDir/schemas")
 }
 
-kotlin {
-    compilerOptions {
-//        languageVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_5
-        jvmTarget = JvmTarget.JVM_11
-    }
-
-}
-
 dependencies {
     implementation(libs.androidx.core)
-    implementation(libs.androidx.runtime.android)
+    implementation(libs.androidx.runtime)
 
     implementation(libs.androidx.room)
 
@@ -72,11 +55,10 @@ dependencies {
     implementation(libs.androidx.lifecycle.livedata)
 
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.material3.android)
-    implementation(libs.androidx.material3.window.size.class1.android)
+    implementation(libs.androidx.material3.window.size.class1)
 
     implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.tooling.preview.android)
+    implementation(libs.androidx.ui.tooling.preview)
 
     implementation(libs.androidx.navigation.runtime)
     implementation(libs.androidx.navigation.compose)

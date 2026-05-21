@@ -1,3 +1,6 @@
+rootProject.name = "moviechecker"
+include(":app")
+
 pluginManagement {
     repositories {
         google()
@@ -12,7 +15,3 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-
-rootProject.name = "moviechecker"
-include(":app")
- 
