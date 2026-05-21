@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 import ru.moviechecker.database.AppContainer
 import ru.moviechecker.ui.drawer.AppDrawer
 import ru.moviechecker.ui.drawer.AppDrawerViewModel
-import ru.moviechecker.ui.theme.MoviecheckerTheme
 
 /**
  * Top level composable that represents screens for the application.
@@ -29,48 +28,46 @@ fun CheckerApp(
     appContainer: AppContainer,
     widthSizeClass: WindowWidthSizeClass
 ) {
-    MoviecheckerTheme {
-        val navController = rememberNavController()
-        val navigationActions = remember(navController) {
-            CheckerNavigationActions(navController)
-        }
+    val navController = rememberNavController()
+    val navigationActions = remember(navController) {
+        CheckerNavigationActions(navController)
+    }
 
-        val coroutineScope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
 
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute =
-            navBackStackEntry?.destination?.route ?: MoviesRoute
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute =
+        navBackStackEntry?.destination?.route ?: MoviesRoute
 
-        val isExpandedScreen = widthSizeClass == WindowWidthSizeClass.Expanded
-        val sizeAwareDrawerState = rememberSizeAwareDrawerState(isExpandedScreen)
+    val isExpandedScreen = widthSizeClass == WindowWidthSizeClass.Expanded
+    val sizeAwareDrawerState = rememberSizeAwareDrawerState(isExpandedScreen)
 
-        val appDrawerViewModel: AppDrawerViewModel = viewModel(
-            factory = AppDrawerViewModel.provideFactory(
-                sitesRepository = appContainer.sitesRepository
-            )
+    val appDrawerViewModel: AppDrawerViewModel = viewModel(
+        factory = AppDrawerViewModel.provideFactory(
+            sitesRepository = appContainer.sitesRepository
         )
+    )
 
-        ModalNavigationDrawer(
-            drawerContent = {
-                AppDrawer(
-                    drawerState = sizeAwareDrawerState,
-                    currentRoute = currentRoute,
-                    navigateToSites = navigationActions.navigateToSites,
-                    navigateToMovies = navigationActions.navigateToMovies,
-                    closeDrawer = { coroutineScope.launch { sizeAwareDrawerState.close() } },
-                    viewModel = appDrawerViewModel
-                )
-            },
-            drawerState = sizeAwareDrawerState,
-            gesturesEnabled = !isExpandedScreen
-        ) {
-            Row {
-                CheckerNavGraph(
-                    appContainer = appContainer,
-                    navController = navController,
-                    openDrawer = { coroutineScope.launch { sizeAwareDrawerState.open() } }
-                )
-            }
+    ModalNavigationDrawer(
+        drawerContent = {
+            AppDrawer(
+                drawerState = sizeAwareDrawerState,
+                currentRoute = currentRoute,
+                navigateToSites = navigationActions.navigateToSites,
+                navigateToMovies = navigationActions.navigateToMovies,
+                closeDrawer = { coroutineScope.launch { sizeAwareDrawerState.close() } },
+                viewModel = appDrawerViewModel
+            )
+        },
+        drawerState = sizeAwareDrawerState,
+        gesturesEnabled = !isExpandedScreen
+    ) {
+        Row {
+            CheckerNavGraph(
+                appContainer = appContainer,
+                navController = navController,
+                openDrawer = { coroutineScope.launch { sizeAwareDrawerState.open() } }
+            )
         }
     }
 }
