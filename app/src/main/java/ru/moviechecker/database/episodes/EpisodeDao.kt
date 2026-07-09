@@ -22,7 +22,7 @@ interface EpisodeDao {
     fun getEpisodesBySeasonId(seasonId: List<Int>): Flow<List<EpisodeEntity>>
 
     @Query("SELECT * FROM episodes e WHERE e.id = :id")
-    fun getById(id: Int): EpisodeEntity?
+    fun getById(id: Int): EpisodeEntity
     @Query("SELECT * FROM episodes e WHERE e.season_id = :seasonId ORDER BY e.number DESC LIMIT 1")
     fun getLastBySeasonId(seasonId: Int): EpisodeEntity?
     @Query("SELECT * FROM episodes e WHERE e.state = :state ORDER BY e.season_id, e.number ASC")

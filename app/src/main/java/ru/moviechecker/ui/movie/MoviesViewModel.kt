@@ -1,140 +1,51 @@
 package ru.moviechecker.ui.movie
 
-import android.content.Context
-import android.util.Log
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
-import androidx.work.Constraints
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ru.moviechecker.MoviesRoute
+import ru.moviechecker.database.episodes.EpisodeEntity
 import ru.moviechecker.database.episodes.EpisodeState
 import ru.moviechecker.database.episodes.EpisodesRepository
-import ru.moviechecker.database.movies.MovieCard2
+import ru.moviechecker.database.movies.MovieCard
+import ru.moviechecker.database.movies.MovieDetails
 import ru.moviechecker.database.movies.MoviesRepository
-import ru.moviechecker.database.sites.SiteEntity
-import ru.moviechecker.database.sites.SitesRepository
-import ru.moviechecker.workers.AsyncRetrieveDataWorker
+import ru.moviechecker.database.seasons.SeasonEntity
 import java.net.URI
 import java.time.LocalDateTime
 
-class MovieCardsViewModel(
-    savedStateHandle: SavedStateHandle,
-    private val sitesRepository: SitesRepository,
+class MoviesViewModel(
     private val moviesRepository: MoviesRepository,
     private val episodesRepository: EpisodesRepository
 ) : ViewModel() {
 
-    private val route: MoviesRoute = savedStateHandle.toRoute()
-    private val site = route.siteId?.let { sitesRepository.getByIdStream(it) }
-
-    private val _viewModelState = MutableStateFlow(
-        MoviesUiState(
-            shouldShowOnlyFavorites = false,
-            shouldShowViewedEpisodes = true,
-            isLoading = false,
-            siteTitle = null
-        )
-    )
-
-    val uiState = _viewModelState
-        .combine(site?.map { site -> site.title } ?: flowOf(null)) { state, siteTitle ->
-            MoviesUiState(
-                shouldShowViewedEpisodes = state.shouldShowViewedEpisodes,
-                shouldShowOnlyFavorites = state.shouldShowOnlyFavorites,
-                isLoading = state.isLoading,
-                siteTitle = siteTitle
-            )
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
-            initialValue = _viewModelState.value
-        )
-
-    val movies = moviesRepository.getMovieCardsStream(siteId = route.siteId)
-        .map { it.map(MovieCardModel::fromEntity) }
+    val movies = moviesRepository.getMovieCardStream()
+        .map { it.map(NewMovieCardModel::fromEntity) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000L),
             initialValue = emptyList()
         )
 
-    private val _errors = MutableStateFlow(emptyList<String>())
-    val errors = _errors.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Eagerly,
-        initialValue = emptyList()
-    )
+    private val _movieDetails = MutableStateFlow<MovieDetailsCardModel?>(null)
+    val movieDetails: StateFlow<MovieDetailsCardModel?> = _movieDetails
 
-    fun onRefresh(context: Context) {
-        _viewModelState.update { it.copy(isLoading = true) }
-        _errors.update { emptyList() }
-
-        val workManager = WorkManager.getInstance(context)
-        val workRequest = OneTimeWorkRequestBuilder<AsyncRetrieveDataWorker>()
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .setRequiresStorageNotLow(true)
-                    .build()
-            )
-            .build()
-        workManager
-            .beginUniqueWork(
-                uniqueWorkName = AsyncRetrieveDataWorker.NAME,
-                existingWorkPolicy = ExistingWorkPolicy.KEEP,
-                request = workRequest
-            )
-            .enqueue()
-
-        viewModelScope.launch {
-            workManager.getWorkInfoByIdFlow(workRequest.id)
-                .collect { workInfo ->
-                    Log.d(
-                        this.javaClass.simpleName,
-                        "Получили статус обновления: ${workInfo?.state}"
-                    )
-                    workInfo?.let { info ->
-                        if (info.state.isFinished) {
-                            if (WorkInfo.State.FAILED == info.state) {
-                                info.outputData.getStringArray("errors")
-                                    ?.let { newErrors ->
-                                        Log.d(
-                                            this.javaClass.simpleName,
-                                            "Обновление закончилось с ошибкой: ${newErrors.asList()}"
-                                        )
-                                        _errors.update { newErrors.asList() }
-                                    }
-
-                            } else {
-                                Log.d(this.javaClass.simpleName, "Обновление закончено")
-                            }
-                            _viewModelState.update { it.copy(isLoading = false) }
-                        }
-                    }
-                }
+    fun loadMovieDetails(movieId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _movieDetails.value =
+                MovieDetailsCardModel.fromEntity(moviesRepository.getMovieDetails(movieId))
         }
     }
 
     fun toggleFavoritesMark(movieId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            moviesRepository.findById(movieId)?.let { movie ->
+            moviesRepository.getById(movieId).let { movie ->
                 movie.favoritesMark = !movie.favoritesMark
                 moviesRepository.updateMovie(movie)
             }
@@ -143,7 +54,7 @@ class MovieCardsViewModel(
 
     fun markEpisodeViewed(episodeId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            episodesRepository.findById(episodeId)?.let { episode ->
+            episodesRepository.getById(episodeId).let { episode ->
                 episode.state = EpisodeState.VIEWED
                 episodesRepository.updateEpisode(episode)
             }
@@ -152,113 +63,242 @@ class MovieCardsViewModel(
 
     fun toggleEpisodeViewedMark(episodeId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            episodesRepository.findById(episodeId)?.let { episode ->
-                episode.state = if (episode.state == EpisodeState.VIEWED) {
-                    EpisodeState.RELEASED
-                } else if (episode.state == EpisodeState.RELEASED) {
-                    EpisodeState.VIEWED
-                } else {
-                    episode.state
+            episodesRepository.getById(episodeId).let { episode ->
+                episode.state = when (episode.state) {
+                    EpisodeState.VIEWED -> {
+                        EpisodeState.RELEASED
+                    }
+
+                    EpisodeState.RELEASED -> {
+                        EpisodeState.VIEWED
+                    }
+
+                    else -> {
+                        episode.state
+                    }
                 }
                 episodesRepository.updateEpisode(episode)
             }
         }
     }
 
-    fun toggleShouldShowOnlyFavoritesFlag() {
-        _viewModelState.update {
-            it.copy(
-                shouldShowOnlyFavorites = !it.shouldShowOnlyFavorites
-            )
-        }
-    }
-
-    fun toggleShouldShowViewedEpisodesFlag() {
-        _viewModelState.update {
-            it.copy(
-                shouldShowViewedEpisodes = !it.shouldShowViewedEpisodes
-            )
-        }
-    }
-
     companion object {
         fun provideFactory(
-            savedStateHandle: SavedStateHandle,
-            sitesRepository: SitesRepository,
             moviesRepository: MoviesRepository,
             episodesRepository: EpisodesRepository
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return MovieCardsViewModel(
-                    savedStateHandle,
-                    sitesRepository,
-                    moviesRepository,
-                    episodesRepository
+                return MoviesViewModel(
+                    moviesRepository = moviesRepository,
+                    episodesRepository = episodesRepository
                 ) as T
             }
         }
     }
 }
 
-data class MoviesUiState(
-    val shouldShowOnlyFavorites: Boolean = false,
-    val shouldShowViewedEpisodes: Boolean = true,
-    val isLoading: Boolean = false,
-    val siteTitle: String? = null
-)
-
-data class SiteModel(
-    val title: String?
-) {
-    companion object Factory {
-
-        fun fromEntity(entity: SiteEntity): SiteModel {
-            return SiteModel(entity.title)
-        }
-    }
-}
-
-data class MovieCardModel(
+data class NewMovieCardModel(
     val id: Int,
     val title: String,
     val poster: ByteArray? = null,
     val favoritesMark: Boolean,
-    val viewedMark: Boolean,
-    val seasonId: Int,
     val seasonNumber: Int,
-    val nextEpisodeId: Int? = null,
-    val nextEpisodeNumber: Int? = null,
-    val nextEpisodeTitle: String? = null,
-    val nextEpisodeLink: URI? = null,
-    val nextEpisodeDate: LocalDateTime? = null,
-    val lastEpisodeId: Int,
-    val lastEpisodeNumber: Int,
-    val lastEpisodeTitle: String? = null,
-    val lastEpisodeLink: URI,
-    val lastEpisodeDate: LocalDateTime
+    val episode: NewEpisodeModel,
+    val hasMoreEpisodes: Boolean,
+    val updatedAt: LocalDateTime
 ) {
     companion object Factory {
 
-        fun fromEntity(entity: MovieCard2): MovieCardModel {
-            return MovieCardModel(
+        fun fromEntity(entity: MovieCard): NewMovieCardModel {
+            val host = if (entity.site.useMirror) entity.site.mirror else entity.site.address
+            return NewMovieCardModel(
                 id = entity.id,
                 title = entity.title,
                 poster = entity.poster,
                 favoritesMark = entity.favoritesMark,
-                viewedMark = entity.viewedMark,
-                seasonId = 0, //entity.seasonId,
-                seasonNumber = entity.seasonNumber,
-                nextEpisodeId = entity.nextEpisodeId,
-                nextEpisodeNumber = entity.nextEpisodeNumber,
-                nextEpisodeTitle = entity.nextEpisodeTitle,
-                nextEpisodeLink = entity.nextEpisodeLink,
-                nextEpisodeDate = entity.nextEpisodeDate,
-                lastEpisodeId = entity.lastEpisodeId,
-                lastEpisodeNumber = entity.lastEpisodeNumber,
-                lastEpisodeTitle = entity.lastEpisodeTitle,
-                lastEpisodeLink = entity.lastEpisodeLink,
-                lastEpisodeDate = entity.lastEpisodeDate
+                seasonNumber = entity.season.number,
+                episode = NewEpisodeModel(
+                    id = entity.episode.id,
+                    number = entity.episode.number,
+                    title = entity.episode.title,
+                    link = URI.create("${host}${entity.episode.link}"),
+                    date = entity.episode.date,
+                    viewedMark = entity.episode.viewedMark
+                ),
+                hasMoreEpisodes = entity.episode.number < entity.season.lastEpisodeNumber,
+                updatedAt = entity.season.lastEpisodeDate
+            )
+        }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as NewMovieCardModel
+
+        if (id != other.id) return false
+        if (favoritesMark != other.favoritesMark) return false
+        if (seasonNumber != other.seasonNumber) return false
+        if (hasMoreEpisodes != other.hasMoreEpisodes) return false
+        if (title != other.title) return false
+//        if (!poster.contentEquals(other.poster)) return false
+        if (episode != other.episode) return false
+        if (updatedAt != other.updatedAt) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id
+        result = 31 * result + favoritesMark.hashCode()
+        result = 31 * result + seasonNumber
+        result = 31 * result + hasMoreEpisodes.hashCode()
+        result = 31 * result + title.hashCode()
+//        result = 31 * result + (poster?.contentHashCode() ?: 0)
+        result = 31 * result + episode.hashCode()
+        result = 31 * result + updatedAt.hashCode()
+        return result
+    }
+
+
+}
+
+data class NewEpisodeModel(
+    val id: Int,
+    val number: Int,
+    val title: String? = null,
+    val link: URI,
+    val date: LocalDateTime,
+    val viewedMark: Boolean
+)
+
+data class MovieDetailsCardModel(
+    val id: Int,
+    val siteId: Int,
+    val pageId: String,
+    val title: String,
+    val link: String? = null,
+    val poster: ByteArray? = null,
+    val favoritesMark: Boolean = false,
+    val seasons: List<SeasonCardModel>
+) {
+    companion object Factory {
+
+        fun fromEntity(
+            entity: MovieDetails
+        ): MovieDetailsCardModel {
+            return MovieDetailsCardModel(
+                id = entity.id,
+                siteId = entity.siteId,
+                pageId = entity.pageId,
+                title = entity.title,
+                link = entity.link,
+                poster = entity.poster,
+                favoritesMark = entity.favoritesMark,
+                seasons = entity.seasons.map { (season, episodes) ->
+                    SeasonCardModel.fromEntity(season, episodes.map(EpisodeCardModel::fromEntity))
+                }
+            )
+        }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as MovieDetailsCardModel
+
+        if (id != other.id) return false
+        if (siteId != other.siteId) return false
+        if (favoritesMark != other.favoritesMark) return false
+        if (pageId != other.pageId) return false
+        if (title != other.title) return false
+        if (link != other.link) return false
+//        if (!poster.contentEquals(other.poster)) return false
+        if (seasons != other.seasons) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id
+        result = 31 * result + siteId
+        result = 31 * result + favoritesMark.hashCode()
+        result = 31 * result + pageId.hashCode()
+        result = 31 * result + title.hashCode()
+        result = 31 * result + (link?.hashCode() ?: 0)
+//        result = 31 * result + (poster?.contentHashCode() ?: 0)
+        result = 31 * result + seasons.hashCode()
+        return result
+    }
+}
+
+data class SeasonCardModel(
+    val id: Int,
+    val number: Int,
+    var title: String? = null,
+    var link: String? = null,
+    var poster: ByteArray? = null,
+    val episodes: List<EpisodeCardModel>
+) {
+    companion object Factory {
+        fun fromEntity(entity: SeasonEntity, episodes: List<EpisodeCardModel> = listOf()): SeasonCardModel {
+            return SeasonCardModel(
+                id = entity.id,
+                number = entity.number,
+                title = entity.link,
+                poster = entity.poster,
+                episodes = episodes
+            )
+        }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as SeasonCardModel
+
+        if (id != other.id) return false
+        if (number != other.number) return false
+        if (title != other.title) return false
+        if (link != other.link) return false
+//        if (!poster.contentEquals(other.poster)) return false
+        if (episodes != other.episodes) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id
+        result = 31 * result + number
+        result = 31 * result + (title?.hashCode() ?: 0)
+        result = 31 * result + (link?.hashCode() ?: 0)
+//        result = 31 * result + (poster?.contentHashCode() ?: 0)
+        result = 31 * result + episodes.hashCode()
+        return result
+    }
+}
+
+data class EpisodeCardModel(
+    val id: Int = 0,
+    val number: Int,
+    var title: String? = null,
+    var link: String,
+    var state: EpisodeState,
+    var date: LocalDateTime
+) {
+    companion object Factory {
+        fun fromEntity(entity: EpisodeEntity): EpisodeCardModel {
+            return EpisodeCardModel(
+                id = entity.id,
+                number = entity.number,
+                title = entity.title,
+                link = entity.link,
+                state = entity.state,
+                date = entity.date
             )
         }
     }

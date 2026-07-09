@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface SeasonsRepository {
     fun updateSeason(season: SeasonEntity)
-    fun getSeasonsByMovieIdStream(movieId: Int): Flow<List<SeasonEntity>>
-    fun getSeasonsWithEpisodesByMovieIdStream(movieId: Int): Flow<List<SeasonWithEpisodes>>
+    fun getSeasonsByMovieId(movieId: Int): List<SeasonEntity>
+    fun getSeasonsWithEpisodesByMovieId(movieId: Int): List<SeasonWithEpisodes>
     fun getNumberOfSeasonsByMovieIdStream(movieId: Int): Flow<Int>
 }

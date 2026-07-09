@@ -9,7 +9,7 @@ interface EpisodesRepository {
     fun getEpisodesBySeasonIdStream(seasonId: Int): Flow<List<EpisodeEntity>>
     fun getEpisodesBySeasonIdStream(seasonIds: List<Int>): Flow<List<EpisodeEntity>>
 
-    fun findById(id: Int): EpisodeEntity?
+    fun getById(id: Int): EpisodeEntity
 
     fun insertEpisode(episode: EpisodeEntity)
     fun updateEpisode(episode: EpisodeEntity)

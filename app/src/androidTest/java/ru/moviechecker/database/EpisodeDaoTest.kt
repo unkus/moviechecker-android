@@ -6,10 +6,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
-import org.junit.Assert.fail
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -69,11 +66,11 @@ class EpisodeDaoTest {
     fun daoGetAllEpisodes_returnsAllEpisodesFromDB() = runBlocking {
         episodeDao.insert(episode1, episode2, episode3)
         episodeDao.getAllEpisodesStream().first().let {
-            assertNotNull(it)
-            assertEquals(3, it.size)
-            assertEquals(episode1, it[0])
-            assertEquals(episode2, it[1])
-            assertEquals(episode3, it[2])
+            Assert.assertNotNull(it)
+            Assert.assertEquals(3, it.size)
+            Assert.assertEquals(episode1, it[0])
+            Assert.assertEquals(episode2, it[1])
+            Assert.assertEquals(episode3, it[2])
         }
     }
 
@@ -81,10 +78,10 @@ class EpisodeDaoTest {
     fun daoGetEpisodeById_getsEpisodeByIdFromDB() = runBlocking {
         episodeDao.insert(episode1, episode2, episode3)
         episodeDao.getEpisodeById(4).first().let {
-            assertNull("Some episode found but not expected", it)
+            Assert.assertNull("Some episode found but not expected", it)
         }
         episodeDao.getEpisodeById(2).first().let {
-            assertEquals(episode2, it)
+            Assert.assertEquals(episode2, it)
         }
     }
 
@@ -92,10 +89,10 @@ class EpisodeDaoTest {
     fun daoGetEpisodeBySeasonIdAndNumber_getsEpisodeBySeasonIdAndNumberFromDB() = runBlocking {
         episodeDao.insert(episode1, episode2, episode3)
         episodeDao.getLastBySeasonId(2)?.let {
-            fail("Some episode found but not expected")
+            Assert.fail("Some episode found but not expected")
         }
         episodeDao.getLastBySeasonId(1)?.let {
-            assertEquals(episode2, it)
-        } ?: fail("Episode not found")
+            Assert.assertEquals(episode2, it)
+        } ?: Assert.fail("Episode not found")
     }
 }

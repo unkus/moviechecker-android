@@ -3,11 +3,6 @@ package ru.moviechecker.database
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.count
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -68,7 +63,7 @@ class SeasonDaoTest {
         seasonDao.insert(season1, season2, season3)
         episodeDao.insert(episode1, episode2, episode3)
 
-        val seasonOfMovie1 = seasonDao.getSeasonsWithEpisodesByMovieIdStream(1).first()
+        val seasonOfMovie1 = seasonDao.getSeasonsWithEpisodesByMovieId(1)
         assertEquals("Проверка что у сериала 3 сезона", 3, seasonOfMovie1.size)
         val season = seasonOfMovie1[0].season
         assertEquals("Проверка что номер сезона первый", 1, season.number)

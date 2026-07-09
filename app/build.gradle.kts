@@ -56,6 +56,9 @@ dependencies {
 
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material3.window.size.class1)
+    implementation(libs.androidx.material3.adaptive.navigation.suite)
+
+    implementation(libs.androidx.adaptive.navigation)
 
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.tooling.preview)
@@ -70,7 +73,6 @@ dependencies {
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.ext.junit)
 
-    testImplementation(libs.androidx.test.ext.junit)
     testImplementation(libs.mockk)
 
     debugImplementation(libs.androidx.ui.tooling)

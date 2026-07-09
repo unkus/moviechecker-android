@@ -1,20 +1,18 @@
 package ru.moviechecker.database.movies
 
-import androidx.room.ColumnInfo
+import ru.moviechecker.database.episodes.EpisodeEntity
+import ru.moviechecker.database.seasons.SeasonEntity
 
 data class MovieDetails(
     val id: Int,
-    @ColumnInfo(name = "site_id")
     val siteId: Int,
     val address: String,
-    @ColumnInfo(name = "page_id")
     val pageId: String,
-    var title: String,
-    var link: String,
-    @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
-    var poster: ByteArray,
-    @ColumnInfo(name = "favorites_mark")
-    var favoritesMark: Boolean
+    val title: String,
+    val link: String?,
+    val poster: ByteArray?,
+    val favoritesMark: Boolean,
+    val seasons: Map<SeasonEntity, List<EpisodeEntity>>
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -1,59 +1,27 @@
 <resources>
     <string name="app_name">Moviechecker</string>
-    <string name="back_button">Back</string>
-    <string name="delete">Delete</string>
-    <string name="date">Date</string>
-    <string name="episode">Episode</string>
-    <string name="title">Title</string>
-    <string name="attention">Attention</string>
-    <string name="delete_question">Are you sure you want to delete?</string>
-    <string name="no">No</string>
-    <string name="yes">Yes</string>
-    <string name="open_in_browser">Open In Browser</string>
-    <string name="save_action">Save</string>
-    <string name="episode_entry_title">Add</string>
-    <string name="episode_title_req">Title*</string>
-    <string name="episode_number_req">Number*</string>
-    <string name="episode_link_req">Link*</string>
-    <string name="episode_date_req">Date*</string>
-    <string name="episode_state_req">State*</string>
-    <string name="required_fields">*required fields</string>
-    <string name="link">Link</string>
-    <string name="state">State</string>
-    <string name="add_to_favorites">Add To Favorites</string>
-    <string name="remove_from_favorites">Remove From Favorites</string>
     <string name="today_time">Today %s</string>
-    <string name="today_unstable">Today unstable</string>
     <string name="tomorrow_time">Tomorrow %s</string>
     <string name="yesterday_time">Yesterday %s</string>
-    <string name="date_time" formatted="false" translatable="false">%s %s</string>
-    <string name="edit_button_text" translatable="false">…</string>
     <string name="item_title" translatable="false">%s %d%s</string>
     <string name="named_item_title" translatable="false">%s (%d%s)</string>
     <string name="site_title">Site %d</string>
     <string name="season_title">Season #%d%s</string>
     <string name="episode_title">Episode #%d%s</string>
-    <string name="cleanup">Cleanup</string>
-    <string name="poster_error">Unable to process poster data</string>
-    <string name="movies_title">Movies</string>
-    <string name="movie_details_title">Movie Details</string>
     <string name="cd_open_navigation_drawer">Open navigation drawer</string>
     <string name="cd_search">Search</string>
     <string name="cd_favorites_filter">Favorites filter</string>
     <string name="cd_viewed_filter">Viewed filter</string>
-    <string name="cd_back">Back</string>
-    <string name="sites_title">Sites</string>
-    <string name="driwer_item_sites_title">Sites</string>
-    <string name="driwer_item_movies_title">Movies/Episodes</string>
-    <string name="driwer_item_all_sites_title">All sites</string>
-    <string name="driwer_item_favorites_title">Favorites</string>
-    <string name="driwer_item_menu_title">Menu</string>
+    <string name="sites">Sites</string>
+    <string name="movies_episodes">Movies/Episodes</string>
     <string name="site_mnemonic_label">Mnemonic</string>
     <string name="site_title_label">Title</string>
     <string name="site_address_label">Address</string>
     <string name="site_mirror_label">Mirror</string>
     <string name="site_use_mirror_label">Use mirror</string>
-    <string name="default_episode_title">Episode %d</string>
-    <string name="episode_title_with_number" translatable="false">%s (%d)</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="movies">Movies</string>
+    <string name="open_next_or_last">Open next or last episode in browser</string>
+    <string name="not_implemented">Not implemented</string>
+    <string name="episodes_with_count">Episodes: %d</string>
+    <string name="back">Back</string>
 </resources>

@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import ru.moviechecker.database.sites.SiteEntity
 import ru.moviechecker.database.sites.SitesRepository
-import java.net.URI
 
 class SitesViewModel(
     sitesRepository: SitesRepository
@@ -37,6 +36,7 @@ class SitesViewModel(
 data class SiteModel(
     val id: Int,
     val mnemonic: String,
+    val poster: ByteArray? = null,
     var title: String,
     var address: String,
     var useMirror: Boolean = false,
@@ -48,6 +48,7 @@ data class SiteModel(
             return SiteModel(
                 id = entity.id,
                 mnemonic = entity.mnemonic,
+                poster = entity.poster,
                 title = entity.title ?: entity.mnemonic,
                 address = entity.address,
                 useMirror = entity.useMirror,

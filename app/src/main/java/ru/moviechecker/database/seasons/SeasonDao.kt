@@ -15,11 +15,11 @@ interface SeasonDao {
     fun getSeasonByMovieIdAndNumber(movieId: Int, number: Int): SeasonEntity?
 
     @Query("SELECT * FROM seasons s WHERE s.movie_id = :movieId")
-    fun getSeasonsByMovieIdStream(movieId: Int): Flow<List<SeasonEntity>>
+    fun getSeasonsByMovieId(movieId: Int): List<SeasonEntity>
 
     @Transaction
     @Query("SELECT * FROM seasons s WHERE s.movie_id = :movieId")
-    fun getSeasonsWithEpisodesByMovieIdStream(movieId: Int): Flow<List<SeasonWithEpisodes>>
+    fun getSeasonsWithEpisodesByMovieId(movieId: Int): List<SeasonWithEpisodes>
 
     @Query("SELECT COUNT(*) FROM seasons s WHERE s.movie_id = :movieId")
     fun getNumberOfSeasonsByMovieId(movieId: Int): Flow<Int>

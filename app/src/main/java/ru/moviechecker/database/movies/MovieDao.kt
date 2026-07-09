@@ -5,9 +5,11 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
+import ru.moviechecker.database.episodes.EpisodeEntity
+import ru.moviechecker.database.seasons.SeasonEntity
+import ru.moviechecker.database.sites.SiteEntity
 
 @Dao
 interface MovieDao {
@@ -15,7 +17,7 @@ interface MovieDao {
     fun getMoviesByFavoriteMark(mark: Boolean): List<MovieEntity>
 
     @Query("SELECT * FROM movies m WHERE m.id = :id")
-    fun getMovieById(id: Int): MovieEntity?
+    fun getMovieById(id: Int): MovieEntity
 
     @Query("SELECT * FROM movies m")
     fun getMovies(): List<MovieEntity>
@@ -26,52 +28,72 @@ interface MovieDao {
     @Query("SELECT * FROM movies m WHERE m.site_id = :siteId AND m.page_id = :pageId")
     fun getMovieBySiteIdAndPageId(siteId: Int, pageId: String): MovieEntity?
 
-    @Query("SELECT movie.id, " +
-            "season.number 'season_number'," +
-            "CASE WHEN season.title IS NOT NULL THEN season.title ELSE movie.title END AS 'title', " +
-            "CASE WHEN season.poster IS NOT NULL THEN season.poster ELSE movie.poster END AS 'poster', " +
-            "movie.favorites_mark, " +
-            "next_episode.id 'next_episode_id', " +
-            "next_episode.number 'next_episode_number', " +
-            "next_episode.title 'next_episode_title', " +
-            "CASE WHEN site.mirror IS NOT NULL AND site.use_mirror THEN site.mirror ELSE site.address END || next_episode.link 'next_episode_link', " +
-            "next_episode.date 'next_episode_date', " +
-            "last_episode.id 'last_episode_id', " +
-            "last_episode.number 'last_episode_number', " +
-            "last_episode.title 'last_episode_title', " +
-            "CASE WHEN site.mirror IS NOT NULL AND site.use_mirror THEN site.mirror ELSE site.address END || last_episode.link 'last_episode_link', " +
-            "last_episode.date 'last_episode_date', " +
-            "CASE WHEN last_episode.state = 'VIEWED' THEN true ELSE false END AS 'viewed_mark' " +
-            "FROM movies movie " +
-            "JOIN sites site ON site.id = movie.site_id " +
-            "JOIN seasons season ON season.movie_id = movie.id " +
-            "LEFT JOIN (SELECT e.id, e.season_id, MIN(e.number) 'number', e.date, e.title, e.link, e.date FROM episodes e WHERE e.state = 'RELEASED' GROUP BY e.season_id) 'next_episode' ON next_episode.season_id = season.id " +
-            "JOIN (SELECT e.id, e.season_id, MAX(e.number) 'number', e.date, e.title, e.link, e.state, e.date FROM episodes e WHERE e.state IN ('RELEASED', 'VIEWED') GROUP BY e.season_id) 'last_episode' ON last_episode.season_id = season.id " +
-            "WHERE :siteId IS NULL OR movie.site_id = :siteId " +
-            "GROUP BY season.id " +
-            "ORDER BY last_episode_date DESC")
-    fun getMovieCardsStream(siteId: Int?): Flow<List<MovieCard2>>
-
     @Query("SELECT * FROM movies WHERE id = :id")
     fun getMovieByIdStream(id: Int): Flow<MovieEntity>
 
     @Query(
-        "SELECT movie.id, " +
-                "movie.site_id, " +
-                "site.address, " +
-                "movie.page_id, " +
-                "movie.title, " +
-                "CASE WHEN movie.link IS NOT NULL THEN movie.link ELSE season.link END AS link, " +
-                "CASE WHEN movie.poster IS NOT NULL THEN movie.poster ELSE season.poster END AS poster, " +
-                "movie.favorites_mark " +
-                "FROM movies movie " +
-                "JOIN sites site ON site.id = movie.site_id " +
+        "SELECT * FROM sites site " +
+                "JOIN movies movie ON movie.site_id = site.id " +
                 "JOIN seasons season ON season.movie_id = movie.id " +
-                "WHERE movie.id = :id " +
-                "ORDER BY season.number ASC " +
-                "LIMIT 1"
+                "JOIN episodes episode ON episode.season_id = season.id " +
+                "WHERE movie.id = :id"
     )
-    fun getMovieDetailsStream(id: Int): Flow<MovieDetails>
+    fun getMovieDetails(id: Int): Map<SiteEntity, Map<MovieEntity, Map<SeasonEntity, List<EpisodeEntity>>>>
+
+    @Query(
+        "WITH last_episodes AS ( " +
+                "SELECT episode.season_id, MAX(episode.number) as number, episode.date " +
+                "FROM episodes episode " +
+                "WHERE episode.state != 'EXPECTED' " +
+                "GROUP BY episode.season_id" +
+                "), " +
+                "last_seasons AS (" +
+                "SELECT season.movie_id, MAX(season.number) as number " +
+                "FROM seasons season " +
+                "JOIN last_episodes last_episode ON last_episode.season_id = season.id " +
+                "GROUP BY season.movie_id" +
+                ") " +
+                "SELECT " +
+                "movie.id as id, " +
+                "COALESCE(season.title, movie.title) as title, " +
+                "COALESCE(season.poster, movie.poster) as poster, " +
+                "movie.favorites_mark as favorites_mark, " +
+
+                "site.id as site_id, " + // для фильтра по сайту
+                "site.address as site_address, " + // для формирования ссылки
+                "site.use_mirror as site_use_mirror, " + // для формирования ссылки
+                "site.mirror as site_mirror, " + // для формирования ссылки
+                "movie.id as movie_id, " + // для добавления/удаления в/из избранного
+                "movie.title as movie_title, " + // для отображения если нету названия у сезона
+                "movie.poster as movie_poster, " + // для отобрадения если нету постера у сезона
+                "movie.favorites_mark as movie_favorites_mark, " + // для отображения и фильтра
+                "last_season.number as movie_last_season_number, " + // для отображения последний/не последний
+                // первый не просмотренный или последний просмотренный сезон
+                "season.id as season_id, " + // возможно для уникального ключа в списке, но это не точно
+                "COALESCE(MIN(CASE WHEN episode.state = 'RELEASED' THEN season.number END), season.number) as season_number, " + // для отображения если нет названия
+                "season.title as season_title, " + // для отображения
+                "season.poster as season_poster, " + // для отображения
+                "season.link as season_link, " + // для формирования ссылки (!!! пока не используется)
+                "last_episode.number as season_last_episode_number, " + // для отображения последний/не последний
+                "last_episode.date as season_last_episode_date, " + // для сортировки
+                // первый не просмотренный или последний просмотренный эпизод
+                "episode.id as episode_id, " + // для проставления статуса
+                "COALESCE(MIN(CASE WHEN episode.state = 'RELEASED' THEN episode.number END), episode.number) as episode_number, " + // для отображения
+                "episode.title as episode_title, " + // для отображения
+                "(episode.state = 'VIEWED') as episode_viewed_mark, " + // для отображения и фильтра
+                "episode.date as episode_date, " + // для отображения
+                "episode.link as episode_link " + // для перехода в браузер
+                "FROM sites site " +
+                "JOIN movies movie ON movie.site_id = site.id " +
+                "JOIN seasons season ON season.movie_id = movie.id " +
+                "JOIN episodes episode ON episode.season_id = season.id " +
+                "JOIN last_seasons last_season ON last_season.movie_id = movie.id " +
+                "JOIN last_episodes last_episode ON last_episode.season_id = season.id " +
+                "WHERE episode.state != 'EXPECTED' " +
+                "GROUP BY movie.id " +
+                "ORDER BY last_episode.date DESC"
+    )
+    fun getMovieCardStream(): Flow<List<MovieCard>>
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     fun insert(vararg movies: MovieEntity)
