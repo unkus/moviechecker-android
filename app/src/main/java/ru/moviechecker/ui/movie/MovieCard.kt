@@ -4,7 +4,6 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -45,7 +44,7 @@ import java.time.format.FormatStyle
 
 @Composable
 fun MovieCard(
-    cardProvider: () -> NewMovieCardModel,
+    cardProvider: () -> MovieCardModel,
     onClick: (Int) -> Unit = {},
     onClickOnFavorite: (Int) -> Unit = {},
     onClickOnViewed: (Int) -> Unit = {},
@@ -85,9 +84,7 @@ fun MovieCard(
             }
 
             Column {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
+                Row {
                     Icon(
                         modifier = Modifier.clickable { onClickOnFavorite(card.id) },
                         imageVector = if (card.favoritesMark) ImageVector.vectorResource(
@@ -127,7 +124,6 @@ fun MovieCard(
                 }
 
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
@@ -235,7 +231,7 @@ fun Date(
 @Preview(name = "Темная тема", uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun MovieCardPreview(
-    @PreviewParameter(MovieCardPreviewParameterProvider::class) movieCard: NewMovieCardModel
+    @PreviewParameter(MovieCardPreviewParameterProvider::class) movieCard: MovieCardModel
 ) {
     MoviecheckerTheme {
         MovieCard(
@@ -244,15 +240,15 @@ fun MovieCardPreview(
     }
 }
 
-class MovieCardPreviewParameterProvider : PreviewParameterProvider<NewMovieCardModel> {
+class MovieCardPreviewParameterProvider : PreviewParameterProvider<MovieCardModel> {
     override val values = sequenceOf(
-        NewMovieCardModel(
+        MovieCardModel(
             id = 1,
             title = "Начальное сегодня",
             poster = poster,
             favoritesMark = false,
             seasonNumber = 1,
-            episode = NewEpisodeModel(
+            episode = EpisodeModel(
                 id = 1,
                 number = 1,
                 title = "Серия №1",
@@ -263,13 +259,13 @@ class MovieCardPreviewParameterProvider : PreviewParameterProvider<NewMovieCardM
             hasMoreEpisodes = false,
             updatedAt = LocalDateTime.now()
         ),
-        NewMovieCardModel(
+        MovieCardModel(
             id = 2,
             title = "Следующий сегодня",
             poster = poster,
             favoritesMark = false,
             seasonNumber = 2,
-            episode = NewEpisodeModel(
+            episode = EpisodeModel(
                 id = 1,
                 number = 2,
                 title = "Следующий эпизод",
@@ -280,13 +276,13 @@ class MovieCardPreviewParameterProvider : PreviewParameterProvider<NewMovieCardM
             hasMoreEpisodes = true,
             updatedAt = LocalDateTime.now()
         ),
-        NewMovieCardModel(
+        MovieCardModel(
             id = 3,
             title = "В избранном и просмотрено вчера",
             poster = poster,
             favoritesMark = true,
             seasonNumber = 1,
-            episode = NewEpisodeModel(
+            episode = EpisodeModel(
                 id = 1,
                 number = 2,
                 title = "Следующий эпизод",
@@ -297,13 +293,13 @@ class MovieCardPreviewParameterProvider : PreviewParameterProvider<NewMovieCardM
             hasMoreEpisodes = false,
             updatedAt = LocalDateTime.now()
         ),
-        NewMovieCardModel(
+        MovieCardModel(
             id = 4,
             title = "В избранном и не просмотрено вчера",
             poster = poster,
             favoritesMark = true,
             seasonNumber = 1,
-            episode = NewEpisodeModel(
+            episode = EpisodeModel(
                 id = 1,
                 number = 2,
                 title = "Следующий эпизод",
@@ -314,13 +310,13 @@ class MovieCardPreviewParameterProvider : PreviewParameterProvider<NewMovieCardM
             hasMoreEpisodes = false,
             updatedAt = LocalDateTime.now()
         ),
-        NewMovieCardModel(
+        MovieCardModel(
             id = 5,
             title = "Очень длинное название, ну очень длинное или не очень позавчера+",
             poster = poster,
             favoritesMark = false,
             seasonNumber = 1,
-            episode = NewEpisodeModel(
+            episode = EpisodeModel(
                 id = 1,
                 number = 2,
                 title = "Следующий эпизод",

@@ -27,7 +27,7 @@ import ru.moviechecker.ui.theme.MoviecheckerTheme
 
 @Composable
 fun MoviesScreen(
-    moviesProvider: () -> List<NewMovieCardModel>,
+    moviesProvider: () -> List<MovieCardModel>,
     onClickOnItem: (Int) -> Unit = {},
     onClickOnItemFavorite: (Int) -> Unit = {},
     onClickOnItemViewed: (Int) -> Unit = {},

@@ -26,7 +26,7 @@ class MoviesViewModel(
 ) : ViewModel() {
 
     val movies = moviesRepository.getMovieCardStream()
-        .map { it.map(NewMovieCardModel::fromEntity) }
+        .map { it.map(MovieCardModel::fromEntity) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000L),
@@ -98,27 +98,27 @@ class MoviesViewModel(
     }
 }
 
-data class NewMovieCardModel(
+data class MovieCardModel(
     val id: Int,
     val title: String,
     val poster: ByteArray? = null,
     val favoritesMark: Boolean,
     val seasonNumber: Int,
-    val episode: NewEpisodeModel,
+    val episode: EpisodeModel,
     val hasMoreEpisodes: Boolean,
     val updatedAt: LocalDateTime
 ) {
     companion object Factory {
 
-        fun fromEntity(entity: MovieCard): NewMovieCardModel {
+        fun fromEntity(entity: MovieCard): MovieCardModel {
             val host = if (entity.site.useMirror) entity.site.mirror else entity.site.address
-            return NewMovieCardModel(
+            return MovieCardModel(
                 id = entity.id,
                 title = entity.title,
                 poster = entity.poster,
                 favoritesMark = entity.favoritesMark,
                 seasonNumber = entity.season.number,
-                episode = NewEpisodeModel(
+                episode = EpisodeModel(
                     id = entity.episode.id,
                     number = entity.episode.number,
                     title = entity.episode.title,
@@ -136,7 +136,7 @@ data class NewMovieCardModel(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as NewMovieCardModel
+        other as MovieCardModel
 
         if (id != other.id) return false
         if (favoritesMark != other.favoritesMark) return false
@@ -161,11 +161,9 @@ data class NewMovieCardModel(
         result = 31 * result + updatedAt.hashCode()
         return result
     }
-
-
 }
 
-data class NewEpisodeModel(
+data class EpisodeModel(
     val id: Int,
     val number: Int,
     val title: String? = null,
