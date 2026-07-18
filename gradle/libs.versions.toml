@@ -1,17 +1,17 @@
 [versions]
 # AGP and tools should be updated together
-androidGradlePlugin = "9.2.1"
-runtimeAndroid = "1.11.2"
+androidGradlePlugin = "9.3.0"
+runtimeAndroid = "1.11.4"
 material3 = "1.4.0"
 androidCore = "1.19.0"
-kotlin = "2.4.0"
+kotlin = "2.4.10"
 workRuntime = "2.11.2"
 room = "2.8.4"
 ksp = "2.3.9"
 navigation = "2.9.8"
 mockk = "1.14.11"
-uiTooling = "1.11.2"
-lifecycleViewmodel = "2.10.0"
+uiTooling = "1.11.4"
+lifecycleViewmodel = "2.11.0"
 kotlinxSerialization = "1.11.0"
 
 # tests
