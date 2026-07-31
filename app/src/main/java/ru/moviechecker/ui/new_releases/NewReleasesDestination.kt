@@ -1,4 +1,4 @@
-package ru.moviechecker.ui.movie
+package ru.moviechecker.ui.new_releases
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,12 +14,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
+import ru.moviechecker.ui.movie.MovieDetailsScreen
+import ru.moviechecker.ui.movie.MoviesScreen
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-fun MoviesDestination(
+fun NewReleasesDestination(
     innerPadding: PaddingValues,
-    viewModel: MoviesViewModel
+    viewModel: NewReleasesViewModel
 ) {
     val navigator = rememberListDetailPaneScaffoldNavigator<Int>()
     val scope = rememberCoroutineScope()
@@ -48,8 +50,8 @@ fun MoviesDestination(
                         }
                     },
                     onClickOnItemFavorite = viewModel::toggleFavoritesMark,
-                    onClickOnItemViewed = viewModel::toggleEpisodeViewedMark,
-                    onClickOnItemOpenInBrowser = viewModel::markEpisodeViewed
+                    onClickOnItemViewed = viewModel::markEpisodeViewed,
+                    onClickOnItemOpenInBrowser = { }
                 )
             }
         },
@@ -63,7 +65,7 @@ fun MoviesDestination(
                         MovieDetailsScreen(
                             movie = it,
                             onClickOnFavorite = { viewModel.toggleFavoritesMark(movieId) },
-                            onClickOnEpisodeViewed = viewModel::toggleEpisodeViewedMark,
+                            onClickOnEpisodeViewed = viewModel::markEpisodeViewed,
                             onClickOnBackArrow = {
                                 scope.launch {
                                     navigator.navigateBack()
