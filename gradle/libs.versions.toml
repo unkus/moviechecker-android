@@ -1,6 +1,6 @@
 [versions]
 # AGP and tools should be updated together
-androidGradlePlugin = "9.3.0"
+androidGradlePlugin = "9.3.1"
 runtimeAndroid = "1.11.4"
 material3 = "1.4.0"
 androidCore = "1.19.0"
