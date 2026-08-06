@@ -14,4 +14,5 @@ interface EpisodesRepository {
     fun insertEpisode(episode: EpisodeEntity)
     fun updateEpisode(episode: EpisodeEntity)
     fun deleteEpisode(episode: EpisodeEntity)
+    fun updateEpisodeState(episodeId: Int, newState: EpisodeState)
 }

@@ -11,6 +11,7 @@ class DefaultMoviesRepository(private val movieDao: MovieDao) : MoviesRepository
     override fun getById(id: Int) = movieDao.getMovieById(id)
     override fun getAll() = movieDao.getMovies()
     override fun updateMovie(movie: MovieEntity) = movieDao.update(movie)
+    override fun toggleFavoritesMark(movieId: Int) = movieDao.toggleFavoritesMark(movieId)
 
     override fun getMovieDetails(id: Int) =
         movieDao.getMovieDetails(id).firstNotNullOf { (site, movies) ->

@@ -24,4 +24,6 @@
     <string name="episodes_with_count">Серий: %d</string>
     <string name="back">Назад</string>
     <string name="new_releases">Новинки</string>
+    <string name="expected">Ожидается</string>
+    <string name="catalog">Каталог</string>
 </resources>

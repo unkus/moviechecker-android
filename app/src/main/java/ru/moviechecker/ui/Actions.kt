@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import ru.moviechecker.R
+import ru.moviechecker.ui.main.ErrorViewModel
 import ru.moviechecker.ui.theme.MoviecheckerTheme
 
 @Composable
@@ -44,7 +45,7 @@ fun ShowNonFavoritesAction(
 @Preview(name = "Темная тема", uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun ShowNonFavoritesActionPreview() {
-    MoviecheckerTheme() {
+    MoviecheckerTheme {
         ShowNonFavoritesAction()
     }
 }
@@ -68,16 +69,18 @@ fun ShowViewedAction(
 @Preview(name = "Темная тема", uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun ShowViewedActionPreview() {
-    MoviecheckerTheme() {
+    MoviecheckerTheme {
         ShowViewedAction()
     }
 }
 
 @Composable
 fun SearchAction(
-    onClick: () -> Unit = {}
+    errorViewModel: ErrorViewModel = viewModel()
 ) {
-    IconButton(onClick = onClick) {
+    val notImplementedMessage = stringResource(R.string.not_implemented)
+
+    IconButton(onClick = { errorViewModel.triggerError(notImplementedMessage) }) {
         Icon(
             imageVector = ImageVector.vectorResource(R.drawable.search_24px),
             contentDescription = stringResource(R.string.cd_search)
@@ -89,7 +92,7 @@ fun SearchAction(
 @Preview(name = "Темная тема", uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun SearchActionPreview() {
-    MoviecheckerTheme() {
+    MoviecheckerTheme {
         SearchAction()
     }
 }

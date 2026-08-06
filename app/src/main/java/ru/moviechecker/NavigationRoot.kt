@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import ru.moviechecker.database.AppContainer
 import ru.moviechecker.database.episodes.EpisodeEntity
+import ru.moviechecker.database.episodes.EpisodeState
 import ru.moviechecker.database.episodes.EpisodesRepository
 import ru.moviechecker.database.movies.MovieCard
 import ru.moviechecker.database.movies.MovieDetails
@@ -36,8 +37,8 @@ import ru.moviechecker.database.sites.SitesRepository
 import ru.moviechecker.ui.SearchAction
 import ru.moviechecker.ui.ShowNonFavoritesAction
 import ru.moviechecker.ui.ShowViewedAction
+import ru.moviechecker.ui.catalog.CatalogDestination
 import ru.moviechecker.ui.main.MainScreen
-import ru.moviechecker.ui.movie.MoviesDestination
 import ru.moviechecker.ui.movie.MoviesViewModel
 import ru.moviechecker.ui.new_releases.NewReleasesDestination
 import ru.moviechecker.ui.new_releases.NewReleasesViewModel
@@ -53,8 +54,8 @@ enum class AppDestinations(
         R.string.new_releases,
         R.drawable.menu_24px
     ),
-    MOVIES(
-        R.string.movies_episodes,
+    CATALOG(
+        R.string.catalog,
         R.drawable.menu_24px
     ),
     SITES(R.string.sites, R.drawable.menu_24px),
@@ -98,22 +99,17 @@ fun NavigationRoot(
     ) {
         MainScreen(
             label = currentDestination.label,
-            actions = { snackbarHostState ->
+            actions = {
                 when (currentDestination) {
 
                     AppDestinations.NEW_RELEASES -> {
                         ShowNonFavoritesAction()
                     }
 
-                    AppDestinations.MOVIES -> {
-                        val notImplementedMessage = stringResource(R.string.not_implemented)
+                    AppDestinations.CATALOG -> {
                         ShowNonFavoritesAction()
                         ShowViewedAction()
-                        SearchAction {
-                            scope.launch {
-                                snackbarHostState.showSnackbar(notImplementedMessage)
-                            }
-                        }
+                        SearchAction()
                     }
 
                     else -> {}
@@ -131,7 +127,7 @@ fun NavigationRoot(
                     )
                 )
 
-                AppDestinations.MOVIES -> MoviesDestination(
+                AppDestinations.CATALOG -> CatalogDestination(
                     innerPadding = innerPadding,
                     viewModel = viewModel(
                         factory = MoviesViewModel.provideFactory(
@@ -191,6 +187,13 @@ fun NavigationRootPreview(
                         override fun deleteEpisode(episode: EpisodeEntity) {
                             TODO("Not yet implemented")
                         }
+
+                        override fun updateEpisodeState(
+                            episodeId: Int,
+                            newState: EpisodeState
+                        ) {
+                            TODO("Not yet implemented")
+                        }
                     }
                 override val seasonsRepository: SeasonsRepository
                     get() = object : SeasonsRepository {
@@ -221,6 +224,10 @@ fun NavigationRootPreview(
                         }
 
                         override fun updateMovie(movie: MovieEntity) {
+                            TODO("Not yet implemented")
+                        }
+
+                        override fun toggleFavoritesMark(movieId: Int) {
                             TODO("Not yet implemented")
                         }
 
@@ -259,9 +266,7 @@ fun NavigationRootPreview(
 }
 
 class NavigationRootPreviewParameterProvider : PreviewParameterProvider<Int> {
-    override val values = sequenceOf(
-        AppDestinations.NEW_RELEASES.ordinal,
-        AppDestinations.MOVIES.ordinal,
-        AppDestinations.SITES.ordinal
-    )
+    override val values = AppDestinations.entries
+        .map(AppDestinations::ordinal)
+        .asSequence()
 }

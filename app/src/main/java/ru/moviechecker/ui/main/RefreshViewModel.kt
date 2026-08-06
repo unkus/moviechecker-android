@@ -1,4 +1,4 @@
-package ru.moviechecker.ui.movie
+package ru.moviechecker.ui.main
 
 import android.app.Application
 import android.util.Log
@@ -10,41 +10,39 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.moviechecker.workers.AsyncRetrieveDataWorker
 
-class MoviesScreenViewModel(application: Application) : AndroidViewModel(application) {
-    private val _viewModelState = MutableStateFlow(
-        MoviesUiState(
-            isLoading = false
+class RefreshViewModel(
+    application: Application
+) : AndroidViewModel(application) {
+
+    private val _uiState = MutableStateFlow(
+        RefreshUiState(
+            isLoading = false,
+            error = null
         )
     )
-    private val _errors = MutableSharedFlow<String>()
-
-    val uiState = _viewModelState
+    val uiState = _uiState
         .map { state ->
-            MoviesUiState(
-                isLoading = state.isLoading
+            RefreshUiState(
+                isLoading = state.isLoading,
+                error = state.error
             )
         }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
-            initialValue = _viewModelState.value
+            initialValue = _uiState.value
         )
 
-    val errors: SharedFlow<String> = _errors.asSharedFlow()
-
     fun onRefresh() {
-        _viewModelState.update { it.copy(isLoading = true) }
+        _uiState.update { it.copy(isLoading = true) }
 
         val workManager = WorkManager.getInstance(getApplication())
         val workRequest = OneTimeWorkRequestBuilder<AsyncRetrieveDataWorker>()
@@ -79,13 +77,13 @@ class MoviesScreenViewModel(application: Application) : AndroidViewModel(applica
                                             this.javaClass.simpleName,
                                             "Обновление закончилось с ошибкой: ${newErrors.asList()}"
                                         )
-                                        newErrors.forEach { error -> _errors.emit(error) }
+                                        newErrors.forEach { error -> _uiState.update { it.copy(error = error) } }
                                     }
 
                             } else {
                                 Log.d(this.javaClass.simpleName, "Обновление закончено")
                             }
-                            _viewModelState.update { it.copy(isLoading = false) }
+                            _uiState.update { it.copy(isLoading = false) }
                         }
                     }
                 }
@@ -93,6 +91,7 @@ class MoviesScreenViewModel(application: Application) : AndroidViewModel(applica
     }
 }
 
-data class MoviesUiState(
-    val isLoading: Boolean = false
+data class RefreshUiState(
+    val isLoading: Boolean,
+    val error: String?
 )

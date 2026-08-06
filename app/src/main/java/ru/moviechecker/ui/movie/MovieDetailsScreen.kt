@@ -27,7 +27,7 @@ import java.time.LocalDateTime
 fun MovieDetailsScreen(
     movie: MovieDetailsCardModel,
     onClickOnFavorite: () -> Unit = {},
-    onClickOnEpisodeViewed: (Int) -> Unit = {},
+    onClickOnEpisodeViewed: (Int, Boolean) -> Unit = { id, isViewed -> },
     onClickOnBackArrow: () -> Unit = {},
     screenViewModel: MovieDetailsScreenViewModel = viewModel()
 ) {
@@ -95,15 +95,15 @@ fun PreviewMovieDetailsScreen() {
                                 id = 1,
                                 number = 1,
                                 link = "stub",
-                                state = EpisodeState.VIEWED,
-                                date = LocalDateTime.now()
+                                date = LocalDateTime.now(),
+                                viewedMark = true
                             ),
                             EpisodeCardModel(
                                 id = 2,
                                 number = 2,
                                 link = "stub",
-                                state = EpisodeState.RELEASED,
-                                date = LocalDateTime.now()
+                                date = LocalDateTime.now(),
+                                viewedMark = false
                             )
                         )
                     ),
@@ -116,15 +116,15 @@ fun PreviewMovieDetailsScreen() {
                                 id = 1,
                                 number = 1,
                                 link = "stub",
-                                state = EpisodeState.VIEWED,
-                                date = LocalDateTime.now()
+                                date = LocalDateTime.now(),
+                                viewedMark = true
                             ),
                             EpisodeCardModel(
                                 id = 2,
                                 number = 2,
                                 link = "stub",
-                                state = EpisodeState.VIEWED,
-                                date = LocalDateTime.now()
+                                date = LocalDateTime.now(),
+                                viewedMark = true
                             )
                         )
                     ),

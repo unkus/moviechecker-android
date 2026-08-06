@@ -47,7 +47,7 @@ fun MovieCard(
     cardProvider: () -> MovieCardModel,
     onClick: (Int) -> Unit = {},
     onClickOnFavorite: (Int) -> Unit = {},
-    onClickOnViewed: (Int) -> Unit = {},
+    onClickOnViewed: (Int, Boolean) -> Unit = { id, isViewed -> },
     onClickOnOpenInBrowser: (Int) -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -127,7 +127,7 @@ fun MovieCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        modifier = Modifier.clickable { onClickOnViewed(card.episode.id) },
+                        modifier = Modifier.clickable { onClickOnViewed(card.episode.id, card.episode.viewedMark) },
                         imageVector = ImageVector.vectorResource(R.drawable.check_24px),
                         contentDescription = null,
                         tint = if (card.episode.viewedMark) Color.Green else Color.Gray
@@ -186,7 +186,7 @@ private fun Poster(
 }
 
 @Composable
-fun Date(
+private fun Date(
     date: LocalDateTime,
     style: TextStyle
 ) {

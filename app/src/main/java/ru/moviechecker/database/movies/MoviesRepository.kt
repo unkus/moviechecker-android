@@ -6,6 +6,7 @@ interface MoviesRepository {
     fun getById(id: Int): MovieEntity
     fun getAll(): List<MovieEntity>
     fun updateMovie(movie: MovieEntity)
+    fun toggleFavoritesMark(movieId: Int)
 
     fun getMovieDetails(id: Int): MovieDetails
 

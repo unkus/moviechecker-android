@@ -36,7 +36,7 @@ class MoviesViewModel(
     private val _movieDetails = MutableStateFlow<MovieDetailsCardModel?>(null)
     val movieDetails: StateFlow<MovieDetailsCardModel?> = _movieDetails
 
-    fun loadMovieDetails(movieId: Int) {
+    fun loadDetails(movieId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             _movieDetails.value =
                 MovieDetailsCardModel.fromEntity(moviesRepository.getMovieDetails(movieId))
@@ -45,40 +45,20 @@ class MoviesViewModel(
 
     fun toggleFavoritesMark(movieId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            moviesRepository.getById(movieId).let { movie ->
-                movie.favoritesMark = !movie.favoritesMark
-                moviesRepository.updateMovie(movie)
-            }
+            moviesRepository.toggleFavoritesMark(movieId)
         }
     }
 
     fun markEpisodeViewed(episodeId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            episodesRepository.getById(episodeId).let { episode ->
-                episode.state = EpisodeState.VIEWED
-                episodesRepository.updateEpisode(episode)
-            }
+            episodesRepository.updateEpisodeState(episodeId, EpisodeState.VIEWED)
         }
     }
 
-    fun toggleEpisodeViewedMark(episodeId: Int) {
+    fun toggleEpisodeViewedMark(episodeId: Int, isViewed: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
-            episodesRepository.getById(episodeId).let { episode ->
-                episode.state = when (episode.state) {
-                    EpisodeState.VIEWED -> {
-                        EpisodeState.RELEASED
-                    }
-
-                    EpisodeState.RELEASED -> {
-                        EpisodeState.VIEWED
-                    }
-
-                    else -> {
-                        episode.state
-                    }
-                }
-                episodesRepository.updateEpisode(episode)
-            }
+            val newState = if (isViewed) EpisodeState.RELEASED else EpisodeState.VIEWED
+            episodesRepository.updateEpisodeState(episodeId, newState)
         }
     }
 
@@ -242,11 +222,14 @@ data class SeasonCardModel(
     val episodes: List<EpisodeCardModel>
 ) {
     companion object Factory {
-        fun fromEntity(entity: SeasonEntity, episodes: List<EpisodeCardModel> = listOf()): SeasonCardModel {
+        fun fromEntity(
+            entity: SeasonEntity,
+            episodes: List<EpisodeCardModel> = listOf()
+        ): SeasonCardModel {
             return SeasonCardModel(
                 id = entity.id,
                 number = entity.number,
-                title = entity.link,
+                title = entity.title,
                 poster = entity.poster,
                 episodes = episodes
             )
@@ -285,8 +268,8 @@ data class EpisodeCardModel(
     val number: Int,
     var title: String? = null,
     var link: String,
-    var state: EpisodeState,
-    var date: LocalDateTime
+    var date: LocalDateTime,
+    var viewedMark: Boolean
 ) {
     companion object Factory {
         fun fromEntity(entity: EpisodeEntity): EpisodeCardModel {
@@ -295,8 +278,8 @@ data class EpisodeCardModel(
                 number = entity.number,
                 title = entity.title,
                 link = entity.link,
-                state = entity.state,
-                date = entity.date
+                date = entity.date,
+                viewedMark = entity.state == EpisodeState.VIEWED
             )
         }
     }

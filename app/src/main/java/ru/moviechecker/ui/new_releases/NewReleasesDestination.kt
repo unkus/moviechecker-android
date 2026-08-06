@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import ru.moviechecker.ui.movie.MovieDetailsScreen
-import ru.moviechecker.ui.movie.MoviesScreen
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -39,7 +38,7 @@ fun NewReleasesDestination(
         value = navigator.scaffoldValue,
         listPane = {
             AnimatedPane {
-                MoviesScreen(
+                NewReleasesScreen(
                     moviesProvider = { movies },
                     onClickOnItem = { movieId ->
                         scope.launch {
@@ -50,7 +49,7 @@ fun NewReleasesDestination(
                         }
                     },
                     onClickOnItemFavorite = viewModel::toggleFavoritesMark,
-                    onClickOnItemViewed = viewModel::markEpisodeViewed,
+                    onClickOnItemViewed = { episodeId, viewedMark -> viewModel.markEpisodeViewed(episodeId) },
                     onClickOnItemOpenInBrowser = { }
                 )
             }
@@ -65,7 +64,7 @@ fun NewReleasesDestination(
                         MovieDetailsScreen(
                             movie = it,
                             onClickOnFavorite = { viewModel.toggleFavoritesMark(movieId) },
-                            onClickOnEpisodeViewed = viewModel::markEpisodeViewed,
+                            onClickOnEpisodeViewed = { episodeId, viewedMark -> viewModel.markEpisodeViewed(episodeId) },
                             onClickOnBackArrow = {
                                 scope.launch {
                                     navigator.navigateBack()

@@ -34,4 +34,7 @@ interface EpisodeDao {
     fun update(vararg episodes: EpisodeEntity)
     @Delete
     fun delete(vararg episodes: EpisodeEntity)
+
+    @Query("UPDATE episodes SET state = :newState WHERE id = :episodeId")
+    fun updateEpisodeState(episodeId: Int, newState: EpisodeState)
 }

@@ -1,4 +1,4 @@
-package ru.moviechecker.ui.movie
+package ru.moviechecker.ui.catalog
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,10 +14,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
+import ru.moviechecker.ui.movie.MovieDetailsScreen
+import ru.moviechecker.ui.movie.MoviesViewModel
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-fun MoviesDestination(
+fun CatalogDestination(
     innerPadding: PaddingValues,
     viewModel: MoviesViewModel
 ) {
@@ -37,7 +39,7 @@ fun MoviesDestination(
         value = navigator.scaffoldValue,
         listPane = {
             AnimatedPane {
-                MoviesScreen(
+                CatalogScreen(
                     moviesProvider = { movies },
                     onClickOnItem = { movieId ->
                         scope.launch {
@@ -56,7 +58,7 @@ fun MoviesDestination(
         detailPane = {
             AnimatedPane {
                 navigator.currentDestination?.contentKey?.let { movieId ->
-                    viewModel.loadMovieDetails(movieId)
+                    viewModel.loadDetails(movieId)
                     val details by viewModel.movieDetails.collectAsStateWithLifecycle()
 
                     details?.let {

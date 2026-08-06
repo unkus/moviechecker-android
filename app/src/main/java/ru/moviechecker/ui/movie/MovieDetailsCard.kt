@@ -84,7 +84,7 @@ fun MovieDetailsSeasonCard(
     isExpanded: Boolean,
     onClickOnExpand: () -> Unit = {},
     onClickOnEpisode: (Int) -> Unit = {},
-    onClickOnEpisodeViewed: (Int) -> Unit = {}
+    onClickOnEpisodeViewed: (Int, Boolean) -> Unit = { id, isViewed -> }
 ) {
     val rotation = animateFloatAsState(
         targetValue = if (isExpanded) 0f else 180f,
@@ -147,7 +147,7 @@ fun MovieDetailsSeasonCard(
 fun MovieDetailsEpisodeCard(
     episode: EpisodeCardModel,
     onClick: (Int) -> Unit = {},
-    onClickOnViewed: (Int) -> Unit = {}
+    onClickOnViewed: (Int, Boolean) -> Unit = { id, isViewed -> }
 ) {
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
@@ -158,9 +158,9 @@ fun MovieDetailsEpisodeCard(
                 imageVector = ImageVector.vectorResource(R.drawable.check_24px),
                 contentDescription = null,
                 modifier = Modifier.clickable {
-                    onClickOnViewed(episode.id)
+                    onClickOnViewed(episode.id, episode.viewedMark)
                 },
-                tint = if (episode.state == EpisodeState.VIEWED) Color.Green else Color.Gray
+                tint = if (episode.viewedMark) Color.Green else Color.Gray
             )
             Text(
                 text = episode.title?.let { title ->
@@ -195,8 +195,8 @@ private fun Poster(
     )
 }
 
-@Preview("Movie details")
-@Preview("Movie details (dark)", uiMode = UI_MODE_NIGHT_YES)
+@Preview("Экран детализации")
+@Preview("Экран детализации (dark)", uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun PreviewMovieDetailsCard(
     @PreviewParameter(MovieDetailsCardPreviewParameterProvider::class) favoritesMark: Boolean
@@ -210,7 +210,27 @@ fun PreviewMovieDetailsCard(
                 title = "Фильм такой-то",
                 poster = poster,
                 favoritesMark = favoritesMark,
-                seasons = listOf()
+                seasons = listOf(SeasonCardModel(
+                    id = 1,
+                    number = 1,
+                    poster = poster,
+                    episodes = listOf(
+                        EpisodeCardModel(
+                            id = 1,
+                            number = 1,
+                            link = "stub",
+                            date = LocalDateTime.now(),
+                            viewedMark = true
+                        ),
+                        EpisodeCardModel(
+                            id = 2,
+                            number = 2,
+                            link = "stub",
+                            date = LocalDateTime.now(),
+                            viewedMark = false
+                        )
+                    )
+                ))
             )
         )
     }
@@ -220,8 +240,8 @@ class MovieDetailsCardPreviewParameterProvider : PreviewParameterProvider<Boolea
     override val values = sequenceOf(true, false)
 }
 
-@Preview("Movie details")
-@Preview("Movie details (dark)", uiMode = UI_MODE_NIGHT_YES)
+@Preview("Карточка сезона")
+@Preview("Карточка сезона (темная тема)", uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun PreviewMovieDetailsSeasonCard() {
     MoviecheckerTheme {
@@ -235,22 +255,15 @@ fun PreviewMovieDetailsSeasonCard() {
                         id = 1,
                         number = 1,
                         link = "stub",
-                        state = EpisodeState.VIEWED,
-                        date = LocalDateTime.now()
+                        date = LocalDateTime.now(),
+                        viewedMark = true
                     ),
                     EpisodeCardModel(
                         id = 2,
                         number = 2,
                         link = "stub",
-                        state = EpisodeState.RELEASED,
-                        date = LocalDateTime.now()
-                    ),
-                    EpisodeCardModel(
-                        id = 3,
-                        number = 3,
-                        link = "stub",
-                        state = EpisodeState.EXPECTED,
-                        date = LocalDateTime.now()
+                        date = LocalDateTime.now(),
+                        viewedMark = false
                     )
                 )
             ),

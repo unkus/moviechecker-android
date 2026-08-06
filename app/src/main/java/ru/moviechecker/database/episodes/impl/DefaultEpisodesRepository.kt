@@ -3,6 +3,7 @@ package ru.moviechecker.database.episodes.impl
 import kotlinx.coroutines.flow.Flow
 import ru.moviechecker.database.episodes.EpisodeDao
 import ru.moviechecker.database.episodes.EpisodeEntity
+import ru.moviechecker.database.episodes.EpisodeState
 import ru.moviechecker.database.episodes.EpisodesRepository
 
 class DefaultEpisodesRepository(private val episodeDao: EpisodeDao) : EpisodesRepository {
@@ -17,4 +18,6 @@ class DefaultEpisodesRepository(private val episodeDao: EpisodeDao) : EpisodesRe
     override fun insertEpisode(episode: EpisodeEntity) = episodeDao.insert(episode)
     override fun updateEpisode(episode: EpisodeEntity) = episodeDao.update(episode)
     override fun deleteEpisode(episode: EpisodeEntity) = episodeDao.delete(episode)
+
+    override fun updateEpisodeState(episodeId: Int, newState: EpisodeState) = episodeDao.updateEpisodeState(episodeId, newState)
 }
