@@ -83,7 +83,6 @@ fun MovieDetailsSeasonCard(
     season: SeasonCardModel,
     isExpanded: Boolean,
     onClickOnExpand: () -> Unit = {},
-    onClickOnEpisode: (Int) -> Unit = {},
     onClickOnEpisodeViewed: (Int, Boolean) -> Unit = { id, isViewed -> }
 ) {
     val rotation = animateFloatAsState(
@@ -195,8 +194,8 @@ private fun Poster(
     )
 }
 
-@Preview("Экран детализации")
-@Preview("Экран детализации (dark)", uiMode = UI_MODE_NIGHT_YES)
+@Preview("Детализации")
+@Preview("Детализации (темная тема)", uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun PreviewMovieDetailsCard(
     @PreviewParameter(MovieDetailsCardPreviewParameterProvider::class) favoritesMark: Boolean

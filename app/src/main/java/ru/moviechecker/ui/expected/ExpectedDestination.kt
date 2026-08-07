@@ -1,4 +1,4 @@
-package ru.moviechecker.ui.new_releases
+package ru.moviechecker.ui.expected
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,7 +19,7 @@ import ru.moviechecker.ui.movie.MoviesViewModel
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-fun NewReleasesDestination(
+fun ExpectedDestination(
     innerPadding: PaddingValues,
     viewModel: MoviesViewModel
 ) {
@@ -32,14 +32,14 @@ fun NewReleasesDestination(
         }
     }
 
-    val movies by viewModel.newReleases.collectAsStateWithLifecycle()
+    val movies by viewModel.expected.collectAsStateWithLifecycle()
 
     ListDetailPaneScaffold(
         directive = navigator.scaffoldDirective,
         value = navigator.scaffoldValue,
         listPane = {
             AnimatedPane {
-                NewReleasesScreen(
+                ExpectedScreen(
                     moviesProvider = { movies },
                     onClickOnItem = { movieId ->
                         scope.launch {
@@ -49,9 +49,7 @@ fun NewReleasesDestination(
                             )
                         }
                     },
-                    onClickOnItemFavorite = viewModel::toggleFavoritesMark,
-                    onClickOnItemViewed = { episodeId, viewedMark -> viewModel.markEpisodeViewed(episodeId) },
-                    onClickOnItemOpenInBrowser = { }
+                    onClickOnItemFavorite = viewModel::toggleFavoritesMark
                 )
             }
         },
@@ -65,7 +63,7 @@ fun NewReleasesDestination(
                         MovieDetailsScreen(
                             movie = it,
                             onClickOnFavorite = { viewModel.toggleFavoritesMark(movieId) },
-                            onClickOnEpisodeViewed = { episodeId, viewedMark -> viewModel.markEpisodeViewed(episodeId) },
+                            onClickOnEpisodeViewed = { id, isViewed -> },
                             onClickOnBackArrow = {
                                 scope.launch {
                                     navigator.navigateBack()

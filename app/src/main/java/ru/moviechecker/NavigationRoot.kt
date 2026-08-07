@@ -25,6 +25,7 @@ import ru.moviechecker.database.AppContainer
 import ru.moviechecker.database.episodes.EpisodeEntity
 import ru.moviechecker.database.episodes.EpisodeState
 import ru.moviechecker.database.episodes.EpisodesRepository
+import ru.moviechecker.database.movies.ExpectedCard
 import ru.moviechecker.database.movies.MovieCard
 import ru.moviechecker.database.movies.MovieDetails
 import ru.moviechecker.database.movies.MovieEntity
@@ -38,10 +39,10 @@ import ru.moviechecker.ui.SearchAction
 import ru.moviechecker.ui.ShowNonFavoritesAction
 import ru.moviechecker.ui.ShowViewedAction
 import ru.moviechecker.ui.catalog.CatalogDestination
+import ru.moviechecker.ui.expected.ExpectedDestination
 import ru.moviechecker.ui.main.MainScreen
 import ru.moviechecker.ui.movie.MoviesViewModel
 import ru.moviechecker.ui.new_releases.NewReleasesDestination
-import ru.moviechecker.ui.new_releases.NewReleasesViewModel
 import ru.moviechecker.ui.site.SitesDestination
 import ru.moviechecker.ui.site.SitesViewModel
 import ru.moviechecker.ui.theme.MoviecheckerTheme
@@ -52,6 +53,10 @@ enum class AppDestinations(
 ) {
     NEW_RELEASES(
         R.string.new_releases,
+        R.drawable.menu_24px
+    ),
+    EXPECTED(
+        R.string.expected,
         R.drawable.menu_24px
     ),
     CATALOG(
@@ -106,6 +111,10 @@ fun NavigationRoot(
                         ShowNonFavoritesAction()
                     }
 
+                    AppDestinations.EXPECTED -> {
+                        ShowNonFavoritesAction()
+                    }
+
                     AppDestinations.CATALOG -> {
                         ShowNonFavoritesAction()
                         ShowViewedAction()
@@ -120,7 +129,17 @@ fun NavigationRoot(
                 AppDestinations.NEW_RELEASES -> NewReleasesDestination(
                     innerPadding = innerPadding,
                     viewModel = viewModel(
-                        factory = NewReleasesViewModel.provideFactory(
+                        factory = MoviesViewModel.provideFactory(
+                            moviesRepository = appContainer.moviesRepository,
+                            episodesRepository = appContainer.episodesRepository
+                        )
+                    )
+                )
+
+                AppDestinations.EXPECTED -> ExpectedDestination(
+                    innerPadding = innerPadding,
+                    viewModel = viewModel(
+                        factory = MoviesViewModel.provideFactory(
                             moviesRepository = appContainer.moviesRepository,
                             episodesRepository = appContainer.episodesRepository
                         )
@@ -241,6 +260,10 @@ fun NavigationRootPreview(
 
                         override fun getNewReleasesStream(): Flow<List<MovieCard>> {
                             return emptyFlow()
+                        }
+
+                        override fun getExpectedStream(): Flow<List<ExpectedCard>> {
+                            TODO("Not yet implemented")
                         }
                     }
                 override val sitesRepository: SitesRepository

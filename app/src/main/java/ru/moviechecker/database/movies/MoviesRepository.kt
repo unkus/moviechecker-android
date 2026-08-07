@@ -13,4 +13,6 @@ interface MoviesRepository {
     fun getMovieCardStream(): Flow<List<MovieCard>>
 
     fun getNewReleasesStream(): Flow<List<MovieCard>>
+
+    fun getExpectedStream(): Flow<List<ExpectedCard>>
 }

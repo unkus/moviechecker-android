@@ -64,7 +64,6 @@ fun MovieDetailsScreen(
                     season = season,
                     isExpanded = uiState.expandedSeasonNumber == season.number,
                     onClickOnExpand = { screenViewModel.expandSeason(season.number) },
-                    onClickOnEpisode = { },
                     onClickOnEpisodeViewed = onClickOnEpisodeViewed,
                 )
             }
@@ -72,8 +71,8 @@ fun MovieDetailsScreen(
     }
 }
 
-@Preview("Movie details")
-@Preview("Movie details (dark)", uiMode = UI_MODE_NIGHT_YES)
+@Preview("Детализации")
+@Preview("Детализации (темная тема)", uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun PreviewMovieDetailsScreen() {
     MoviecheckerTheme {

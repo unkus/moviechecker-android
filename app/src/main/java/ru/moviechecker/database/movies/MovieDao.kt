@@ -167,6 +167,43 @@ interface MovieDao {
     )
     fun getNewReleasesStream(): Flow<List<MovieCard>>
 
+    @Query(
+        "SELECT " +
+                "movie.id as id, " +
+                "COALESCE(season.title, movie.title) as title, " + // для отображения
+                "COALESCE(season.poster, movie.poster) as poster, " + // для отображения
+                "movie.favorites_mark as favorites_mark, " + // для отображения и фильтра
+
+                // Сайт
+                "site.id as site_id, " + // для фильтра по сайту
+                "site.address as site_address, " + // для формирования ссылки
+                "site.use_mirror as site_use_mirror, " + // для формирования ссылки
+                "site.mirror as site_mirror, " + // для формирования ссылки
+
+                // Тайтл
+                "movie.id as movie_id, " + // для добавления/удаления в/из избранного
+
+                // Сезон
+                "season.id as season_id, " +
+                "season.number as season_number, " + // для отображения если нет названия
+
+                // Эпизод
+                "episode.id as episode_id, " +
+                "episode.number as episode_number, " + // для отображения если нет названия
+                "episode.title as episode_title, " + // для отображения
+                "episode.date as episode_date, " + // для отображения
+                "episode.link as episode_link " + // для перехода в браузер
+
+                "FROM sites site " +
+                "JOIN movies movie ON movie.site_id = site.id " +
+                "JOIN seasons season ON season.movie_id = movie.id " +
+                "JOIN episodes episode ON episode.season_id = season.id " +
+                "WHERE episode.state = 'EXPECTED' " +
+                "GROUP BY movie.id " +
+                "ORDER BY episode.date ASC"
+    )
+    fun getExpectedStream(): Flow<List<ExpectedCard>>
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     fun insert(vararg movies: MovieEntity)
 

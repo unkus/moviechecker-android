@@ -54,21 +54,7 @@ fun MovieCard(
     val card = cardProvider()
 
     Card(
-        modifier = Modifier
-//            .combinedClickable(
-//                onClick = {
-//                    val link = movie.nextEpisodeLink ?: movie.lastEpisodeLink
-//                    val browserIntent = Intent(
-//                        Intent.ACTION_VIEW,
-//                        link.toString().toUri()
-//                    )
-//                    context.startActivity(browserIntent)
-
-//                    onClick(movie)
-//                },
-//                onLongClick = { onLongClick(movie) }
-//            )
-            .padding(dimensionResource(id = R.dimen.padding_small)),
+        modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small)),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         onClick = { onClick(card.id) }
     ) {
@@ -227,8 +213,8 @@ private fun Date(
     )
 }
 
-@Preview
-@Preview(name = "Темная тема", uiMode = UI_MODE_NIGHT_YES)
+@Preview(name = "Карточка фильма")
+@Preview(name = "Карточка фильма (темная тема)", uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun MovieCardPreview(
     @PreviewParameter(MovieCardPreviewParameterProvider::class) movieCard: MovieCardModel

@@ -1,6 +1,7 @@
 package ru.moviechecker.database.movies.impl
 
 import kotlinx.coroutines.flow.Flow
+import ru.moviechecker.database.movies.ExpectedCard
 import ru.moviechecker.database.movies.MovieCard
 import ru.moviechecker.database.movies.MovieDao
 import ru.moviechecker.database.movies.MovieDetails
@@ -35,4 +36,6 @@ class DefaultMoviesRepository(private val movieDao: MovieDao) : MoviesRepository
     override fun getMovieCardStream(): Flow<List<MovieCard>> = movieDao.getMovieCardStream()
 
     override fun getNewReleasesStream(): Flow<List<MovieCard>> = movieDao.getNewReleasesStream()
+
+    override fun getExpectedStream(): Flow<List<ExpectedCard>> = movieDao.getExpectedStream()
 }

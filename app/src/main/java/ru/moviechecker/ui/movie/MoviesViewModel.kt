@@ -1,5 +1,6 @@
 package ru.moviechecker.ui.movie
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -8,22 +9,43 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.moviechecker.database.episodes.EpisodeEntity
 import ru.moviechecker.database.episodes.EpisodeState
 import ru.moviechecker.database.episodes.EpisodesRepository
+import ru.moviechecker.database.movies.ExpectedCard
+import ru.moviechecker.database.movies.ExpectedCardEpisode
 import ru.moviechecker.database.movies.MovieCard
+import ru.moviechecker.database.movies.MovieCardEpisode
 import ru.moviechecker.database.movies.MovieDetails
 import ru.moviechecker.database.movies.MoviesRepository
 import ru.moviechecker.database.seasons.SeasonEntity
 import java.net.URI
 import java.time.LocalDateTime
+import kotlin.collections.map
 
 class MoviesViewModel(
     private val moviesRepository: MoviesRepository,
     private val episodesRepository: EpisodesRepository
 ) : ViewModel() {
+
+    var newReleases = moviesRepository.getNewReleasesStream()
+        .map { it.map(MovieCardModel::fromEntity) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000L),
+            initialValue = emptyList()
+        )
+
+    val expected = moviesRepository.getExpectedStream()
+        .map { it.map(MovieCardModel::fromEntity) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000L),
+            initialValue = emptyList()
+        )
 
     val movies = moviesRepository.getMovieCardStream()
         .map { it.map(MovieCardModel::fromEntity) }
@@ -92,22 +114,33 @@ data class MovieCardModel(
 
         fun fromEntity(entity: MovieCard): MovieCardModel {
             val host = if (entity.site.useMirror) entity.site.mirror else entity.site.address
+            val episode =
+                EpisodeModel.fromEntity(entity.episode, URI.create("${host}${entity.episode.link}"))
             return MovieCardModel(
                 id = entity.id,
                 title = entity.title,
                 poster = entity.poster,
                 favoritesMark = entity.favoritesMark,
                 seasonNumber = entity.season.number,
-                episode = EpisodeModel(
-                    id = entity.episode.id,
-                    number = entity.episode.number,
-                    title = entity.episode.title,
-                    link = URI.create("${host}${entity.episode.link}"),
-                    date = entity.episode.date,
-                    viewedMark = entity.episode.viewedMark
-                ),
+                episode = episode,
                 hasMoreEpisodes = entity.episode.number < entity.season.lastEpisodeNumber,
                 updatedAt = entity.season.lastEpisodeDate
+            )
+        }
+
+        fun fromEntity(entity: ExpectedCard): MovieCardModel {
+            val host = if (entity.site.useMirror) entity.site.mirror else entity.site.address
+            val episode =
+                EpisodeModel.fromEntity(entity.episode, URI.create("${host}${entity.episode.link}"))
+            return MovieCardModel(
+                id = entity.id,
+                title = entity.title,
+                poster = entity.poster,
+                favoritesMark = entity.favoritesMark,
+                seasonNumber = entity.season.number,
+                episode = episode,
+                hasMoreEpisodes = false,
+                updatedAt = entity.episode.date
             )
         }
     }
@@ -150,7 +183,31 @@ data class EpisodeModel(
     val link: URI,
     val date: LocalDateTime,
     val viewedMark: Boolean
-)
+) {
+    companion object Factory {
+        fun fromEntity(entity: MovieCardEpisode, link: URI): EpisodeModel {
+            return EpisodeModel(
+                id = entity.id,
+                number = entity.number,
+                title = entity.title,
+                link = link,
+                date = entity.date,
+                viewedMark = entity.viewedMark
+            )
+        }
+
+        fun fromEntity(entity: ExpectedCardEpisode, link: URI): EpisodeModel {
+            return EpisodeModel(
+                id = entity.id,
+                number = entity.number,
+                title = entity.title,
+                link = link,
+                date = entity.date,
+                viewedMark = false
+            )
+        }
+    }
+}
 
 data class MovieDetailsCardModel(
     val id: Int,
