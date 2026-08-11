@@ -31,7 +31,7 @@ class MoviesViewModel(
     private val episodesRepository: EpisodesRepository
 ) : ViewModel() {
 
-    var newReleases = moviesRepository.getNewReleasesStream()
+    var novelties = moviesRepository.getNoveltiesStream()
         .map { it.map(MovieCardModel::fromEntity) }
         .stateIn(
             scope = viewModelScope,

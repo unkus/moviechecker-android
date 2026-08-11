@@ -35,7 +35,7 @@ class DefaultMoviesRepository(private val movieDao: MovieDao) : MoviesRepository
 
     override fun getMovieCardStream(): Flow<List<MovieCard>> = movieDao.getMovieCardStream()
 
-    override fun getNewReleasesStream(): Flow<List<MovieCard>> = movieDao.getNewReleasesStream()
+    override fun getNoveltiesStream(): Flow<List<MovieCard>> = movieDao.getNoveltiesStream()
 
     override fun getExpectedStream(): Flow<List<ExpectedCard>> = movieDao.getExpectedStream()
 }

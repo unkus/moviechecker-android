@@ -42,7 +42,7 @@ import ru.moviechecker.ui.catalog.CatalogDestination
 import ru.moviechecker.ui.expected.ExpectedDestination
 import ru.moviechecker.ui.main.MainScreen
 import ru.moviechecker.ui.movie.MoviesViewModel
-import ru.moviechecker.ui.new_releases.NewReleasesDestination
+import ru.moviechecker.ui.novelties.NoveltiesDestination
 import ru.moviechecker.ui.site.SitesDestination
 import ru.moviechecker.ui.site.SitesViewModel
 import ru.moviechecker.ui.theme.MoviecheckerTheme
@@ -51,8 +51,8 @@ enum class AppDestinations(
     val label: Int,
     val icon: Int
 ) {
-    NEW_RELEASES(
-        R.string.new_releases,
+    NOVELTIES(
+        R.string.novelties,
         R.drawable.menu_24px
     ),
     EXPECTED(
@@ -74,7 +74,7 @@ enum class AppDestinations(
 fun NavigationRoot(
     appContainer: AppContainer
 ) {
-    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.NEW_RELEASES) }
+    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.NOVELTIES) }
     val scope = rememberCoroutineScope()
 
     val navigationSuiteScaffoldState =
@@ -107,7 +107,7 @@ fun NavigationRoot(
             actions = {
                 when (currentDestination) {
 
-                    AppDestinations.NEW_RELEASES -> {
+                    AppDestinations.NOVELTIES -> {
                         ShowNonFavoritesAction()
                     }
 
@@ -126,7 +126,7 @@ fun NavigationRoot(
             }
         ) { innerPadding ->
             when (currentDestination) {
-                AppDestinations.NEW_RELEASES -> NewReleasesDestination(
+                AppDestinations.NOVELTIES -> NoveltiesDestination(
                     innerPadding = innerPadding,
                     viewModel = viewModel(
                         factory = MoviesViewModel.provideFactory(

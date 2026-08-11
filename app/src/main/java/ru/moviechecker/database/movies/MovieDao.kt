@@ -165,7 +165,7 @@ interface MovieDao {
                 "GROUP BY movie.id " +
                 "ORDER BY last_episode.date DESC"
     )
-    fun getNewReleasesStream(): Flow<List<MovieCard>>
+    fun getNoveltiesStream(): Flow<List<MovieCard>>
 
     @Query(
         "SELECT " +

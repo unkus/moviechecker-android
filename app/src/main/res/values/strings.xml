@@ -24,7 +24,7 @@
     <string name="not_implemented">Not implemented</string>
     <string name="episodes_with_count">Episodes: %d</string>
     <string name="back">Back</string>
-    <string name="new_releases">New releases</string>
+    <string name="novelties">Novelties</string>
     <string name="expected">Expected</string>
     <string name="catalog">Catalog</string>
 </resources>

@@ -1,4 +1,4 @@
-package ru.moviechecker.ui.new_releases
+package ru.moviechecker.ui.novelties
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,7 +19,7 @@ import ru.moviechecker.ui.movie.MoviesViewModel
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-fun NewReleasesDestination(
+fun NoveltiesDestination(
     innerPadding: PaddingValues,
     viewModel: MoviesViewModel
 ) {
@@ -32,14 +32,14 @@ fun NewReleasesDestination(
         }
     }
 
-    val movies by viewModel.newReleases.collectAsStateWithLifecycle()
+    val movies by viewModel.novelties.collectAsStateWithLifecycle()
 
     ListDetailPaneScaffold(
         directive = navigator.scaffoldDirective,
         value = navigator.scaffoldValue,
         listPane = {
             AnimatedPane {
-                NewReleasesScreen(
+                NoveltiesScreen(
                     moviesProvider = { movies },
                     onClickOnItem = { movieId ->
                         scope.launch {

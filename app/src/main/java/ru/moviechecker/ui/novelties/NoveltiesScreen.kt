@@ -1,4 +1,4 @@
-package ru.moviechecker.ui.new_releases
+package ru.moviechecker.ui.novelties
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -9,7 +9,7 @@ import ru.moviechecker.ui.catalog.MovieList
 import ru.moviechecker.ui.movie.MovieCardModel
 
 @Composable
-fun NewReleasesScreen(
+fun NoveltiesScreen(
     moviesProvider: () -> List<MovieCardModel>,
     onClickOnItem: (Int) -> Unit = {},
     onClickOnItemFavorite: (Int) -> Unit = {},
