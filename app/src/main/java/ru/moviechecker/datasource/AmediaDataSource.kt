@@ -1,7 +1,6 @@
 package ru.moviechecker.datasource
 
 import android.util.Log
-import ru.moviechecker.datasource.model.DataSource
 import ru.moviechecker.datasource.model.DataState
 import ru.moviechecker.datasource.model.EpisodeData
 import ru.moviechecker.datasource.model.MovieData
@@ -9,6 +8,7 @@ import ru.moviechecker.datasource.model.SeasonData
 import ru.moviechecker.datasource.model.SiteData
 import ru.moviechecker.datasource.model.SourceData
 import ru.moviechecker.datasource.model.SourceDataEntry
+import ru.moviechecker.datasource.model.StrictDataSource
 import java.net.URI
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -38,7 +38,7 @@ private const val PATTERN_DATE_TIME =
 private const val PATTERN_EPISODE_NNUMBER =
     "<div class=\"animseri\"><span>(?<episodeNumber>\\d+)?(?:-\\d+)?</span>серия</div>"
 
-class AmediaDataSource : DataSource {
+class AmediaDataSource : StrictDataSource("amedia", "https://amedia.online") {
 
     private val dateFormat = DateTimeFormatter.ofPattern("d-MM-yyyy")
 
@@ -49,22 +49,9 @@ class AmediaDataSource : DataSource {
     private val dateTimeRegex = PATTERN_DATE_TIME.toRegex()
     private val episodeNumberRegex = PATTERN_EPISODE_NNUMBER.toRegex()
 
-    override val mnemonic: String
-        get() = "amedia"
-    override val address: URI
-        get() = URI.create("https://amedia.online")
-
-    override fun retrieveData(mirror: URI?): SourceData {
+    override fun retrieveData(uri: URI): SourceData {
         val entries = mutableListOf<SourceDataEntry>()
-        val lineIterator = (mirror ?: address).toURL().openConnection()
-            .apply {
-                connectTimeout = 1000
-                readTimeout = 3000
-            }
-            .getInputStream()
-            .use { it.readBytes().toString(Charsets.UTF_8) }
-            .lines()
-            .iterator()
+        val lineIterator = readContent(uri).lines().iterator()
         val (siteTitle) = getFirstValueByRegex(lineIterator, siteTitleRegex)
 
         while (lineIterator.hasNext()) {
@@ -150,7 +137,7 @@ class AmediaDataSource : DataSource {
             site = SiteData(
                 mnemonic = mnemonic,
                 title = siteTitle,
-                address = address
+                address = initialAddress
             ),
             entries = entries
         )

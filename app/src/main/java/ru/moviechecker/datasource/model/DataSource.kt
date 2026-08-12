@@ -2,9 +2,25 @@ package ru.moviechecker.datasource.model
 
 import java.net.URI
 
-interface DataSource {
-    val mnemonic: String
-    val address: URI
+sealed interface DataSource {
+    fun retrieveData(uri: URI): SourceData
+}
 
-    fun retrieveData(mirror: URI? = null): SourceData
+open class StrictDataSource(val mnemonic: String, address: String) : DataSource {
+
+    val initialAddress: URI = URI.create(address)
+
+    protected fun readContent(uri: URI): String = uri.toURL()
+        .openConnection()
+        .apply {
+            connectTimeout = 1000
+            readTimeout = 3000
+        }
+        .getInputStream()
+        .use { it.readBytes().toString(Charsets.UTF_8) }
+
+    override fun retrieveData(uri: URI): SourceData {
+        TODO("Not yet implemented")
+    }
+
 }

@@ -1,16 +1,15 @@
 package ru.moviechecker.datasource
 
 import android.util.Log
-import ru.moviechecker.datasource.model.SourceData
-import ru.moviechecker.datasource.model.DataSource
 import ru.moviechecker.datasource.model.DataState
 import ru.moviechecker.datasource.model.EpisodeData
 import ru.moviechecker.datasource.model.MovieData
 import ru.moviechecker.datasource.model.SeasonData
 import ru.moviechecker.datasource.model.SiteData
+import ru.moviechecker.datasource.model.SourceData
 import ru.moviechecker.datasource.model.SourceDataEntry
+import ru.moviechecker.datasource.model.StrictDataSource
 import java.net.URI
-import java.net.URL
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -37,7 +36,7 @@ private const val PATTERN_EPISODE_TITLE_EN = "<div class=\"title-en\">(?<title>.
 private const val PATTERN_DATE =
     "<span data-proper=\".+\" data-released=\"(?<date>.+?)\">.*</span>"
 
-class LostfilmDataSource : DataSource {
+class LostfilmDataSource : StrictDataSource("lostfilm", "https://www.lostfilm.tv") {
 
     private val siteTitleRegex = PATTERN_OG_SITE_NAME.toRegex()
     private val newMovieClassRegex = PATTERN_NEW_MOVIE_CLASS.toRegex(RegexOption.MULTILINE)
@@ -52,33 +51,21 @@ class LostfilmDataSource : DataSource {
     private val dateFormat =
         DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.forLanguageTag("ru-RU"))
 
-    override val mnemonic: String
-        get() = "lostfilm"
-    override val address: URI
-        get() = URI.create("https://www.lostfilm.tv")
-
-    override fun retrieveData(mirror: URI?): SourceData {
-        val content = (mirror ?: address).toURL()
-            .openConnection()
-            .apply {
-                connectTimeout = 1000
-                readTimeout = 3000
-            }
-            .getInputStream()
-            .use { it.readBytes().toString(Charsets.UTF_8) }
-
+    override fun retrieveData(uri: URI): SourceData {
+        val content = readContent(uri)
         val (siteTitle) = siteTitleRegex.find(content)!!.destructured
 
         val entries = newMovieClassRegex.findAll(content)
-            .map { matchResult ->
+            .mapNotNull { matchResult ->
                 val (href, typeString, name, season, episode) = matchResult.destructured
                 val type = EntryType.valueOf(typeString.uppercase())
                 val hrefNormalized = href.replace(" ", "")
                 val nameNormalized = name.trim()
+                val movieUri: URI = uri.resolve(href)
                 when (type) {
                     EntryType.MOVIES -> {
                         parseMovie(
-                            address = mirror ?: address,
+                            uri = movieUri,
                             pageId = nameNormalized,
                             href = hrefNormalized
                         )
@@ -87,7 +74,7 @@ class LostfilmDataSource : DataSource {
                     EntryType.SERIES -> {
                         if (episode.isNotBlank()) {
                             parseSeries(
-                                address = mirror ?: address,
+                                uri = movieUri,
                                 pageId = nameNormalized,
                                 seasonNumber = if (season.isBlank()) 999 else season.toInt(),
                                 episodeNumber = episode.toInt(),
@@ -100,7 +87,6 @@ class LostfilmDataSource : DataSource {
                     }
                 }
             }
-            .filterNotNull()
             .onEach {
                 Log.d(this.javaClass.simpleName, "movie=${it.movie}")
                 Log.d(this.javaClass.simpleName, "season=${it.season}")
@@ -112,7 +98,7 @@ class LostfilmDataSource : DataSource {
             site = SiteData(
                 mnemonic = mnemonic,
                 title = siteTitle,
-                address = address,
+                address = initialAddress,
                 posterLink = null
             ),
             entries = entries
@@ -124,96 +110,76 @@ class LostfilmDataSource : DataSource {
     }
 
     private fun parseMovie(
-        address: URI,
+        uri: URI,
         pageId: String,
         href: String
-    ): SourceDataEntry? {
-        Log.d(this.javaClass.simpleName, "Парсим фильм $pageId ($href)")
-        return resolveLink(address, href)?.let { url ->
-            val lineIterator = url.openConnection()
-                .apply {
-                    connectTimeout = 1000
-                    readTimeout = 3000
-                }
-                .getInputStream()
-                .use { it.readBytes().toString(Charsets.UTF_8) }
-                .lines()
-                .iterator()
-            val (title) = getFirstValueByRegex(lineIterator, ogTitleRegex)
-            val (posterLink) = getFirstValueByRegex(lineIterator, ogImageRegex)
-//            val (description) = getFirstValueByRegex(lineIterator, ogDescriptionRegex)
+    ): SourceDataEntry {
+        Log.d(this.javaClass.simpleName, "Парсим фильм $pageId ($uri)")
+        val lineIterator = readContent(uri).lines().iterator()
+        val (title) = getFirstValueByRegex(lineIterator, ogTitleRegex)
+        val (posterLink) = getFirstValueByRegex(lineIterator, ogImageRegex)
+        //            val (description) = getFirstValueByRegex(lineIterator, ogDescriptionRegex)
 
-            val (date) = getFirstValueByRegex(lineIterator, dateRegex)
+        val (date) = getFirstValueByRegex(lineIterator, dateRegex)
 
-            val movie = MovieData(
-                pageId = pageId,
-                title = title,
-//                description = description,
-                link = href,
-                posterLink = posterLink
-            )
+        val movie = MovieData(
+            pageId = pageId,
+            title = title,
+            //                description = description,
+            link = href,
+            posterLink = posterLink
+        )
 
-            SourceDataEntry(movie = movie, season = null, episode = null)
-        }
+        return SourceDataEntry(movie = movie, season = null, episode = null)
     }
 
     private fun parseSeries(
-        address: URI,
+        uri: URI,
         pageId: String,
         seasonNumber: Int,
         episodeNumber: Int,
         href: String
-    ): SourceDataEntry? {
-        Log.d(this.javaClass.simpleName, "Парсим эпизод $pageId (${href})")
-        return resolveLink(address, href)?.let { url ->
-            val lineIterator = url.openConnection()
-                .apply {
-                    connectTimeout = 1000
-                    readTimeout = 3000
-                }
-                .getInputStream()
-                .use { it.readBytes().toString(Charsets.UTF_8) }
-                .lines()
-                .iterator()
-            val (seriesTitle) = getFirstValueByRegex(lineIterator, ogTitleRegex)
-            val (seriesPosterLink) = getFirstValueByRegex(lineIterator, ogImageRegex)
-//            val (episodeDescription) = getFirstValueByRegex(
-//                lineIterator,
-//                ogDescriptionRegex
-//            )
-            val (seasonPosterLink) = getFirstValueByRegex(lineIterator, seasonPosterLinkRegex)
-            val (episodeTitleRu) = getFirstValueByRegex(lineIterator, ruEpisodeTitleRegex)
-            val (episodeTitleEn) = getFirstValueByRegex(lineIterator, enEpisodeTitleRegex)
-            val (episodeDate) = getFirstValueByRegex(lineIterator, dateRegex)
+    ): SourceDataEntry {
+        Log.d(this.javaClass.simpleName, "Парсим эпизод $pageId (${uri})")
+        val lineIterator = readContent(uri).lines().iterator()
+        val (seriesTitle) = getFirstValueByRegex(lineIterator, ogTitleRegex)
+        val (seriesPosterLink) = getFirstValueByRegex(lineIterator, ogImageRegex)
+        //            val (episodeDescription) = getFirstValueByRegex(
+        //                lineIterator,
+        //                ogDescriptionRegex
+        //            )
+        val (seasonPosterLink) = getFirstValueByRegex(lineIterator, seasonPosterLinkRegex)
+        val (episodeTitleRu) = getFirstValueByRegex(lineIterator, ruEpisodeTitleRegex)
+        val (episodeTitleEn) = getFirstValueByRegex(lineIterator, enEpisodeTitleRegex)
+        val (episodeDate) = getFirstValueByRegex(lineIterator, dateRegex)
 
-            val movie = MovieData(
-                pageId = pageId,
-                title = seriesTitle,
-                link = href.split("/").take(3).joinToString(separator = "/"),
-                posterLink = seriesPosterLink
-            )
+        val movie = MovieData(
+            pageId = pageId,
+            title = seriesTitle,
+            link = href.split("/").take(3).joinToString(separator = "/"),
+            posterLink = seriesPosterLink
+        )
 
-            val season = SeasonData(
-                number = seasonNumber,
-                //у сезонов нет своего названия
-                //title = seriesTitle,
-                link = href.split("/").take(4).joinToString(separator = "/"),
-                posterLink = seasonPosterLink
-            )
+        val season = SeasonData(
+            number = seasonNumber,
+            //у сезонов нет своего названия
+            //title = seriesTitle,
+            link = href.split("/").take(4).joinToString(separator = "/"),
+            posterLink = seasonPosterLink
+        )
 
-            val episode = EpisodeData(
-                number = episodeNumber,
-                title = episodeTitleRu,
-//                description = episodeDescription,
-                link = href,
-                date = LocalDateTime.of(
-                    LocalDate.parse(episodeDate, dateFormat), LocalTime.MIN
-                ),
-                state = DataState.RELEASED
-            )
+        val episode = EpisodeData(
+            number = episodeNumber,
+            title = episodeTitleRu,
+            //                description = episodeDescription,
+            link = href,
+            date = LocalDateTime.of(
+                LocalDate.parse(episodeDate, dateFormat), LocalTime.MIN
+            ),
+            state = DataState.RELEASED
+        )
 
-            SourceDataEntry(movie, season, episode)
-        }
+        return SourceDataEntry(movie, season, episode)
     }
 
     private fun getFirstValueByRegex(
