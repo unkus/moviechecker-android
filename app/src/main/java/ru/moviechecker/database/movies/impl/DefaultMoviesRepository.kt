@@ -12,6 +12,7 @@ class DefaultMoviesRepository(private val movieDao: MovieDao) : MoviesRepository
     override fun getById(id: Int) = movieDao.getMovieById(id)
     override fun getAll() = movieDao.getMovies()
     override fun updateMovie(movie: MovieEntity) = movieDao.update(movie)
+    override fun updateKinopoiskId(id: Int, kinopoiskId: String?) = movieDao.updateKinopoiskId(id, kinopoiskId)
     override fun toggleFavoritesMark(movieId: Int) = movieDao.toggleFavoritesMark(movieId)
 
     override fun getMovieDetails(id: Int) =
@@ -27,6 +28,7 @@ class DefaultMoviesRepository(private val movieDao: MovieDao) : MoviesRepository
                         link = movie.link,
                         poster = movie.poster,
                         favoritesMark = movie.favoritesMark,
+                        kinopoiskId = movie.kinopoiskId,
                         seasons = seasons
                     )
                 }

@@ -1,6 +1,5 @@
 package ru.moviechecker.ui.movie
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -9,7 +8,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.moviechecker.database.episodes.EpisodeEntity
@@ -65,6 +63,12 @@ class MoviesViewModel(
         }
     }
 
+    fun update(id: Int, kinopoiskId: String?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            moviesRepository.updateKinopoiskId(id, kinopoiskId)
+        }
+    }
+
     fun toggleFavoritesMark(movieId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             moviesRepository.toggleFavoritesMark(movieId)
@@ -105,6 +109,7 @@ data class MovieCardModel(
     val title: String,
     val poster: ByteArray? = null,
     val favoritesMark: Boolean,
+    val kinopoiskId: String? = null,
     val seasonNumber: Int,
     val episode: EpisodeModel,
     val hasMoreEpisodes: Boolean,
@@ -121,6 +126,7 @@ data class MovieCardModel(
                 title = entity.title,
                 poster = entity.poster,
                 favoritesMark = entity.favoritesMark,
+                kinopoiskId = entity.kinopoiskId,
                 seasonNumber = entity.season.number,
                 episode = episode,
                 hasMoreEpisodes = entity.episode.number < entity.season.lastEpisodeNumber,
@@ -137,6 +143,7 @@ data class MovieCardModel(
                 title = entity.title,
                 poster = entity.poster,
                 favoritesMark = entity.favoritesMark,
+                kinopoiskId = entity.kinopoiskId,
                 seasonNumber = entity.season.number,
                 episode = episode,
                 hasMoreEpisodes = false,
@@ -156,7 +163,8 @@ data class MovieCardModel(
         if (seasonNumber != other.seasonNumber) return false
         if (hasMoreEpisodes != other.hasMoreEpisodes) return false
         if (title != other.title) return false
-//        if (!poster.contentEquals(other.poster)) return false
+        if (!poster.contentEquals(other.poster)) return false
+        if (kinopoiskId != other.kinopoiskId) return false
         if (episode != other.episode) return false
         if (updatedAt != other.updatedAt) return false
 
@@ -169,11 +177,13 @@ data class MovieCardModel(
         result = 31 * result + seasonNumber
         result = 31 * result + hasMoreEpisodes.hashCode()
         result = 31 * result + title.hashCode()
-//        result = 31 * result + (poster?.contentHashCode() ?: 0)
+        result = 31 * result + (poster?.contentHashCode() ?: 0)
+        result = 31 * result + (kinopoiskId?.hashCode() ?: 0)
         result = 31 * result + episode.hashCode()
         result = 31 * result + updatedAt.hashCode()
         return result
     }
+
 }
 
 data class EpisodeModel(
@@ -217,6 +227,7 @@ data class MovieDetailsCardModel(
     val link: String? = null,
     val poster: ByteArray? = null,
     val favoritesMark: Boolean = false,
+    val kinopoiskId: String? = null,
     val seasons: List<SeasonCardModel>
 ) {
     companion object Factory {
@@ -232,6 +243,7 @@ data class MovieDetailsCardModel(
                 link = entity.link,
                 poster = entity.poster,
                 favoritesMark = entity.favoritesMark,
+                kinopoiskId = entity.kinopoiskId,
                 seasons = entity.seasons.map { (season, episodes) ->
                     SeasonCardModel.fromEntity(season, episodes.map(EpisodeCardModel::fromEntity))
                 }
@@ -251,7 +263,8 @@ data class MovieDetailsCardModel(
         if (pageId != other.pageId) return false
         if (title != other.title) return false
         if (link != other.link) return false
-//        if (!poster.contentEquals(other.poster)) return false
+        if (!poster.contentEquals(other.poster)) return false
+        if (kinopoiskId != other.kinopoiskId) return false
         if (seasons != other.seasons) return false
 
         return true
@@ -264,10 +277,12 @@ data class MovieDetailsCardModel(
         result = 31 * result + pageId.hashCode()
         result = 31 * result + title.hashCode()
         result = 31 * result + (link?.hashCode() ?: 0)
-//        result = 31 * result + (poster?.contentHashCode() ?: 0)
+        result = 31 * result + (poster?.contentHashCode() ?: 0)
+        result = 31 * result + (kinopoiskId?.hashCode() ?: 0)
         result = 31 * result + seasons.hashCode()
         return result
     }
+
 }
 
 data class SeasonCardModel(
@@ -303,7 +318,7 @@ data class SeasonCardModel(
         if (number != other.number) return false
         if (title != other.title) return false
         if (link != other.link) return false
-//        if (!poster.contentEquals(other.poster)) return false
+        if (!poster.contentEquals(other.poster)) return false
         if (episodes != other.episodes) return false
 
         return true
@@ -314,10 +329,11 @@ data class SeasonCardModel(
         result = 31 * result + number
         result = 31 * result + (title?.hashCode() ?: 0)
         result = 31 * result + (link?.hashCode() ?: 0)
-//        result = 31 * result + (poster?.contentHashCode() ?: 0)
+        result = 31 * result + (poster?.contentHashCode() ?: 0)
         result = 31 * result + episodes.hashCode()
         return result
     }
+
 }
 
 data class EpisodeCardModel(

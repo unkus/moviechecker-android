@@ -50,7 +50,11 @@ fun NoveltiesDestination(
                         }
                     },
                     onClickOnItemFavorite = viewModel::toggleFavoritesMark,
-                    onClickOnItemViewed = { episodeId, viewedMark -> viewModel.markEpisodeViewed(episodeId) },
+                    onClickOnItemViewed = { episodeId, viewedMark ->
+                        viewModel.markEpisodeViewed(
+                            episodeId
+                        )
+                    },
                     onClickOnItemOpenInBrowser = { }
                 )
             }
@@ -61,11 +65,18 @@ fun NoveltiesDestination(
                     viewModel.loadDetails(movieId)
                     val details by viewModel.movieDetails.collectAsStateWithLifecycle()
 
-                    details?.let {
+                    details?.let { model ->
                         MovieDetailsScreen(
-                            movie = it,
+                            details = model,
+                            saveAction = { kinopoiskId ->
+                                viewModel.update(model.id, kinopoiskId)
+                            },
                             onClickOnFavorite = { viewModel.toggleFavoritesMark(movieId) },
-                            onClickOnEpisodeViewed = { episodeId, viewedMark -> viewModel.markEpisodeViewed(episodeId) },
+                            onClickOnEpisodeViewed = { episodeId, viewedMark ->
+                                viewModel.markEpisodeViewed(
+                                    episodeId
+                                )
+                            },
                             onClickOnBackArrow = {
                                 scope.launch {
                                     navigator.navigateBack()

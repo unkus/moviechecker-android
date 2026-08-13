@@ -61,9 +61,12 @@ fun CatalogDestination(
                     viewModel.loadDetails(movieId)
                     val details by viewModel.movieDetails.collectAsStateWithLifecycle()
 
-                    details?.let {
+                    details?.let { details ->
                         MovieDetailsScreen(
-                            movie = it,
+                            details = details,
+                            saveAction = { kinopoiskId ->
+                                viewModel.update(details.id, kinopoiskId)
+                            },
                             onClickOnFavorite = { viewModel.toggleFavoritesMark(movieId) },
                             onClickOnEpisodeViewed = viewModel::toggleEpisodeViewedMark,
                             onClickOnBackArrow = {

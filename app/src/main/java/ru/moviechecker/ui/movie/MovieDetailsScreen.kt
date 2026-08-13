@@ -18,14 +18,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.moviechecker.R
-import ru.moviechecker.database.episodes.EpisodeState
 import ru.moviechecker.ui.theme.MoviecheckerTheme
 import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieDetailsScreen(
-    movie: MovieDetailsCardModel,
+    details: MovieDetailsCardModel,
+    saveAction: (String) -> Unit = {},
     onClickOnFavorite: () -> Unit = {},
     onClickOnEpisodeViewed: (Int, Boolean) -> Unit = { id, isViewed -> },
     onClickOnBackArrow: () -> Unit = {},
@@ -37,7 +37,7 @@ fun MovieDetailsScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(movie.title)
+                    Text(details.title)
                 },
                 navigationIcon = {
                     IconButton(
@@ -55,11 +55,12 @@ fun MovieDetailsScreen(
         LazyColumn(contentPadding = innerPadding) {
             item {
                 MovieDetailsCard(
-                    movie = movie,
+                    movie = details,
+                    saveAction = saveAction,
                     onFavoriteIconClick = { onClickOnFavorite() }
                 )
             }
-            items(items = movie.seasons, key = { listOf(it.number) }) { season ->
+            items(items = details.seasons, key = { listOf(it.number) }) { season ->
                 MovieDetailsSeasonCard(
                     season = season,
                     isExpanded = uiState.expandedSeasonNumber == season.number,
@@ -77,7 +78,7 @@ fun MovieDetailsScreen(
 fun PreviewMovieDetailsScreen() {
     MoviecheckerTheme {
         MovieDetailsScreen(
-            movie = MovieDetailsCardModel(
+            details = MovieDetailsCardModel(
                 id = 1,
                 siteId = 1,
                 pageId = "movie_page_id",

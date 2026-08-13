@@ -15,13 +15,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,29 +43,34 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import ru.moviechecker.R
-import ru.moviechecker.database.episodes.EpisodeState
 import ru.moviechecker.ui.theme.MoviecheckerTheme
 import java.time.LocalDateTime
 
 @Composable
 fun MovieDetailsCard(
     movie: MovieDetailsCardModel,
+    saveAction: (String) -> Unit = {},
     onFavoriteIconClick: (Int) -> Unit = {}
 ) {
+    var kinopoiskId by remember { mutableStateOf(movie.kinopoiskId ?: "") }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(dimensionResource(id = R.dimen.padding_small)),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        val poster = movie.poster?:movie.seasons.last().poster
+        val poster = movie.poster ?: movie.seasons.last().poster
         poster?.let {
-            Poster(
-                it,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(CenterHorizontally)
-            )
+            Row(
+                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small))
+            ) {
+                Poster(
+                    it,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+            }
         }
         Row(
             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small))
@@ -74,6 +84,26 @@ fun MovieDetailsCard(
                 tint = if (movie.favoritesMark) Color.Yellow else Color.Gray
             )
             Text(text = if (movie.favoritesMark) "В избранном" else "Добавить в избранные")
+        }
+        Row(
+            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small))
+        ) {
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = kinopoiskId,
+                onValueChange = { kinopoiskId = it },
+                label = { Text("id на кинопоиске") },
+                placeholder = { Text("Введите id с кинопоиска") }
+            )
+        }
+        Row(
+            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small))
+        ) {
+            Button(
+                onClick = { saveAction(kinopoiskId) }
+            ) {
+                Text("Сохранить")
+            }
         }
     }
 }
@@ -209,27 +239,29 @@ fun PreviewMovieDetailsCard(
                 title = "Фильм такой-то",
                 poster = poster,
                 favoritesMark = favoritesMark,
-                seasons = listOf(SeasonCardModel(
-                    id = 1,
-                    number = 1,
-                    poster = poster,
-                    episodes = listOf(
-                        EpisodeCardModel(
-                            id = 1,
-                            number = 1,
-                            link = "stub",
-                            date = LocalDateTime.now(),
-                            viewedMark = true
-                        ),
-                        EpisodeCardModel(
-                            id = 2,
-                            number = 2,
-                            link = "stub",
-                            date = LocalDateTime.now(),
-                            viewedMark = false
+                seasons = listOf(
+                    SeasonCardModel(
+                        id = 1,
+                        number = 1,
+                        poster = poster,
+                        episodes = listOf(
+                            EpisodeCardModel(
+                                id = 1,
+                                number = 1,
+                                link = "stub",
+                                date = LocalDateTime.now(),
+                                viewedMark = true
+                            ),
+                            EpisodeCardModel(
+                                id = 2,
+                                number = 2,
+                                link = "stub",
+                                date = LocalDateTime.now(),
+                                viewedMark = false
+                            )
                         )
                     )
-                ))
+                )
             )
         )
     }

@@ -31,7 +31,7 @@ data class SeasonEntity(
 
     override fun hashCode(): Int {
         var result = movieId
-        result = 31 * result + number
+        result = 31 * result + number.hashCode()
         return result
     }
 }

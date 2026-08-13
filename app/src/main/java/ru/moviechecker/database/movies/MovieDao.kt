@@ -68,9 +68,10 @@ interface MovieDao {
                 // Тайтл
                 "movie.id as movie_id, " + // для добавления/удаления в/из избранного
                 "movie.title as movie_title, " + // для отображения если нет названия у сезона
-                "movie.poster as movie_poster, " + // для отобрадения если нет постера у сезона
+                "movie.poster as movie_poster, " + // для отображения если нет постера у сезона
                 "movie.favorites_mark as movie_favorites_mark, " + // для отображения и фильтра
                 "last_season.number as movie_last_season_number, " + // для отображения последний/не последний
+                "movie.kinopoiskId as movie_kinopoiskId, " + // для перехода на кинопоиск
 
                 // Сезон
                 // первый не просмотренный или последний просмотренный сезон
@@ -121,6 +122,7 @@ interface MovieDao {
                 "COALESCE(season.title, movie.title) as title, " +
                 "COALESCE(season.poster, movie.poster) as poster, " +
                 "movie.favorites_mark as favorites_mark, " +
+                "movie.kinopoiskId as kinopoiskId, " + // для перехода на кинопоиск
 
                 // Сайт
                 "site.id as site_id, " + // для фильтра по сайту
@@ -131,7 +133,7 @@ interface MovieDao {
                 // Тайтл
                 "movie.id as movie_id, " + // для добавления/удаления в/из избранного
                 "movie.title as movie_title, " + // для отображения если нет названия у сезона
-                "movie.poster as movie_poster, " + // для отобрадения если нет постера у сезона
+                "movie.poster as movie_poster, " + // для отображения если нет постера у сезона
                 "movie.favorites_mark as movie_favorites_mark, " + // для отображения и фильтра
                 "last_season.number as movie_last_season_number, " + // для отображения последний/не последний
 
@@ -173,6 +175,7 @@ interface MovieDao {
                 "COALESCE(season.title, movie.title) as title, " + // для отображения
                 "COALESCE(season.poster, movie.poster) as poster, " + // для отображения
                 "movie.favorites_mark as favorites_mark, " + // для отображения и фильтра
+                "movie.kinopoiskId as kinopoiskId, " + // для перехода на кинопоиск
 
                 // Сайт
                 "site.id as site_id, " + // для фильтра по сайту
@@ -210,9 +213,13 @@ interface MovieDao {
     @Update
     fun update(vararg movie: MovieEntity)
 
+    @Query("UPDATE movies SET kinopoiskId = :kinopoiskId WHERE id = :id")
+    fun updateKinopoiskId(id: Int, kinopoiskId: String?)
+
     @Delete
     fun delete(vararg movie: MovieEntity)
 
     @Query("UPDATE movies SET favorites_mark = NOT favorites_mark WHERE id = :id")
     fun toggleFavoritesMark(id: Int)
+
 }

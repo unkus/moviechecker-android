@@ -2,7 +2,6 @@ package ru.moviechecker.database.movies
 
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
-import java.net.URI
 import java.time.LocalDateTime
 
 data class ExpectedCard(
@@ -11,6 +10,7 @@ data class ExpectedCard(
     @ColumnInfo(name = "favorites_mark")
     val favoritesMark: Boolean,
     val poster: ByteArray?,
+    val kinopoiskId: String?,
 
     @Embedded(prefix = "site_")
     val site: ExpectedCardSite,

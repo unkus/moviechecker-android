@@ -27,5 +27,7 @@
             </intent-filter>
         </activity>
     </application>
-
+    <queries>
+        <package android:name="ru.kinopoisk" />
+    </queries>
 </manifest>

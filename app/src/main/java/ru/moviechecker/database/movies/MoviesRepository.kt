@@ -6,6 +6,7 @@ interface MoviesRepository {
     fun getById(id: Int): MovieEntity
     fun getAll(): List<MovieEntity>
     fun updateMovie(movie: MovieEntity)
+    fun updateKinopoiskId(id: Int, kinopoiskId: String?)
     fun toggleFavoritesMark(movieId: Int)
 
     fun getMovieDetails(id: Int): MovieDetails
@@ -15,4 +16,5 @@ interface MoviesRepository {
     fun getNoveltiesStream(): Flow<List<MovieCard>>
 
     fun getExpectedStream(): Flow<List<ExpectedCard>>
+
 }

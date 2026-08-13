@@ -10,6 +10,7 @@ data class MovieDetails(
     val pageId: String,
     val title: String,
     val link: String?,
+    val kinopoiskId: String?,
     val poster: ByteArray?,
     val favoritesMark: Boolean,
     val seasons: Map<SeasonEntity, List<EpisodeEntity>>

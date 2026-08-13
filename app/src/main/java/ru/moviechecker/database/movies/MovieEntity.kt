@@ -18,7 +18,8 @@ data class MovieEntity(
     @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
     override var poster: ByteArray? = null,
     @ColumnInfo(name = "favorites_mark")
-    override var favoritesMark: Boolean = false
+    override var favoritesMark: Boolean = false,
+    override var kinopoiskId: String? = null
 ) : IMovie {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

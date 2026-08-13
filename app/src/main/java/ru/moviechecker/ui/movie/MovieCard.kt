@@ -1,7 +1,11 @@
 package ru.moviechecker.ui.movie
 
+import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -96,12 +100,7 @@ fun MovieCard(
 
                     Icon(
                         modifier = Modifier.clickable {
-                            val browserIntent = Intent(
-                                Intent.ACTION_VIEW,
-                                card.episode.link.toString().toUri()
-                            )
-                            context.startActivity(browserIntent)
-
+                            openLink(context, card)
                             onClickOnOpenInBrowser(card.episode.id)
                         },
                         imageVector = ImageVector.vectorResource(R.drawable.open_in_new_24px),
@@ -113,7 +112,12 @@ fun MovieCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        modifier = Modifier.clickable { onClickOnViewed(card.episode.id, card.episode.viewedMark) },
+                        modifier = Modifier.clickable {
+                            onClickOnViewed(
+                                card.episode.id,
+                                card.episode.viewedMark
+                            )
+                        },
                         imageVector = ImageVector.vectorResource(R.drawable.check_24px),
                         contentDescription = null,
                         tint = if (card.episode.viewedMark) Color.Green else Color.Gray
@@ -144,6 +148,40 @@ fun MovieCard(
                 }
             }
         }
+    }
+}
+
+fun openLink(context: Context, card: MovieCardModel) {
+    val intent = Intent(Intent.ACTION_VIEW)
+    intent.data = card.episode.link.toString().toUri()
+
+    card.kinopoiskId?.let { id ->
+        val packageName = "ru.kinopoisk" // Пакетное имя приложения «Кинопоиск»
+
+        // Проверяем, установлено ли приложение
+        try {
+            val packageManager = context.packageManager
+            packageManager.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(0))
+
+            // Приложение установлено — указываем его явно
+            intent.setPackage(packageName)
+            // TODO: разобраться с открытием приложения -
+            //  открытие через hd.kinopoisk.ru не происходит
+            intent.data = "https://hd.kinopoisk.ru/film/${card.kinopoiskId}".toUri()
+        } catch (e: PackageManager.NameNotFoundException) {
+            // Приложение не установлено — оставляем intent без setPackage, откроется браузер
+            intent.data = "https://hd.kinopoisk.ru/film/${card.kinopoiskId}?content_tab=series&season=${card.seasonNumber}&episode=${card.episode.number}&watch=".toUri()
+        }
+    }
+
+    // Добавляем флаги для корректной работы
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+    try {
+        context.startActivity(intent)
+    } catch (e: ActivityNotFoundException) {
+        // Если не удалось запустить ни приложение, ни браузер
+        Toast.makeText(context, "Не удалось открыть ссылку", Toast.LENGTH_SHORT).show()
     }
 }
 

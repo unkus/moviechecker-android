@@ -105,10 +105,6 @@ class LostfilmDataSource : StrictDataSource("lostfilm", "https://www.lostfilm.tv
         )
     }
 
-    private fun resolveLink(address: URI, href: String): URL? {
-        return address.resolve(href).toURL()
-    }
-
     private fun parseMovie(
         uri: URI,
         pageId: String,

@@ -246,6 +246,13 @@ fun NavigationRootPreview(
                             TODO("Not yet implemented")
                         }
 
+                        override fun updateKinopoiskId(
+                            id: Int,
+                            kinopoiskId: String?
+                        ) {
+                            TODO("Not yet implemented")
+                        }
+
                         override fun toggleFavoritesMark(movieId: Int) {
                             TODO("Not yet implemented")
                         }
@@ -258,7 +265,7 @@ fun NavigationRootPreview(
                             return emptyFlow()
                         }
 
-                        override fun getNewReleasesStream(): Flow<List<MovieCard>> {
+                        override fun getNoveltiesStream(): Flow<List<MovieCard>> {
                             return emptyFlow()
                         }
 
