@@ -135,11 +135,7 @@ fun MovieDetailsSeasonCard(
             ) {
                 season.title
                     ?.let { title ->
-                        if (title.endsWith(season.number.toString())) {
-                            Text(text = title)
-                        } else {
-                            Text(text = "$title ${season.number}")
-                        }
+                        Text(text = "$title (${season.number})")
                     }
                     ?: Text(
                         text = stringResource(R.string.season_title, season.number, "")
@@ -280,6 +276,7 @@ fun PreviewMovieDetailsSeasonCard() {
             season = SeasonCardModel(
                 id = 1,
                 number = 1,
+                title = "Заголовок сезона",
                 poster = poster,
                 episodes = listOf(
                     EpisodeCardModel(

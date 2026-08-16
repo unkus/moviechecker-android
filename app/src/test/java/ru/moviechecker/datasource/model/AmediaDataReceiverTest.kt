@@ -7,15 +7,15 @@ import io.mockk.mockkStatic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.junit.Assert.assertNotEquals
-import org.junit.Before
-import org.junit.Test
 import ru.moviechecker.datasource.AmediaDataSource
 import java.net.URI
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertNotEquals
 
 class AmediaDataReceiverTest {
 
-    @Before
+    @BeforeTest
     fun setUp() {
         mockkStatic(Log::class)
 
@@ -29,7 +29,9 @@ class AmediaDataReceiverTest {
         every { anyConstructed<SiteData>().address } returns URI.create(javaClass.getResource("amedia/amedia.html")!!.toString())
 
         CoroutineScope(Dispatchers.IO).launch {
-            val sourceData = AmediaDataSource().retrieveData()
+            val sourceData = AmediaDataSource().retrieveData(
+                uri = URI.create("")
+            )
             assertNotEquals(0, sourceData.entries.size)
             sourceData.entries.forEach { r -> println(r) }
         }

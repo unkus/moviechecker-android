@@ -20,15 +20,21 @@ import java.time.format.DateTimeFormatter
 private const val PATTERN_SITE_TITLE = "<title>(?<title>.*) -.*</title>"
 
 // <a class="ftop-item d-flex has-overlay" href="/1593-moj-djejmon.html">
+// <a class="ftop-item d-flex has-overlay" href="/2370-voennaja-hronika-malenkoj-devochki-2.html">
+// <a class="ftop-item d-flex has-overlay" href="/2371-klevatess-2-korol-demonicheskih-zverej-i-legenda-o-lozhnom-geroe.html">
+// <a class="ftop-item d-flex has-overlay" href="/2340-adskij-rezhim-gejmer-kotoryj-ljubit-spidran-stanovitsja-bespodobnym-v-parallelnom-mire-s-ustarevshimi-nastrojkami-2.html">
 private const val PATTERN_EPISODE_LINK =
-    "<a class=\"ftop-item d-flex has-overlay\" href=\"(?<href>/(?<id>\\d+)-(?:(?<pageId1>.+)-(?<seasonNumber>\\d+)|(?<pageId2>.+))\\.html)\">"
+    """<a class="ftop-item d-flex has-overlay" href="(?<seasonPage>/(?<seasonPageId>\d+-(?<mnemonic>.*?))\.html)">"""
 
 // <img src="/uploads/posts/2023-12/thumbs/fhk1xclgnqldcwyf__6895b8df64dcf260929c7c58a83a81e7.webp" alt="постер к аниме Мой Дэймон" >
 private const val PATTERN_IMG_SRC = "<img src=\"(?<imgSrc>.*)\" alt=\".*\""
 
 // <div class="ftop-item__title  line-clamp">Мой Дэймон </div>
+// <div class="ftop-item__title  line-clamp">Старик из деревни становится Святым мечом 2 </div>
+// <div class="ftop-item__title  line-clamp">Клеватесс 2: Король демонических зверей и легенда о ложном герое </div>
+// <div class="ftop-item__title  line-clamp">Адский режим: Геймер, который любит спидран, становится бесподобным в параллельном мире с устаревшими настройками 2 </div>
 private const val PATTERN_TITLE =
-    "<div class=\"ftop-item__title +line-clamp\">(?<title>.*)</div>"
+    """<div class="ftop-item__title +line-clamp">(?<movieTitle>.*?)\s*(?<seasonNumber>\d{1,2})?(?::\s*(?<seasonTitle>.+?))?\s*(?<seasonNumber2>\d{1,2})?\s*</div>"""
 
 // <div class="ftop-item__meta poster__subtitle line-clamp">Сегодня, 17:13</div>
 private const val PATTERN_DATE_TIME =
@@ -56,21 +62,18 @@ class AmediaDataSource : StrictDataSource("amedia", "https://amedia.online") {
 
         while (lineIterator.hasNext()) {
             try {
-                val (href, id, pageId1, seasonNumber, pageId2) = getFirstValueByRegex(
+                val (seasonPage, seasonPageId, movieMnemonic) = getFirstValueByRegex(
                     lineIterator,
                     episodeLinkRegex
                 )
 
                 val (imgSrc) = getFirstValueByRegex(lineIterator, posterRegex)
 
-                val (parsedTitle) = getFirstValueByRegex(lineIterator, titleRegex)
-                val seasonTitle = parsedTitle.trim()
-                val movieTitle =
-                    if (seasonNumber.isNotEmpty()) seasonTitle.dropLast(seasonNumber.length + 1)
-                        .trim() else seasonTitle
+                val (movieTitle, seasonNumber1, seasonTitle, seasonNumber2) = getFirstValueByRegex(lineIterator, titleRegex)
+                val seasonNumber = seasonNumber1.ifBlank{ seasonNumber2 }
 
                 val (dateString, timeString) = getFirstValueByRegex(lineIterator, dateTimeRegex)
-                Log.d(this.javaClass.simpleName, "$seasonTitle - $dateString $timeString")
+                Log.d(this.javaClass.simpleName, "$movieTitle - $dateString $timeString")
 
                 // @formatter:off
                 /*
@@ -98,8 +101,9 @@ class AmediaDataSource : StrictDataSource("amedia", "https://amedia.online") {
 
                 val (episodeNumber) = getFirstValueByRegex(lineIterator, episodeNumberRegex)
 
+                val moviePageId = if (seasonNumber.isBlank()) movieMnemonic else movieMnemonic.substringBeforeLast("-$seasonNumber")
                 val movie = MovieData(
-                    pageId = pageId1.ifBlank { pageId2 },
+                    pageId = moviePageId,
                     title = movieTitle
                 )
                 Log.d(this.javaClass.simpleName, "movie=$movie")
@@ -107,14 +111,14 @@ class AmediaDataSource : StrictDataSource("amedia", "https://amedia.online") {
                 val season = SeasonData(
                     number = seasonNumber.ifBlank { "1" }.toInt(),
                     title = if (seasonTitle.startsWith(movieTitle)) null else seasonTitle,
-                    link = href,
+                    link = seasonPage,
                     posterLink = imgSrc
                 )
                 Log.d(this.javaClass.simpleName, "season=$season")
 
                 val episode = EpisodeData(
                     number = episodeNumber.toInt(),
-                    link = "/$id-${pageId1.ifBlank { pageId2 }}${if (seasonNumber.isNotBlank()) "-$seasonNumber" else ""}/episode/$episodeNumber/seriya-onlayn.html",
+                    link = "/$seasonPageId/episode/$episodeNumber/seriya-onlayn.html",
                     date = releaseTime,
                     state = if (dateString == "Новая серия в") DataState.EXPECTED else DataState.RELEASED
                 )

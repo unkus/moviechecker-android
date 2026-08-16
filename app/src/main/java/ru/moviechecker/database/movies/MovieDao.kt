@@ -55,7 +55,7 @@ interface MovieDao {
                 ") " +
                 "SELECT " +
                 "movie.id as id, " +
-                "COALESCE(season.title, movie.title) as title, " +
+                "movie.title as title, " +
                 "COALESCE(season.poster, movie.poster) as poster, " +
                 "movie.favorites_mark as favorites_mark, " +
 
@@ -119,7 +119,7 @@ interface MovieDao {
                 ") " +
                 "SELECT " +
                 "movie.id as id, " +
-                "COALESCE(season.title, movie.title) as title, " +
+                "movie.title as title, " +
                 "COALESCE(season.poster, movie.poster) as poster, " +
                 "movie.favorites_mark as favorites_mark, " +
                 "movie.kinopoiskId as kinopoiskId, " + // для перехода на кинопоиск
@@ -172,7 +172,7 @@ interface MovieDao {
     @Query(
         "SELECT " +
                 "movie.id as id, " +
-                "COALESCE(season.title, movie.title) as title, " + // для отображения
+                "movie.title as title, " + // для отображения
                 "COALESCE(season.poster, movie.poster) as poster, " + // для отображения
                 "movie.favorites_mark as favorites_mark, " + // для отображения и фильтра
                 "movie.kinopoiskId as kinopoiskId, " + // для перехода на кинопоиск
@@ -189,6 +189,7 @@ interface MovieDao {
                 // Сезон
                 "season.id as season_id, " +
                 "season.number as season_number, " + // для отображения если нет названия
+                "season.title as season_title, " + // для отображения
 
                 // Эпизод
                 "episode.id as episode_id, " +

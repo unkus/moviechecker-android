@@ -1,22 +1,23 @@
-package ru.moviechecker.datasource
+package ru.moviechecker.datasource.lostfilm
 
 import android.util.Log
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.spyk
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
-import org.junit.Before
-import org.junit.Test
+import ru.moviechecker.datasource.LostfilmDataSource
 import ru.moviechecker.datasource.model.DataState
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 internal class LostfilmDataSourceTest {
 
-    @Before
+    @BeforeTest
     fun setUp() {
         mockkStatic(Log::class)
 
@@ -47,13 +48,13 @@ internal class LostfilmDataSourceTest {
         val sourceData = dataSource.retrieveData(address)
         assertEquals("LostFilm.TV", sourceData.site.title)
         assertEquals(
-            "Количество полученных записей не соответствует ожиданию",
             4,
-            sourceData.entries.size
+            sourceData.entries.size,
+            "Количество полученных записей не соответствует ожиданию"
         )
         val mufasaTheLionKing =
             sourceData.entries.firstOrNull { it.movie.pageId == "Mufasa_The_Lion_King" }
-        assertNotNull("Запись \"Муфаса: Король Лев\" не найдена", mufasaTheLionKing)
+        assertNotNull(mufasaTheLionKing, "Запись \"Муфаса: Король Лев\" не найдена")
         assertEquals("Муфаса: Король Лев", mufasaTheLionKing!!.movie.title)
         assertEquals("/movies/Mufasa_The_Lion_King", mufasaTheLionKing.movie.link)
         assertEquals(
@@ -64,8 +65,8 @@ internal class LostfilmDataSourceTest {
         assertNull(mufasaTheLionKing.episode)
 
         val euphoria = sourceData.entries.firstOrNull { it.movie.pageId == "Euphoria" }
-        assertNotNull("Запись \"Эйфория\" не найдена", euphoria)
-        assertEquals("Эйфория", euphoria!!.movie.title)
+        assertNotNull(euphoria, "Запись \"Эйфория\" не найдена")
+        assertEquals("Эйфория", euphoria.movie.title)
         assertEquals("/series/Euphoria", euphoria.movie.link)
         assertEquals(
             "/Static/Images/915/Posters/e_999_1.jpg",
@@ -92,8 +93,8 @@ internal class LostfilmDataSourceTest {
         )
 
         val severance = sourceData.entries.firstOrNull { it.movie.pageId == "Severance" }
-        assertNotNull("Запись \"Разделение\" не найдена", severance)
-        assertEquals("Разделение", severance!!.movie.title)
+        assertNotNull(severance, "Запись \"Разделение\" не найдена")
+        assertEquals("Разделение", severance.movie.title)
         assertEquals("/series/Severance", severance.movie.link)
         assertEquals(
             "/Static/Images/651/Posters/e_2_6.jpg",
@@ -120,8 +121,8 @@ internal class LostfilmDataSourceTest {
         )
 
         val surrealEstate = sourceData.entries.firstOrNull { it.movie.pageId == "SurrealEstate" }
-        assertNotNull("Запись \"Сюрриэлторы\" не найдена", surrealEstate)
-        assertEquals("Сюрриэлторы", surrealEstate!!.movie.title)
+        assertNotNull(surrealEstate, "Запись \"Сюрриэлторы\" не найдена")
+        assertEquals("Сюрриэлторы", surrealEstate.movie.title)
         assertEquals("/series/SurrealEstate", surrealEstate.movie.link)
         assertEquals("/series/SurrealEstate/season_3/episode_3", surrealEstate.episode?.link)
     }

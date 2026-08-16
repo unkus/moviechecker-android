@@ -15,8 +15,10 @@ import ru.moviechecker.database.episodes.EpisodeState
 import ru.moviechecker.database.episodes.EpisodesRepository
 import ru.moviechecker.database.movies.ExpectedCard
 import ru.moviechecker.database.movies.ExpectedCardEpisode
+import ru.moviechecker.database.movies.ExpectedCardSeason
 import ru.moviechecker.database.movies.MovieCard
 import ru.moviechecker.database.movies.MovieCardEpisode
+import ru.moviechecker.database.movies.MovieCardSeason
 import ru.moviechecker.database.movies.MovieDetails
 import ru.moviechecker.database.movies.MoviesRepository
 import ru.moviechecker.database.seasons.SeasonEntity
@@ -38,7 +40,10 @@ class MoviesViewModel(
         )
 
     val expected = moviesRepository.getExpectedStream()
-        .map { it.map(MovieCardModel::fromEntity) }
+        .map {
+            it.filter { item -> item.episode.date > LocalDateTime.now() }
+                .map(MovieCardModel::fromEntity)
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000L),
@@ -110,7 +115,7 @@ data class MovieCardModel(
     val poster: ByteArray? = null,
     val favoritesMark: Boolean,
     val kinopoiskId: String? = null,
-    val seasonNumber: Int,
+    val season: SeasonModel,
     val episode: EpisodeModel,
     val hasMoreEpisodes: Boolean,
     val updatedAt: LocalDateTime
@@ -119,6 +124,7 @@ data class MovieCardModel(
 
         fun fromEntity(entity: MovieCard): MovieCardModel {
             val host = if (entity.site.useMirror) entity.site.mirror else entity.site.address
+            val season = SeasonModel.fromEntity(entity.season)
             val episode =
                 EpisodeModel.fromEntity(entity.episode, URI.create("${host}${entity.episode.link}"))
             return MovieCardModel(
@@ -127,7 +133,7 @@ data class MovieCardModel(
                 poster = entity.poster,
                 favoritesMark = entity.favoritesMark,
                 kinopoiskId = entity.kinopoiskId,
-                seasonNumber = entity.season.number,
+                season = season,
                 episode = episode,
                 hasMoreEpisodes = entity.episode.number < entity.season.lastEpisodeNumber,
                 updatedAt = entity.season.lastEpisodeDate
@@ -136,6 +142,7 @@ data class MovieCardModel(
 
         fun fromEntity(entity: ExpectedCard): MovieCardModel {
             val host = if (entity.site.useMirror) entity.site.mirror else entity.site.address
+            val season = SeasonModel.fromEntity(entity.season)
             val episode =
                 EpisodeModel.fromEntity(entity.episode, URI.create("${host}${entity.episode.link}"))
             return MovieCardModel(
@@ -144,7 +151,7 @@ data class MovieCardModel(
                 poster = entity.poster,
                 favoritesMark = entity.favoritesMark,
                 kinopoiskId = entity.kinopoiskId,
-                seasonNumber = entity.season.number,
+                season = season,
                 episode = episode,
                 hasMoreEpisodes = false,
                 updatedAt = entity.episode.date
@@ -160,11 +167,11 @@ data class MovieCardModel(
 
         if (id != other.id) return false
         if (favoritesMark != other.favoritesMark) return false
-        if (seasonNumber != other.seasonNumber) return false
         if (hasMoreEpisodes != other.hasMoreEpisodes) return false
         if (title != other.title) return false
         if (!poster.contentEquals(other.poster)) return false
         if (kinopoiskId != other.kinopoiskId) return false
+        if (season != other.season) return false
         if (episode != other.episode) return false
         if (updatedAt != other.updatedAt) return false
 
@@ -174,16 +181,37 @@ data class MovieCardModel(
     override fun hashCode(): Int {
         var result = id
         result = 31 * result + favoritesMark.hashCode()
-        result = 31 * result + seasonNumber
         result = 31 * result + hasMoreEpisodes.hashCode()
         result = 31 * result + title.hashCode()
         result = 31 * result + (poster?.contentHashCode() ?: 0)
         result = 31 * result + (kinopoiskId?.hashCode() ?: 0)
+        result = 31 * result + season.hashCode()
         result = 31 * result + episode.hashCode()
         result = 31 * result + updatedAt.hashCode()
         return result
     }
 
+}
+
+data class SeasonModel(
+    val number: Int,
+    val title: String? = null
+) {
+    companion object Factory {
+        fun fromEntity(entity: MovieCardSeason): SeasonModel {
+            return SeasonModel(
+                number = entity.number,
+                title = entity.title
+            )
+        }
+
+        fun fromEntity(entity: ExpectedCardSeason): SeasonModel {
+            return SeasonModel(
+                number = entity.number,
+                title = entity.title
+            )
+        }
+    }
 }
 
 data class EpisodeModel(
