@@ -74,6 +74,8 @@ dependencies {
     androidTestImplementation(libs.androidx.test.ext.junit)
 
     testImplementation(libs.mockk)
+    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit"))
 
     debugImplementation(libs.androidx.ui.tooling)
 
