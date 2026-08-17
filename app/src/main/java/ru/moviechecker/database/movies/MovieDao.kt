@@ -58,6 +58,7 @@ interface MovieDao {
                 "movie.title as title, " +
                 "COALESCE(season.poster, movie.poster) as poster, " +
                 "movie.favorites_mark as favorites_mark, " +
+                "movie.kinopoiskId askinopoiskId, " +
 
                 // Сайт
                 "site.id as site_id, " + // для фильтра по сайту
@@ -136,6 +137,7 @@ interface MovieDao {
                 "movie.poster as movie_poster, " + // для отображения если нет постера у сезона
                 "movie.favorites_mark as movie_favorites_mark, " + // для отображения и фильтра
                 "last_season.number as movie_last_season_number, " + // для отображения последний/не последний
+                "movie.kinopoiskId as movie_kinopoiskId, " + // для перехода на кинопоиск
 
                 // Сезон
                 // первый не просмотренный или последний просмотренный сезон

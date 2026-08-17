@@ -54,8 +54,7 @@ fun NoveltiesDestination(
                         viewModel.markEpisodeViewed(
                             episodeId
                         )
-                    },
-                    onClickOnItemOpenInBrowser = { }
+                    }
                 )
             }
         },

@@ -54,7 +54,8 @@ fun MovieCard(
     cardProvider: () -> MovieCardModel,
     onClick: (Int) -> Unit = {},
     onClickOnFavorite: (Int) -> Unit = {},
-    onClickOnViewed: (Int, Boolean) -> Unit = { id, isViewed -> }
+    onClickOnViewed: (Int, Boolean) -> Unit = { id, isViewed -> },
+    onActionPerformed: (Int) -> Unit = {}
 ) {
     val card = cardProvider()
 
@@ -80,7 +81,8 @@ fun MovieCard(
                     .weight(1f)
                     .fillMaxHeight(),
                 onClickOnFavorite = onClickOnFavorite,
-                onClickOnViewed = onClickOnViewed
+                onClickOnViewed = onClickOnViewed,
+                onActionPerformed = onActionPerformed
             )
         }
     }
@@ -91,7 +93,8 @@ fun DataSection(
     card: MovieCardModel,
     modifier: Modifier = Modifier,
     onClickOnFavorite: (Int) -> Unit = {},
-    onClickOnViewed: (Int, Boolean) -> Unit = { id, isViewed -> }
+    onClickOnViewed: (Int, Boolean) -> Unit = { id, isViewed -> },
+    onActionPerformed: (Int) -> Unit = {}
 ) {
     val lastSeason =
         true // TODO: lastSeasonId == (nextSeasonId ?: lastSeasonId)
@@ -119,7 +122,7 @@ fun DataSection(
                 fontWeight = FontWeight.Bold
             )
 
-            ActionSection(card = card)
+            ActionSection(card = card, onActionPerformed = onActionPerformed)
         }
 
         Row {

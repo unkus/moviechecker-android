@@ -37,7 +37,8 @@ fun MovieList(
                     cardProvider = { card },
                     onClick = onClickOnItem,
                     onClickOnFavorite = onClickOnItemFavorite,
-                    onClickOnViewed = onClickOnItemViewed
+                    onClickOnViewed = onClickOnItemViewed,
+                    onActionPerformed = onClickOnItemOpenInBrowser
                 )
             }
         }
