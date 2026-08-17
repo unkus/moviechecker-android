@@ -1,15 +1,14 @@
 package ru.moviechecker.ui.main
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 
@@ -21,11 +20,11 @@ fun MainScreen(
     actions: @Composable () -> Unit,
     content: @Composable (innerPadding: PaddingValues) -> Unit,
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         errorViewModel.errorEvent.collect { error ->
-            snackbarHostState.showSnackbar(error)
+            Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -35,9 +34,6 @@ fun MainScreen(
                 title = { Text(stringResource(label)) },
                 actions = { actions() }
             )
-        },
-        snackbarHost = {
-            SnackbarHost(snackbarHostState)
         }
     ) { innerPadding ->
         content(innerPadding)
