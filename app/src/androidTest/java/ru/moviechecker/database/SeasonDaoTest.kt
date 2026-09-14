@@ -10,11 +10,11 @@ import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import ru.moviechecker.database.episodes.EpisodeDao
-import ru.moviechecker.database.episodes.EpisodeEntity
-import ru.moviechecker.database.episodes.EpisodeState
-import ru.moviechecker.database.seasons.SeasonDao
-import ru.moviechecker.database.seasons.SeasonEntity
+import ru.moviechecker.database.episode.EpisodeDao
+import ru.moviechecker.database.episode.EpisodeEntity
+import ru.moviechecker.database.episode.EpisodeState
+import ru.moviechecker.database.season.SeasonDao
+import ru.moviechecker.database.season.SeasonEntity
 import java.time.LocalDateTime
 
 @RunWith(AndroidJUnit4::class)

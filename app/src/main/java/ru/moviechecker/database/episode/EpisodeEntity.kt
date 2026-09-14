@@ -1,4 +1,4 @@
-package ru.moviechecker.database.episodes
+package ru.moviechecker.database.episode
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

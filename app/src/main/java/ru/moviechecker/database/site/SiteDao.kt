@@ -1,4 +1,4 @@
-package ru.moviechecker.database.sites
+package ru.moviechecker.database.site
 
 import androidx.room.Dao
 import androidx.room.Delete

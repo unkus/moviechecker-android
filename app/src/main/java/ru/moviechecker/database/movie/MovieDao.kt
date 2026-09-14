@@ -1,4 +1,4 @@
-package ru.moviechecker.database.movies
+package ru.moviechecker.database.movie
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -7,9 +7,9 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
-import ru.moviechecker.database.episodes.EpisodeEntity
-import ru.moviechecker.database.seasons.SeasonEntity
-import ru.moviechecker.database.sites.SiteEntity
+import ru.moviechecker.database.episode.EpisodeEntity
+import ru.moviechecker.database.season.SeasonEntity
+import ru.moviechecker.database.site.SiteEntity
 
 @Dao
 interface MovieDao {

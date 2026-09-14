@@ -22,19 +22,19 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import ru.moviechecker.database.AppContainer
-import ru.moviechecker.database.episodes.EpisodeEntity
-import ru.moviechecker.database.episodes.EpisodeState
-import ru.moviechecker.database.episodes.EpisodesRepository
-import ru.moviechecker.database.movies.ExpectedCard
-import ru.moviechecker.database.movies.MovieCard
-import ru.moviechecker.database.movies.MovieDetails
-import ru.moviechecker.database.movies.MovieEntity
-import ru.moviechecker.database.movies.MoviesRepository
-import ru.moviechecker.database.seasons.SeasonEntity
-import ru.moviechecker.database.seasons.SeasonWithEpisodes
-import ru.moviechecker.database.seasons.SeasonsRepository
-import ru.moviechecker.database.sites.SiteEntity
-import ru.moviechecker.database.sites.SitesRepository
+import ru.moviechecker.database.episode.EpisodeEntity
+import ru.moviechecker.database.episode.EpisodeState
+import ru.moviechecker.database.episode.EpisodeRepository
+import ru.moviechecker.database.movie.ExpectedCard
+import ru.moviechecker.database.movie.MovieCard
+import ru.moviechecker.database.movie.MovieDetails
+import ru.moviechecker.database.movie.MovieEntity
+import ru.moviechecker.database.movie.MovieRepository
+import ru.moviechecker.database.season.SeasonEntity
+import ru.moviechecker.database.season.SeasonWithEpisodes
+import ru.moviechecker.database.season.SeasonRepository
+import ru.moviechecker.database.site.SiteEntity
+import ru.moviechecker.database.site.SiteRepository
 import ru.moviechecker.ui.SearchAction
 import ru.moviechecker.ui.ShowNonFavoritesAction
 import ru.moviechecker.ui.ShowViewedAction
@@ -130,8 +130,8 @@ fun NavigationRoot(
                     innerPadding = innerPadding,
                     viewModel = viewModel(
                         factory = MoviesViewModel.provideFactory(
-                            moviesRepository = appContainer.moviesRepository,
-                            episodesRepository = appContainer.episodesRepository
+                            movieRepository = appContainer.movieRepository,
+                            episodeRepository = appContainer.episodeRepository
                         )
                     )
                 )
@@ -140,8 +140,8 @@ fun NavigationRoot(
                     innerPadding = innerPadding,
                     viewModel = viewModel(
                         factory = MoviesViewModel.provideFactory(
-                            moviesRepository = appContainer.moviesRepository,
-                            episodesRepository = appContainer.episodesRepository
+                            movieRepository = appContainer.movieRepository,
+                            episodeRepository = appContainer.episodeRepository
                         )
                     )
                 )
@@ -150,15 +150,15 @@ fun NavigationRoot(
                     innerPadding = innerPadding,
                     viewModel = viewModel(
                         factory = MoviesViewModel.provideFactory(
-                            moviesRepository = appContainer.moviesRepository,
-                            episodesRepository = appContainer.episodesRepository
+                            movieRepository = appContainer.movieRepository,
+                            episodeRepository = appContainer.episodeRepository
                         )
                     )
                 )
 
                 AppDestinations.SITES -> SitesDestination(
                     innerPadding = innerPadding,
-                    viewModel = viewModel(factory = SitesViewModel.provideFactory(appContainer.sitesRepository))
+                    viewModel = viewModel(factory = SitesViewModel.provideFactory(appContainer.siteRepository))
                 )
             }
         }
@@ -173,8 +173,8 @@ fun NavigationRootPreview(
     MoviecheckerTheme {
         NavigationRoot(
             appContainer = object : AppContainer {
-                override val episodesRepository: EpisodesRepository
-                    get() = object : EpisodesRepository {
+                override val episodeRepository: EpisodeRepository
+                    get() = object : EpisodeRepository {
                         override fun getAllStream(): Flow<List<EpisodeEntity>> {
                             return emptyFlow()
                         }
@@ -214,8 +214,8 @@ fun NavigationRootPreview(
                             TODO("Not yet implemented")
                         }
                     }
-                override val seasonsRepository: SeasonsRepository
-                    get() = object : SeasonsRepository {
+                override val seasonRepository: SeasonRepository
+                    get() = object : SeasonRepository {
                         override fun updateSeason(season: SeasonEntity) {
                             TODO("Not yet implemented")
                         }
@@ -232,8 +232,8 @@ fun NavigationRootPreview(
                             return emptyFlow()
                         }
                     }
-                override val moviesRepository: MoviesRepository
-                    get() = object : MoviesRepository {
+                val movieRepository: MovieRepository
+                    get() = object : MovieRepository {
                         override fun getById(id: Int): MovieEntity {
                             TODO("Not yet implemented")
                         }
@@ -273,8 +273,8 @@ fun NavigationRootPreview(
                             TODO("Not yet implemented")
                         }
                     }
-                override val sitesRepository: SitesRepository
-                    get() = object : SitesRepository {
+                override val siteRepository: SiteRepository
+                    get() = object : SiteRepository {
                         override fun findById(id: Int): SiteEntity? {
                             TODO("Not yet implemented")
                         }

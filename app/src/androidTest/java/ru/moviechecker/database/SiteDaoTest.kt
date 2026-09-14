@@ -11,9 +11,8 @@ import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import ru.moviechecker.database.sites.SiteDao
-import ru.moviechecker.database.sites.SiteEntity
-import java.net.URI
+import ru.moviechecker.database.site.SiteDao
+import ru.moviechecker.database.site.SiteEntity
 
 @RunWith(AndroidJUnit4::class)
 class SiteDaoTest {

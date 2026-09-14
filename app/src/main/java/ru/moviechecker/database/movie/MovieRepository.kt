@@ -1,8 +1,8 @@
-package ru.moviechecker.database.movies
+package ru.moviechecker.database.movie
 
 import kotlinx.coroutines.flow.Flow
 
-interface MoviesRepository {
+interface MovieRepository {
     fun getById(id: Int): MovieEntity
     fun getAll(): List<MovieEntity>
     fun updateMovie(movie: MovieEntity)

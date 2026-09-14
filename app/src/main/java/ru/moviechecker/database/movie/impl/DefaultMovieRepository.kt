@@ -1,14 +1,14 @@
-package ru.moviechecker.database.movies.impl
+package ru.moviechecker.database.movie.impl
 
 import kotlinx.coroutines.flow.Flow
-import ru.moviechecker.database.movies.ExpectedCard
-import ru.moviechecker.database.movies.MovieCard
-import ru.moviechecker.database.movies.MovieDao
-import ru.moviechecker.database.movies.MovieDetails
-import ru.moviechecker.database.movies.MovieEntity
-import ru.moviechecker.database.movies.MoviesRepository
+import ru.moviechecker.database.movie.ExpectedCard
+import ru.moviechecker.database.movie.MovieCard
+import ru.moviechecker.database.movie.MovieDao
+import ru.moviechecker.database.movie.MovieDetails
+import ru.moviechecker.database.movie.MovieEntity
+import ru.moviechecker.database.movie.MovieRepository
 
-class DefaultMoviesRepository(private val movieDao: MovieDao) : MoviesRepository {
+class DefaultMovieRepository(private val movieDao: MovieDao) : MovieRepository {
     override fun getById(id: Int) = movieDao.getMovieById(id)
     override fun getAll() = movieDao.getMovies()
     override fun updateMovie(movie: MovieEntity) = movieDao.update(movie)

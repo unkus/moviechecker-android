@@ -1,43 +1,43 @@
 package ru.moviechecker.database
 
 import android.content.Context
-import ru.moviechecker.database.episodes.impl.DefaultEpisodesRepository
-import ru.moviechecker.database.episodes.EpisodesRepository
-import ru.moviechecker.database.movies.impl.DefaultMoviesRepository
-import ru.moviechecker.database.movies.MoviesRepository
-import ru.moviechecker.database.seasons.impl.DefaultSeasonsRepository
-import ru.moviechecker.database.seasons.SeasonsRepository
-import ru.moviechecker.database.sites.SitesRepository
-import ru.moviechecker.database.sites.impl.DefaultSitesRepository
+import ru.moviechecker.database.episode.impl.DefaultEpisodeRepository
+import ru.moviechecker.database.episode.EpisodeRepository
+import ru.moviechecker.database.movie.impl.DefaultMovieRepository
+import ru.moviechecker.database.movie.MovieRepository
+import ru.moviechecker.database.season.impl.DefaultSeasonRepository
+import ru.moviechecker.database.season.SeasonRepository
+import ru.moviechecker.database.site.SiteRepository
+import ru.moviechecker.database.site.impl.DefaultSiteRepository
 
 /**
  * App container for Dependency injection.
  */
 interface AppContainer {
-    val episodesRepository: EpisodesRepository
-    val seasonsRepository: SeasonsRepository
-    val moviesRepository: MoviesRepository
-    val sitesRepository: SitesRepository
+    val episodeRepository: EpisodeRepository
+    val seasonRepository: SeasonRepository
+    val movieRepository: MovieRepository
+    val siteRepository: SiteRepository
 }
 
 /**
- * [AppContainer] implementation that provides instance of [EpisodesRepository] and [MoviesRepository]
+ * [AppContainer] implementation that provides instance of [EpisodeRepository] and [MovieRepository]
  */
 class DefaultAppContainer(private val context: Context) : AppContainer {
 
-    override val episodesRepository: EpisodesRepository by lazy {
-        DefaultEpisodesRepository(CheckerDatabase.getDatabase(context).episodeDao())
+    override val episodeRepository: EpisodeRepository by lazy {
+        DefaultEpisodeRepository(CheckerDatabase.getDatabase(context).episodeDao())
     }
 
-    override val seasonsRepository: SeasonsRepository by lazy {
-        DefaultSeasonsRepository(CheckerDatabase.getDatabase(context).seasonDao())
+    override val seasonRepository: SeasonRepository by lazy {
+        DefaultSeasonRepository(CheckerDatabase.getDatabase(context).seasonDao())
     }
 
-    override val moviesRepository: MoviesRepository by lazy {
-        DefaultMoviesRepository(CheckerDatabase.getDatabase(context).movieDao())
+    override val movieRepository: MovieRepository by lazy {
+        DefaultMovieRepository(CheckerDatabase.getDatabase(context).movieDao())
     }
 
-    override val sitesRepository: SitesRepository by lazy {
-        DefaultSitesRepository(CheckerDatabase.getDatabase(context).siteDao())
+    override val siteRepository: SiteRepository by lazy {
+        DefaultSiteRepository(CheckerDatabase.getDatabase(context).siteDao())
     }
 }

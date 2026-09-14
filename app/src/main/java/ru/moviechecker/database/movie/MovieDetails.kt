@@ -1,7 +1,7 @@
-package ru.moviechecker.database.movies
+package ru.moviechecker.database.movie
 
-import ru.moviechecker.database.episodes.EpisodeEntity
-import ru.moviechecker.database.seasons.SeasonEntity
+import ru.moviechecker.database.episode.EpisodeEntity
+import ru.moviechecker.database.season.SeasonEntity
 
 data class MovieDetails(
     val id: Int,

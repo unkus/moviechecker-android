@@ -1,8 +1,8 @@
-package ru.moviechecker.database.sites
+package ru.moviechecker.database.site
 
 import kotlinx.coroutines.flow.Flow
 
-interface SitesRepository {
+interface SiteRepository {
     fun findById(id: Int): SiteEntity?
     fun getByIdStream(id: Int): Flow<SiteEntity>
     fun getAllStream(): Flow<List<SiteEntity>>

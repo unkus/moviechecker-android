@@ -1,4 +1,4 @@
-package ru.moviechecker.database.episodes
+package ru.moviechecker.database.episode
 
 enum class EpisodeState {
     UNKNOWN,

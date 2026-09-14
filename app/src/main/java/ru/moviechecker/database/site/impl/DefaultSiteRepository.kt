@@ -1,11 +1,11 @@
-package ru.moviechecker.database.sites.impl
+package ru.moviechecker.database.site.impl
 
 import kotlinx.coroutines.flow.Flow
-import ru.moviechecker.database.sites.SiteDao
-import ru.moviechecker.database.sites.SiteEntity
-import ru.moviechecker.database.sites.SitesRepository
+import ru.moviechecker.database.site.SiteDao
+import ru.moviechecker.database.site.SiteEntity
+import ru.moviechecker.database.site.SiteRepository
 
-class DefaultSitesRepository(private val siteDao: SiteDao) : SitesRepository {
+class DefaultSiteRepository(private val siteDao: SiteDao) : SiteRepository {
     override fun findById(id: Int): SiteEntity? = siteDao.getSiteById(id)
 
     override fun getByIdStream(id: Int): Flow<SiteEntity> = siteDao.getSiteByIdStream(id)

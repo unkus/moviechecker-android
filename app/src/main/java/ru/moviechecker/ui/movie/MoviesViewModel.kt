@@ -10,28 +10,28 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import ru.moviechecker.database.episodes.EpisodeEntity
-import ru.moviechecker.database.episodes.EpisodeState
-import ru.moviechecker.database.episodes.EpisodesRepository
-import ru.moviechecker.database.movies.ExpectedCard
-import ru.moviechecker.database.movies.ExpectedCardEpisode
-import ru.moviechecker.database.movies.ExpectedCardSeason
-import ru.moviechecker.database.movies.MovieCard
-import ru.moviechecker.database.movies.MovieCardEpisode
-import ru.moviechecker.database.movies.MovieCardSeason
-import ru.moviechecker.database.movies.MovieDetails
-import ru.moviechecker.database.movies.MoviesRepository
-import ru.moviechecker.database.seasons.SeasonEntity
+import ru.moviechecker.database.episode.EpisodeEntity
+import ru.moviechecker.database.episode.EpisodeState
+import ru.moviechecker.database.episode.EpisodeRepository
+import ru.moviechecker.database.movie.ExpectedCard
+import ru.moviechecker.database.movie.ExpectedCardEpisode
+import ru.moviechecker.database.movie.ExpectedCardSeason
+import ru.moviechecker.database.movie.MovieCard
+import ru.moviechecker.database.movie.MovieCardEpisode
+import ru.moviechecker.database.movie.MovieCardSeason
+import ru.moviechecker.database.movie.MovieDetails
+import ru.moviechecker.database.movie.MovieRepository
+import ru.moviechecker.database.season.SeasonEntity
 import java.net.URI
 import java.time.LocalDateTime
 import kotlin.collections.map
 
 class MoviesViewModel(
-    private val moviesRepository: MoviesRepository,
-    private val episodesRepository: EpisodesRepository
+    private val movieRepository: MovieRepository,
+    private val episodeRepository: EpisodeRepository
 ) : ViewModel() {
 
-    var novelties = moviesRepository.getNoveltiesStream()
+    var novelties = movieRepository.getNoveltiesStream()
         .map { it.map(MovieCardModel::fromEntity) }
         .stateIn(
             scope = viewModelScope,
@@ -39,7 +39,7 @@ class MoviesViewModel(
             initialValue = emptyList()
         )
 
-    val expected = moviesRepository.getExpectedStream()
+    val expected = movieRepository.getExpectedStream()
         .map {
             it.filter { item -> item.episode.date > LocalDateTime.now() }
                 .map(MovieCardModel::fromEntity)
@@ -50,7 +50,7 @@ class MoviesViewModel(
             initialValue = emptyList()
         )
 
-    val movies = moviesRepository.getMovieCardStream()
+    val movies = movieRepository.getMovieCardStream()
         .map { it.map(MovieCardModel::fromEntity) }
         .stateIn(
             scope = viewModelScope,
@@ -64,45 +64,45 @@ class MoviesViewModel(
     fun loadDetails(movieId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             _movieDetails.value =
-                MovieDetailsCardModel.fromEntity(moviesRepository.getMovieDetails(movieId))
+                MovieDetailsCardModel.fromEntity(movieRepository.getMovieDetails(movieId))
         }
     }
 
     fun update(id: Int, kinopoiskId: String?) {
         viewModelScope.launch(Dispatchers.IO) {
-            moviesRepository.updateKinopoiskId(id, kinopoiskId)
+            movieRepository.updateKinopoiskId(id, kinopoiskId)
         }
     }
 
     fun toggleFavoritesMark(movieId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            moviesRepository.toggleFavoritesMark(movieId)
+            movieRepository.toggleFavoritesMark(movieId)
         }
     }
 
     fun markEpisodeViewed(episodeId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            episodesRepository.updateEpisodeState(episodeId, EpisodeState.VIEWED)
+            episodeRepository.updateEpisodeState(episodeId, EpisodeState.VIEWED)
         }
     }
 
     fun toggleEpisodeViewedMark(episodeId: Int, isViewed: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             val newState = if (isViewed) EpisodeState.RELEASED else EpisodeState.VIEWED
-            episodesRepository.updateEpisodeState(episodeId, newState)
+            episodeRepository.updateEpisodeState(episodeId, newState)
         }
     }
 
     companion object {
         fun provideFactory(
-            moviesRepository: MoviesRepository,
-            episodesRepository: EpisodesRepository
+            movieRepository: MovieRepository,
+            episodeRepository: EpisodeRepository
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return MoviesViewModel(
-                    moviesRepository = moviesRepository,
-                    episodesRepository = episodesRepository
+                    movieRepository = movieRepository,
+                    episodeRepository = episodeRepository
                 ) as T
             }
         }

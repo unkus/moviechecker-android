@@ -1,4 +1,4 @@
-package ru.moviechecker.database.movies
+package ru.moviechecker.database.movie
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

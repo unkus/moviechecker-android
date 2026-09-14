@@ -1,4 +1,4 @@
-package ru.moviechecker.database.episodes
+package ru.moviechecker.database.episode
 
 import androidx.room.Dao
 import androidx.room.Delete

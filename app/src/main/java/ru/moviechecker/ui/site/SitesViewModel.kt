@@ -6,14 +6,14 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import ru.moviechecker.database.sites.SiteEntity
-import ru.moviechecker.database.sites.SitesRepository
+import ru.moviechecker.database.site.SiteEntity
+import ru.moviechecker.database.site.SiteRepository
 
 class SitesViewModel(
-    sitesRepository: SitesRepository
+    siteRepository: SiteRepository
 ) : ViewModel() {
 
-    val sites = sitesRepository.getAllStream()
+    val sites = siteRepository.getAllStream()
         .map { it.map(SiteModel::fromEntity) }
         .stateIn(
             scope = viewModelScope,
@@ -23,11 +23,11 @@ class SitesViewModel(
 
     companion object {
         fun provideFactory(
-            sitesRepository: SitesRepository
+            siteRepository: SiteRepository
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return SitesViewModel(sitesRepository) as T
+                return SitesViewModel(siteRepository) as T
             }
         }
     }

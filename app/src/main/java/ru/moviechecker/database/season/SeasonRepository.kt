@@ -1,8 +1,8 @@
-package ru.moviechecker.database.seasons
+package ru.moviechecker.database.season
 
 import kotlinx.coroutines.flow.Flow
 
-interface SeasonsRepository {
+interface SeasonRepository {
     fun updateSeason(season: SeasonEntity)
     fun getSeasonsByMovieId(movieId: Int): List<SeasonEntity>
     fun getSeasonsWithEpisodesByMovieId(movieId: Int): List<SeasonWithEpisodes>

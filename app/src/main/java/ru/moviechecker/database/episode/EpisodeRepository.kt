@@ -1,8 +1,8 @@
-package ru.moviechecker.database.episodes
+package ru.moviechecker.database.episode
 
 import kotlinx.coroutines.flow.Flow
 
-interface EpisodesRepository {
+interface EpisodeRepository {
     fun getAllStream(): Flow<List<EpisodeEntity>>
     fun getByIdStream(id: Int): Flow<EpisodeEntity>
 
