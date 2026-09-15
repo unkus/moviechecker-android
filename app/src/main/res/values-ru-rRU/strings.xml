@@ -26,4 +26,5 @@
     <string name="novelties">Новинки</string>
     <string name="expected">Ожидается</string>
     <string name="catalog">Каталог</string>
+    <string name="save_action">Сохранить</string>
 </resources>

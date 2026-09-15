@@ -102,7 +102,7 @@ fun MovieDetailsCard(
             Button(
                 onClick = { saveAction(kinopoiskId) }
             ) {
-                Text("Сохранить")
+                Text(text = stringResource(R.string.save_action))
             }
         }
     }

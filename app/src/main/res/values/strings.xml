@@ -27,4 +27,5 @@
     <string name="novelties">Novelties</string>
     <string name="expected">Expected</string>
     <string name="catalog">Catalog</string>
+    <string name="save_action">Save</string>
 </resources>
