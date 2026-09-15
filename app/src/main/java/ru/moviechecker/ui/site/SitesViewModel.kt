@@ -1,11 +1,13 @@
 package ru.moviechecker.ui.site
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import ru.moviechecker.checkerApplication
 import ru.moviechecker.database.site.SiteEntity
 import ru.moviechecker.database.site.SiteRepository
 
@@ -22,12 +24,11 @@ class SitesViewModel(
         )
 
     companion object {
-        fun provideFactory(
-            siteRepository: SiteRepository
-        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return SitesViewModel(siteRepository) as T
+        val Factory = viewModelFactory {
+            initializer {
+                SitesViewModel(
+                    checkerApplication().container.siteRepository
+                )
             }
         }
     }

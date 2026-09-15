@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import ru.moviechecker.ui.movie.MovieDetailsScreen
 import ru.moviechecker.ui.movie.MoviesViewModel
@@ -21,7 +22,7 @@ import ru.moviechecker.ui.movie.MoviesViewModel
 @Composable
 fun ExpectedDestination(
     innerPadding: PaddingValues,
-    viewModel: MoviesViewModel
+    viewModel: MoviesViewModel = viewModel(factory = MoviesViewModel.Factory)
 ) {
     val navigator = rememberListDetailPaneScaffoldNavigator<Int>()
     val scope = rememberCoroutineScope()

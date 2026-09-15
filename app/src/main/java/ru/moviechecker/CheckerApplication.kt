@@ -1,8 +1,10 @@
 package ru.moviechecker
 
 import android.app.Application
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.CreationExtras
 import ru.moviechecker.database.AppContainer
-import ru.moviechecker.database.DefaultAppContainer
+import ru.moviechecker.database.AppDataContainer
 
 class CheckerApplication : Application() {
 
@@ -13,7 +15,10 @@ class CheckerApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        container = DefaultAppContainer(this)
+        container = AppDataContainer(this)
     }
 
 }
+
+fun CreationExtras.checkerApplication(): CheckerApplication =
+    (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as CheckerApplication)

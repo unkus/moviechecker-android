@@ -13,13 +13,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun SitesDestination(
     innerPadding: PaddingValues,
-    viewModel: SitesViewModel
+    viewModel: SitesViewModel = viewModel(factory = SitesViewModel.Factory)
 ) {
     val navigator = rememberListDetailPaneScaffoldNavigator<SiteModel>()
     val scope = rememberCoroutineScope()

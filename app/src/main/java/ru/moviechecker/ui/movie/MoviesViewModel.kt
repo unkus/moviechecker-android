@@ -10,9 +10,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import ru.moviechecker.checkerApplication
 import ru.moviechecker.database.episode.EpisodeEntity
-import ru.moviechecker.database.episode.EpisodeState
 import ru.moviechecker.database.episode.EpisodeRepository
+import ru.moviechecker.database.episode.EpisodeState
 import ru.moviechecker.database.movie.ExpectedCard
 import ru.moviechecker.database.movie.ExpectedCardEpisode
 import ru.moviechecker.database.movie.ExpectedCardSeason
@@ -24,7 +25,6 @@ import ru.moviechecker.database.movie.MovieRepository
 import ru.moviechecker.database.season.SeasonEntity
 import java.net.URI
 import java.time.LocalDateTime
-import kotlin.collections.map
 
 class MoviesViewModel(
     private val movieRepository: MovieRepository,
@@ -94,16 +94,12 @@ class MoviesViewModel(
     }
 
     companion object {
-        fun provideFactory(
-            movieRepository: MovieRepository,
-            episodeRepository: EpisodeRepository
-        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return MoviesViewModel(
-                    movieRepository = movieRepository,
-                    episodeRepository = episodeRepository
-                ) as T
+        val Factory = viewModelFactory {
+            initializer {
+                MoviesViewModel(
+                    checkerApplication().container.movieRepository,
+                    checkerApplication().container.episodeRepository
+                )
             }
         }
     }
