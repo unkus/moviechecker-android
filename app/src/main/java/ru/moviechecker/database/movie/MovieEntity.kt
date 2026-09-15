@@ -8,19 +8,19 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "movies", indices = [Index(value = ["site_id", "page_id"], unique = true)])
 data class MovieEntity(
     @PrimaryKey(autoGenerate = true)
-    override val id: Int = 0,
+    val id: Int = 0,
     @ColumnInfo(name = "site_id")
-    override val siteId: Int = 0,
+    val siteId: Int = 0,
     @ColumnInfo(name = "page_id")
-    override val pageId: String,
-    override var title: String,
-    override var link: String? = null,
+    val pageId: String,
+    var title: String,
+    var link: String? = null,
     @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
-    override var poster: ByteArray? = null,
+    var poster: ByteArray? = null,
     @ColumnInfo(name = "favorites_mark")
-    override var favoritesMark: Boolean = false,
-    override var kinopoiskId: String? = null
-) : IMovie {
+    var favoritesMark: Boolean = false,
+    var kinopoiskId: String? = null
+) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
