@@ -23,7 +23,7 @@ import ru.moviechecker.datasource.model.EpisodeData
 import ru.moviechecker.datasource.model.MovieData
 import ru.moviechecker.datasource.model.SeasonData
 import ru.moviechecker.datasource.model.SiteData
-import ru.moviechecker.datasource.model.SourceData
+import ru.moviechecker.datasource.model.DataContainer
 import java.net.SocketTimeoutException
 import java.net.URI
 
@@ -91,30 +91,36 @@ abstract class CheckerDatabase : RoomDatabase() {
         }
     }
 
-    fun populateDatabase(sourceData: SourceData) {
-        Log.d(this.javaClass.simpleName, "Получено ${sourceData.entries.size} записей")
+    fun populateDatabase(dataContainer: DataContainer) {
+        Log.d(this.javaClass.simpleName, "Получено ${dataContainer.entries.size} записей")
         runInTransaction {
-            val siteEntity = processSiteData(siteDao(), sourceData.site)
-            sourceData.entries.forEach { record ->
-                val siteUri =
-                    URI.create(if (siteEntity.useMirror) siteEntity.mirror else siteEntity.address)
-                val movieEntity =
-                    processMovieData(
-                        movieDao(),
-                        siteEntity.id,
-                        siteUri,
-                        record.movie
-                    )
-                record.season?.let {
-                    val seasonEntity = processSeasonData(
-                        seasonDao(),
-                        siteUri,
-                        movieEntity.id,
-                        record.season
-                    )
-                    processEpisodeData(episodeDao(), seasonEntity.id, record.episode!!)
+            val siteEntity = processSiteData(siteDao(), dataContainer.site)
+            dataContainer.entries
+                .filter { it.error == null }
+                .forEach { record ->
+                    val siteUri =
+                        URI.create(if (siteEntity.useMirror) siteEntity.mirror else siteEntity.address)
+                    record.movie?.let { movie ->
+                        val movieEntity =
+                            processMovieData(
+                                movieDao(),
+                                siteEntity.id,
+                                siteUri,
+                                movie
+                            )
+                        record.season?.let { season ->
+                            val seasonEntity = processSeasonData(
+                                seasonDao(),
+                                siteUri,
+                                movieEntity.id,
+                                season
+                            )
+                            record.episode?.let { episode ->
+                                processEpisodeData(episodeDao(), seasonEntity.id, episode)
+                            }
+                        }
+                    }
                 }
-            }
         }
     }
 

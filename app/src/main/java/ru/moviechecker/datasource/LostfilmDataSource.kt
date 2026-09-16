@@ -6,7 +6,7 @@ import ru.moviechecker.datasource.model.EpisodeData
 import ru.moviechecker.datasource.model.MovieData
 import ru.moviechecker.datasource.model.SeasonData
 import ru.moviechecker.datasource.model.SiteData
-import ru.moviechecker.datasource.model.SourceData
+import ru.moviechecker.datasource.model.DataContainer
 import ru.moviechecker.datasource.model.SourceDataEntry
 import ru.moviechecker.datasource.model.StrictDataSource
 import java.net.URI
@@ -22,19 +22,19 @@ import java.util.Locale
 // <a class="new-movie" href="/series/The_Head/season_3/" title="Голова">
 // <a class="new-movie" href="/series/SurrealEstate /season_3/episode_3/" title="Сюрриэлторы">
 private const val PATTERN_NEW_MOVIE_CLASS =
-    "<a class=\"new-movie\" href=\"(?<href>/(?<type>series|movies)/(?<name>[^/]+)(?:/season_(?<season>\\d+)|/additional)?(?:/episode_(?<episode>\\d+))?)/?\" title=\"(?<title>.+)\">"
+    """<a class="new-movie" href="(?<href>/(?<type>series|movies)/(?<name>[^/]+)(?:/season_(?<season>\\d+)|/additional)?(?:/episode_(?<episode>\\d+))?)/?" title="(?<title>.+)">"""
 
 private const val PATTERN_OG_SITE_NAME =
-    "<meta property='og:site_name' content=\"(?<siteName>.+)\" />"
-private const val PATTERN_OG_TITLE = "<meta property='og:title' content=\"(?<title>.+)\" />"
-private const val PATTERN_OG_IMAGE = "<meta property='og:image' content=\"https:(?<image>.+)\" />"
+    """<meta property='og:site_name' content="(?<siteName>.+)" />"""
+private const val PATTERN_OG_TITLE = """<meta property='og:title' content="(?<title>.+)" />"""
+private const val PATTERN_OG_IMAGE = """<meta property='og:image' content="https:(?<image>.+)" />"""
 private const val PATTERN_OG_DESCRIPTION =
-    "<meta property=\"og:description\" content=\"(?<description>.+)\" />"
-private const val PATTERN_SEASON_POSTER_LINK = "<img src=\"(?<link>.+)\" class=\"thumb\" />"
-private const val PATTERN_EPISODE_TITLE_RU = "<h1 class=\"title-ru\">(?<title>.+)</h1>"
-private const val PATTERN_EPISODE_TITLE_EN = "<div class=\"title-en\">(?<title>.+)</div>"
+    """<meta property="og:description" content="(?<description>.+)" />"""
+private const val PATTERN_SEASON_POSTER_LINK = """<img src="(?<link>.+)" class="thumb" />"""
+private const val PATTERN_EPISODE_TITLE_RU = """<h1 class="title-ru">(?<title>.+)</h1>"""
+private const val PATTERN_EPISODE_TITLE_EN = """<div class="title-en">(?<title>.+)</div>"""
 private const val PATTERN_DATE =
-    "<span data-proper=\".+\" data-released=\"(?<date>.+?)\">.*</span>"
+    """<span data-proper=".+" data-released="(?<date>.+?)">.*</span>"""
 
 class LostfilmDataSource : StrictDataSource("lostfilm", "https://www.lostfilm.tv") {
 
@@ -51,7 +51,7 @@ class LostfilmDataSource : StrictDataSource("lostfilm", "https://www.lostfilm.tv
     private val dateFormat =
         DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.forLanguageTag("ru-RU"))
 
-    override fun retrieveData(uri: URI): SourceData {
+    override fun retrieveData(uri: URI): DataContainer {
         val content = readContent(uri)
         val (siteTitle) = siteTitleRegex.find(content)!!.destructured
 
@@ -94,7 +94,7 @@ class LostfilmDataSource : StrictDataSource("lostfilm", "https://www.lostfilm.tv
             }
             .toList()
 
-        return SourceData(
+        return DataContainer(
             site = SiteData(
                 mnemonic = mnemonic,
                 title = siteTitle,

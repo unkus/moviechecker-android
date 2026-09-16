@@ -6,7 +6,7 @@ import ru.moviechecker.datasource.model.EpisodeData
 import ru.moviechecker.datasource.model.MovieData
 import ru.moviechecker.datasource.model.SeasonData
 import ru.moviechecker.datasource.model.SiteData
-import ru.moviechecker.datasource.model.SourceData
+import ru.moviechecker.datasource.model.DataContainer
 import ru.moviechecker.datasource.model.SourceDataEntry
 import ru.moviechecker.datasource.model.StrictDataSource
 import java.net.URI
@@ -55,7 +55,7 @@ class AmediaDataSource : StrictDataSource("amedia", "https://amedia.online") {
     private val dateTimeRegex = PATTERN_DATE_TIME.toRegex()
     private val episodeNumberRegex = PATTERN_EPISODE_NNUMBER.toRegex()
 
-    override fun retrieveData(uri: URI): SourceData {
+    override fun retrieveData(uri: URI): DataContainer {
         val lines = readContent(uri).lines()
 
         val (siteTitle) = lines.firstNotNullOf { siteTitleRegex.find(it)?.destructured }
@@ -63,43 +63,48 @@ class AmediaDataSource : StrictDataSource("amedia", "https://amedia.online") {
         val entries = lines.windowed(11)
             .filter { itemRegex.find(it.first()) != null }
             .map { window ->
-                val (seasonPage, seasonPageId, movieMnemonic) = itemRegex.find(window.first())!!.destructured
-                val (imgSrc) = posterRegex.find(window[2])!!.destructured
-                val (movieTitle, seasonNumber1, seasonTitle, seasonNumber2) = titleRegex.find(window[5])!!.destructured
-                val (dateString, timeString) = dateTimeRegex.find(window[6])!!.destructured
-                val (episodeNumber) = episodeNumberRegex.find(window[8])!!.destructured
+                try {
+                    val (seasonPage, seasonPageId, movieMnemonic) = itemRegex.find(window.first())!!.destructured
+                    val (imgSrc) = posterRegex.find(window[2])!!.destructured
+                    val (movieTitle, seasonNumber1, seasonTitle, seasonNumber2) = titleRegex.find(window[5])!!.destructured
+                    val (dateString, timeString) = dateTimeRegex.find(window[6])!!.destructured
+                    val (episodeNumber) = episodeNumberRegex.find(window[8])!!.destructured
 
-                val seasonNumber = seasonNumber1.ifBlank { seasonNumber2.ifBlank { null } }
-                val moviePageId = seasonNumber?.let { movieMnemonic.substringBeforeLast("-$seasonNumber") } ?: movieMnemonic
-                val movie = MovieData(
-                    pageId = moviePageId,
-                    title = movieTitle
-                )
-                Log.d(this.javaClass.simpleName, "movie=$movie")
-                val season = SeasonData(
-                    number = seasonNumber1.ifBlank { seasonNumber2.ifBlank { "1" } }.toInt(),
-                    title = seasonTitle.ifBlank { null },
-                    link = seasonPage,
-                    posterLink = imgSrc
-                )
-                Log.d(this.javaClass.simpleName, "season=$season")
-                val episode = EpisodeData(
-                    number = episodeNumber.toInt(),
-                    link = "/$seasonPageId/episode/$episodeNumber/seriya-onlayn.html",
-                    state = if (dateString == "Новая серия в") DataState.EXPECTED else DataState.RELEASED,
-                    date = parseDateTime(dateString, timeString)
-                )
-                Log.d(this.javaClass.simpleName, "episode=$episode")
+                    val seasonNumber = seasonNumber1.ifBlank { seasonNumber2.ifBlank { null } }
+                    val moviePageId = seasonNumber?.let { movieMnemonic.substringBeforeLast("-$seasonNumber") } ?: movieMnemonic
+                    val movie = MovieData(
+                        pageId = moviePageId,
+                        title = movieTitle
+                    )
+                    Log.d(this.javaClass.simpleName, "movie=$movie")
+                    val season = SeasonData(
+                        number = seasonNumber1.ifBlank { seasonNumber2.ifBlank { "1" } }.toInt(),
+                        title = seasonTitle.ifBlank { null },
+                        link = seasonPage,
+                        posterLink = imgSrc
+                    )
+                    Log.d(this.javaClass.simpleName, "season=$season")
+                    val episode = EpisodeData(
+                        number = episodeNumber.toInt(),
+                        link = "/$seasonPageId/episode/$episodeNumber/seriya-onlayn.html",
+                        state = if (dateString == "Новая серия в") DataState.EXPECTED else DataState.RELEASED,
+                        date = parseDateTime(dateString, timeString)
+                    )
+                    Log.d(this.javaClass.simpleName, "episode=$episode")
 
-                SourceDataEntry(
-                    movie = movie,
-                    season = season,
-                    episode = episode
-                )
+                    SourceDataEntry(
+                        movie = movie,
+                        season = season,
+                        episode = episode
+                    )
+                } catch (ex: Exception) {
+                    Log.e(this.javaClass.simpleName, "Ошибка парсинга ${ex.message}", ex)
+                    SourceDataEntry(error = ex.message)
+                }
             }
             .toList()
 
-        return SourceData(
+        return DataContainer(
             site = SiteData(
                 mnemonic = mnemonic,
                 title = siteTitle,
