@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,7 +24,6 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,41 +44,33 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 @Composable
-fun MovieCard(
-    cardProvider: () -> MovieCardModel,
-    onClick: (Int) -> Unit = {},
+fun MovieCardContent(
+    dataProvider: () -> MovieCardModel,
     onClickOnFavorite: (Int) -> Unit = {},
     onClickOnViewed: (Int, Boolean) -> Unit = { id, isViewed -> },
     onActionPerformed: (Int) -> Unit = {}
 ) {
-    val card = cardProvider()
-
-    Card(
-        modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        onClick = { onClick(card.id) }
+    val movie = dataProvider()
+    Row(
+        modifier = Modifier
+            .padding(4.dp)
+            .height(IntrinsicSize.Max)
     ) {
-        Row(
-            modifier = Modifier
-                .padding(4.dp)
-                .height(IntrinsicSize.Max)
-        ) {
-            card.poster?.let {
-                Poster(
-                    data = it,
-                    modifier = Modifier.fillMaxHeight()
-                )
-            }
-
-            DataSection(
-                card = card, modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight(),
-                onClickOnFavorite = onClickOnFavorite,
-                onClickOnViewed = onClickOnViewed,
-                onActionPerformed = onActionPerformed
+        movie.poster?.let {
+            Poster(
+                data = it,
+                modifier = Modifier.fillMaxHeight()
             )
         }
+
+        DataSection(
+            card = movie, modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
+            onClickOnFavorite = onClickOnFavorite,
+            onClickOnViewed = onClickOnViewed,
+            onActionPerformed = onActionPerformed
+        )
     }
 }
 
@@ -270,8 +259,8 @@ fun MovieCardPreview(
     @PreviewParameter(MovieCardPreviewParameterProvider::class) movieCard: MovieCardModel
 ) {
     MoviecheckerTheme {
-        MovieCard(
-            cardProvider = { movieCard }
+        MovieCardContent(
+            dataProvider = { movieCard }
         )
     }
 }

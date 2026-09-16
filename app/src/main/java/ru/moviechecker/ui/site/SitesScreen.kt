@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -23,7 +21,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import ru.moviechecker.R
 import ru.moviechecker.ui.common.CommonList
@@ -37,48 +34,43 @@ fun SitesScreen(
 ) {
     CommonList(
         items = sitesProvider(),
-        itemContent = { item ->
-            SiteCard(
-                site = item,
-                onClick = onClickOnItem
+        itemContent = { site ->
+            SiteCardContent(
+                dataProvider = { site }
             )
         },
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
+        onItemClick = onClickOnItem
     )
 }
 
 @Composable
-fun SiteCard(site: SiteModel, onClick: (SiteModel) -> Unit = {}) {
+fun SiteCardContent(
+    dataProvider: () -> SiteModel
+) {
     val context = LocalContext.current
+    val site = dataProvider()
 
-    Card(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(dimensionResource(id = R.dimen.padding_small)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        onClick = { onClick(site) }
+    Column(
+        modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small)),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
     ) {
-        Column(
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small)),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = site.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+            Text(
+                text = site.title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(
+                onClick = { openInBrowser(context, site.address.toUri()) }) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.open_in_new_24px),
+                    contentDescription = stringResource(R.string.cd_open_navigation_drawer)
                 )
-                Spacer(modifier = Modifier.weight(1f))
-                IconButton(
-                    onClick = { openInBrowser(context, site.address.toUri()) }) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.open_in_new_24px),
-                        contentDescription = stringResource(R.string.cd_open_navigation_drawer)
-                    )
-                }
             }
         }
     }

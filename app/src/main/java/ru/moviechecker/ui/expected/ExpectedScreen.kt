@@ -8,7 +8,7 @@ import androidx.compose.ui.tooling.preview.AndroidUiModes.UI_MODE_NIGHT_YES
 import androidx.compose.ui.tooling.preview.Preview
 import ru.moviechecker.ui.common.CommonList
 import ru.moviechecker.ui.main.Refreshable
-import ru.moviechecker.ui.movie.MovieCard
+import ru.moviechecker.ui.movie.MovieCardContent
 import ru.moviechecker.ui.movie.MovieCardModel
 import ru.moviechecker.ui.movie.MovieCardPreviewParameterProvider
 import ru.moviechecker.ui.theme.MoviecheckerTheme
@@ -29,16 +29,16 @@ fun ExpectedScreen(
     ) {
         CommonList(
             items = moviesProvider(),
-            itemContent = { item ->
-                MovieCard(
-                    cardProvider = { item },
-                    onClick = onClickOnItem,
+            itemContent = { movie ->
+                MovieCardContent(
+                    dataProvider = { movie },
                     onClickOnFavorite = onClickOnItemFavorite,
                     onClickOnViewed = onClickOnItemViewed,
                     onActionPerformed = onClickOnItemOpenInBrowser
                 )
             },
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            onItemClick = { movie -> onClickOnItem(movie.id) }
         )
     }
 }
