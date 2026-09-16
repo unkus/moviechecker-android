@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.Data
+import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -12,10 +13,22 @@ import ru.moviechecker.datasource.AmediaDataSource
 import ru.moviechecker.datasource.LostfilmDataSource
 import java.net.URI
 
-class AsyncRetrieveDataWorker(appContext: Context, workerParams: WorkerParameters) :
+class RetrieveDataWorker(appContext: Context, workerParams: WorkerParameters) :
     CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
+        return@withContext if (isCurrentlyRefreshing()) {
+            Result.success() // пропускаем этот запуск, чтобы не было параллелизма
+        } else performRefresh()
+    }
+
+    fun isCurrentlyRefreshing(): Boolean  {
+        val workInfo = WorkManager.getInstance(applicationContext)
+             .getWorkInfosForUniqueWork(MANUAL_REFRESH)
+         return workInfo.get().firstOrNull()?.state?.isFinished == true
+    }
+
+    fun performRefresh(): Result {
         val database = CheckerDatabase.getDatabase(applicationContext)
         val dataSources = listOf(AmediaDataSource(), LostfilmDataSource())
 
@@ -38,7 +51,7 @@ class AsyncRetrieveDataWorker(appContext: Context, workerParams: WorkerParameter
                 }
             }
 
-        return@withContext if (errors.isEmpty()) Result.success() else Result.failure(
+        return if (errors.isEmpty()) Result.success() else Result.failure(
             Data.Builder()
                 .putStringArray("errors", errors.toTypedArray())
                 .build()
@@ -46,7 +59,8 @@ class AsyncRetrieveDataWorker(appContext: Context, workerParams: WorkerParameter
     }
 
     companion object {
-        const val NAME = "Проверка новых релизов"
+        const val MANUAL_REFRESH = "Проверка новых релизов"
+        const val PERIODIC_REFRESH = "Периодическая проверка новых релизов"
     }
 
 }

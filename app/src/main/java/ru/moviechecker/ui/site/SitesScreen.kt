@@ -42,7 +42,8 @@ fun SitesScreen(
                 site = item,
                 onClick = onClickOnItem
             )
-        }
+        },
+        modifier = Modifier.fillMaxSize()
     )
 }
 

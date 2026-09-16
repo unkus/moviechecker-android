@@ -15,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
+import ru.moviechecker.ui.main.ErrorViewModel
+import ru.moviechecker.ui.main.RefreshViewModel
 import ru.moviechecker.ui.movie.MovieDetailsScreen
 import ru.moviechecker.ui.movie.MoviesViewModel
 
@@ -22,7 +24,9 @@ import ru.moviechecker.ui.movie.MoviesViewModel
 @Composable
 fun NoveltiesDestination(
     innerPadding: PaddingValues,
-    viewModel: MoviesViewModel = viewModel(factory = MoviesViewModel.Factory)
+    viewModel: MoviesViewModel = viewModel(factory = MoviesViewModel.Factory),
+    refreshViewModel: RefreshViewModel = viewModel(),
+    errorViewModel: ErrorViewModel = viewModel()
 ) {
     val navigator = rememberListDetailPaneScaffoldNavigator<Int>()
     val scope = rememberCoroutineScope()
@@ -35,6 +39,8 @@ fun NoveltiesDestination(
 
     val movies by viewModel.novelties.collectAsStateWithLifecycle()
 
+    val isRefreshing by refreshViewModel.isRefreshing.collectAsStateWithLifecycle()
+
     ListDetailPaneScaffold(
         directive = navigator.scaffoldDirective,
         value = navigator.scaffoldValue,
@@ -42,6 +48,8 @@ fun NoveltiesDestination(
             AnimatedPane {
                 NoveltiesScreen(
                     moviesProvider = { movies },
+                    refreshStatus = { isRefreshing },
+                    onRefresh = { refreshViewModel.refresh(onError = { error -> errorViewModel.triggerError(error) }) },
                     onClickOnItem = { movieId ->
                         scope.launch {
                             navigator.navigateTo(

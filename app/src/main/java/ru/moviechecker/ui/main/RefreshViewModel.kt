@@ -11,57 +11,43 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import ru.moviechecker.workers.AsyncRetrieveDataWorker
+import ru.moviechecker.workers.RetrieveDataWorker
 
 class RefreshViewModel(
     application: Application
 ) : AndroidViewModel(application) {
 
-    private val _uiState = MutableStateFlow(
-        RefreshUiState(
-            isLoading = false,
-            error = null
-        )
-    )
-    val uiState = _uiState
-        .map { state ->
-            RefreshUiState(
-                isLoading = state.isLoading,
-                error = state.error
-            )
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
-            initialValue = _uiState.value
-        )
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
-    fun onRefresh() {
-        _uiState.update { it.copy(isLoading = true) }
-
-        val workManager = WorkManager.getInstance(getApplication())
-        val workRequest = OneTimeWorkRequestBuilder<AsyncRetrieveDataWorker>()
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .setRequiresStorageNotLow(true)
-                    .build()
-            )
-            .build()
-        workManager
-            .beginUniqueWork(
-                uniqueWorkName = AsyncRetrieveDataWorker.NAME,
-                existingWorkPolicy = ExistingWorkPolicy.KEEP,
-                request = workRequest
-            )
-            .enqueue()
-
+    fun refresh(onError: (String) -> Unit) {
         viewModelScope.launch {
+
+            if (_isRefreshing.value) return@launch
+
+            _isRefreshing.value = true
+
+            val workManager = WorkManager.getInstance(getApplication())
+            val workRequest = OneTimeWorkRequestBuilder<RetrieveDataWorker>()
+                .setConstraints(
+                    Constraints.Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .setRequiresStorageNotLow(true)
+                        .build()
+                )
+                .build()
+
+            workManager
+                .beginUniqueWork(
+                    uniqueWorkName = RetrieveDataWorker.MANUAL_REFRESH,
+                    existingWorkPolicy = ExistingWorkPolicy.KEEP,
+                    request = workRequest
+                )
+                .enqueue()
+
             workManager.getWorkInfoByIdFlow(workRequest.id)
                 .collect { workInfo ->
                     Log.d(
@@ -77,21 +63,17 @@ class RefreshViewModel(
                                             this.javaClass.simpleName,
                                             "Обновление закончилось с ошибкой: ${newErrors.asList()}"
                                         )
-                                        newErrors.forEach { error -> _uiState.update { it.copy(error = error) } }
+                                        newErrors.forEach { onError(it) }
                                     }
 
                             } else {
                                 Log.d(this.javaClass.simpleName, "Обновление закончено")
                             }
-                            _uiState.update { it.copy(isLoading = false) }
+
+                            _isRefreshing.value = false
                         }
                     }
                 }
         }
     }
 }
-
-data class RefreshUiState(
-    val isLoading: Boolean,
-    val error: String?
-)
