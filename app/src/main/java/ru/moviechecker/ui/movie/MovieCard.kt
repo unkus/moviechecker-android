@@ -1,11 +1,6 @@
 package ru.moviechecker.ui.movie
 
-import android.content.ActivityNotFoundException
-import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -42,6 +37,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import ru.moviechecker.R
+import ru.moviechecker.ui.common.openInBrowser
+import ru.moviechecker.ui.common.openInKinopoisk
 import ru.moviechecker.ui.theme.MoviecheckerTheme
 import java.net.URI
 import java.time.LocalDate
@@ -179,7 +176,7 @@ fun ActionSection(
     ) {
         Icon(
             modifier = Modifier.clickable {
-                openInBrowser(context, card)
+                openInBrowser(context, card.episode.link.toString().toUri())
                 onActionPerformed(card.episode.id)
             },
             imageVector = ImageVector.vectorResource(R.drawable.open_in_new_24px),
@@ -238,49 +235,6 @@ fun DateSection(
         style = MaterialTheme.typography.bodySmall,
         maxLines = 1
     )
-}
-
-fun openInBrowser(context: Context, card: MovieCardModel) {
-    val intent = Intent(Intent.ACTION_VIEW)
-    intent.data = card.episode.link.toString().toUri()
-
-    startActivity(context, intent)
-}
-
-fun openInKinopoisk(context: Context, card: MovieCardModel) {
-    val intent = Intent(Intent.ACTION_VIEW)
-    val packageName = "ru.kinopoisk" // Пакетное имя приложения «Кинопоиск»
-
-    // Проверяем, установлено ли приложение
-    try {
-        val packageManager = context.packageManager
-        packageManager.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(0))
-
-        // Приложение установлено — указываем его явно
-        intent.setPackage(packageName)
-        // TODO: разобраться с открытием приложения -
-        //  открытие через hd.kinopoisk.ru не происходит
-        intent.data = "https://kinopoisk.ru/film/${card.kinopoiskId}".toUri()
-    } catch (e: PackageManager.NameNotFoundException) {
-        // Приложение не установлено — оставляем intent без setPackage, откроется браузер
-        intent.data =
-            "https://hd.kinopoisk.ru/film/${card.kinopoiskId}?content_tab=series&season=${card.season.number}&episode=${card.episode.number}&watch=".toUri()
-    }
-
-    startActivity(context, intent)
-}
-
-fun startActivity(context: Context, intent: Intent) {
-
-    // Добавляем флаги для корректной работы
-    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-
-    try {
-        context.startActivity(intent)
-    } catch (e: ActivityNotFoundException) {
-        // Если не удалось запустить ни приложение, ни браузер
-        Toast.makeText(context, "Не удалось открыть ссылку", Toast.LENGTH_SHORT).show()
-    }
 }
 
 @Composable

@@ -1,6 +1,5 @@
 package ru.moviechecker.ui.site
 
-import android.content.Intent
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import ru.moviechecker.R
 import ru.moviechecker.ui.common.CommonList
+import ru.moviechecker.ui.common.openInBrowser
 import ru.moviechecker.ui.theme.MoviecheckerTheme
 
 @Composable
@@ -72,13 +72,7 @@ fun SiteCard(site: SiteModel, onClick: (SiteModel) -> Unit = {}) {
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
-                    onClick = {
-                        val browserIntent = Intent(
-                            Intent.ACTION_VIEW,
-                            site.address.toUri()
-                        )
-                        context.startActivity(browserIntent)
-                    }) {
+                    onClick = { openInBrowser(context, site.address.toUri()) }) {
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.open_in_new_24px),
                         contentDescription = stringResource(R.string.cd_open_navigation_drawer)
