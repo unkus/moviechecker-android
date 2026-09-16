@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -29,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import ru.moviechecker.R
+import ru.moviechecker.ui.common.CommonList
 import ru.moviechecker.ui.theme.MoviecheckerTheme
 
 @Composable
@@ -36,11 +35,15 @@ fun SitesScreen(
     sitesProvider: () -> List<SiteModel>,
     onClickOnItem: (SiteModel) -> Unit = {}
 ) {
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(items = sitesProvider(), key = { it.id }) { site ->
-            SiteCard(site = site, onClick = onClickOnItem)
+    CommonList(
+        items = sitesProvider(),
+        itemContent = { item ->
+            SiteCard(
+                site = item,
+                onClick = onClickOnItem
+            )
         }
-    }
+    )
 }
 
 @Composable

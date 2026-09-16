@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.stateIn
 import ru.moviechecker.checkerApplication
 import ru.moviechecker.database.site.SiteEntity
 import ru.moviechecker.database.site.SiteRepository
+import ru.moviechecker.model.Identifiable
 
 class SitesViewModel(
     siteRepository: SiteRepository
@@ -35,14 +36,14 @@ class SitesViewModel(
 }
 
 data class SiteModel(
-    val id: Int,
+    override val id: Int,
     val mnemonic: String,
     val poster: ByteArray? = null,
     var title: String,
     var address: String,
     var useMirror: Boolean = false,
     var mirror: String? = null
-) {
+) : Identifiable {
     companion object Factory {
 
         fun fromEntity(entity: SiteEntity): SiteModel {

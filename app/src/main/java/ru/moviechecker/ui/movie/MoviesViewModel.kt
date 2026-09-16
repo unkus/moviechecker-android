@@ -1,8 +1,9 @@
 package ru.moviechecker.ui.movie
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,6 +24,7 @@ import ru.moviechecker.database.movie.MovieCardSeason
 import ru.moviechecker.database.movie.MovieDetails
 import ru.moviechecker.database.movie.MovieRepository
 import ru.moviechecker.database.season.SeasonEntity
+import ru.moviechecker.model.Identifiable
 import java.net.URI
 import java.time.LocalDateTime
 
@@ -106,7 +108,7 @@ class MoviesViewModel(
 }
 
 data class MovieCardModel(
-    val id: Int,
+    override val id: Int,
     val title: String,
     val poster: ByteArray? = null,
     val favoritesMark: Boolean,
@@ -115,7 +117,7 @@ data class MovieCardModel(
     val episode: EpisodeModel,
     val hasMoreEpisodes: Boolean,
     val updatedAt: LocalDateTime
-) {
+) : Identifiable {
     companion object Factory {
 
         fun fromEntity(entity: MovieCard): MovieCardModel {
@@ -211,13 +213,13 @@ data class SeasonModel(
 }
 
 data class EpisodeModel(
-    val id: Int,
+    override val id: Int,
     val number: Int,
     val title: String? = null,
     val link: URI,
     val date: LocalDateTime,
     val viewedMark: Boolean
-) {
+) : Identifiable {
     companion object Factory {
         fun fromEntity(entity: MovieCardEpisode, link: URI): EpisodeModel {
             return EpisodeModel(
@@ -244,7 +246,7 @@ data class EpisodeModel(
 }
 
 data class MovieDetailsCardModel(
-    val id: Int,
+    override val id: Int,
     val siteId: Int,
     val pageId: String,
     val title: String,
@@ -253,7 +255,7 @@ data class MovieDetailsCardModel(
     val favoritesMark: Boolean = false,
     val kinopoiskId: String? = null,
     val seasons: List<SeasonCardModel>
-) {
+) : Identifiable {
     companion object Factory {
 
         fun fromEntity(
@@ -310,13 +312,13 @@ data class MovieDetailsCardModel(
 }
 
 data class SeasonCardModel(
-    val id: Int,
+    override val id: Int,
     val number: Int,
     var title: String? = null,
     var link: String? = null,
     var poster: ByteArray? = null,
     val episodes: List<EpisodeCardModel>
-) {
+) : Identifiable {
     companion object Factory {
         fun fromEntity(
             entity: SeasonEntity,

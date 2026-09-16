@@ -54,7 +54,7 @@ enum class AppDestinations(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavigationRoot() {
-    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.CATALOG) }
+    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.NOVELTIES) }
     val scope = rememberCoroutineScope()
 
     val navigationSuiteScaffoldState =
