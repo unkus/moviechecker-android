@@ -6,7 +6,7 @@ material3 = "1.4.0"
 androidCore = "1.19.0"
 kotlin = "2.4.20"
 workRuntime = "2.11.2"
-room = "2.8.5"
+room = "3.0.3"
 ksp = "2.3.9"
 navigation = "2.10.1"
 mockk = "1.14.11"
@@ -34,8 +34,8 @@ androidx-material3-adaptive-navigation-suite = { group = "androidx.compose.mater
 
 androidx-adaptive-navigation = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation", version.ref = "adaptiveNavigation" }
 
-androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
-androidx-room = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-room-compiler = { module = "androidx.room3:room3-compiler", version.ref = "room" }
+androidx-room-runtime = { module = "androidx.room3:room3-runtime", version.ref = "room" }
 
 androidx-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "runtimeAndroid" }
 
@@ -51,13 +51,14 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 
+android-material = { module = "com.google.android.material:material", version.ref = "material" }
+
 # Для тестов
 androidx-test-core = { module = "androidx.test:core-ktx", version.ref = "androidTestCore" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidTestRunner" }
 androidx-test-ext-junit = { module = "androidx.test.ext:junit-ktx", version.ref = "androidTestExt" }
 
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
-material = { module = "com.google.android.material:material", version.ref = "material" }
 #mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 
 [plugins]
@@ -67,4 +68,4 @@ android-application = { id = "com.android.application", version.ref = "androidGr
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-room = { id = "androidx.room", version.ref = "room" }
+room = { id = "androidx.room3", version.ref = "room" }

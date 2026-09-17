@@ -1,9 +1,10 @@
 package ru.moviechecker.database
 
-import androidx.room.RenameColumn
-import androidx.room.migration.AutoMigrationSpec
-import androidx.room.migration.Migration
+import androidx.room3.RenameColumn
+import androidx.room3.migration.AutoMigrationSpec
+import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.db.SupportSQLiteDatabase
+import androidx.sqlite.execSQL
 
 @RenameColumn.Entries(
     RenameColumn(
@@ -20,13 +21,15 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 class Ver1To2AutoMigration : AutoMigrationSpec
 
 class Ver8To9AutoMigration : AutoMigrationSpec {
-    override fun onPostMigrate(db: SupportSQLiteDatabase) {
-        db.execSQL("UPDATE sites SET `mnemonic` = 'lostfilm' WHERE `address` like '%lostfilm%'")
-        db.execSQL("UPDATE sites SET `address` = 'https://www.lostfilm.tv' WHERE `mnemonic` = 'lostfilm'")
-        db.execSQL("UPDATE sites SET `mirror` = 'https://www.lostfilm.download' WHERE `mnemonic` = 'lostfilm'")
+    override suspend fun onPostMigrate(connection: SQLiteConnection) {
+        super.onPostMigrate(connection)
 
-        db.execSQL("UPDATE sites SET `mnemonic` = 'amedia' WHERE `address` like '%amedia%'")
-        db.execSQL("UPDATE sites SET `address` = 'https://amedia.online' WHERE `mnemonic` = 'amedia'")
-        db.execSQL("UPDATE sites SET `mirror` = 'https://a1.amedia.so' WHERE `mnemonic` = 'amedia'")
+        connection.execSQL("UPDATE sites SET `mnemonic` = 'lostfilm' WHERE `address` like '%lostfilm%'")
+        connection.execSQL("UPDATE sites SET `address` = 'https://www.lostfilm.tv' WHERE `mnemonic` = 'lostfilm'")
+        connection.execSQL("UPDATE sites SET `mirror` = 'https://www.lostfilm.download' WHERE `mnemonic` = 'lostfilm'")
+
+        connection.execSQL("UPDATE sites SET `mnemonic` = 'amedia' WHERE `address` like '%amedia%'")
+        connection.execSQL("UPDATE sites SET `address` = 'https://amedia.online' WHERE `mnemonic` = 'amedia'")
+        connection.execSQL("UPDATE sites SET `mirror` = 'https://a1.amedia.so' WHERE `mnemonic` = 'amedia'")
     }
 }

@@ -38,15 +38,17 @@ android {
 
 }
 
-room {
+room3 {
     schemaDirectory("$projectDir/schemas")
 }
 
 dependencies {
+    implementation(libs.android.material)
+
     implementation(libs.androidx.core)
     implementation(libs.androidx.runtime)
 
-    implementation(libs.androidx.room)
+    implementation(libs.androidx.room.runtime)
 
     implementation(libs.androidx.work.runtime)
 
@@ -67,7 +69,6 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.material)
 
     androidTestImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.androidx.test.runner)

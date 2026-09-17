@@ -1,11 +1,11 @@
 package ru.moviechecker.database.movie
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room3.Dao
+import androidx.room3.Delete
+import androidx.room3.Insert
+import androidx.room3.OnConflictStrategy
+import androidx.room3.Query
+import androidx.room3.Update
 import kotlinx.coroutines.flow.Flow
 import ru.moviechecker.database.episode.EpisodeEntity
 import ru.moviechecker.database.season.SeasonEntity
@@ -14,19 +14,19 @@ import ru.moviechecker.database.site.SiteEntity
 @Dao
 interface MovieDao {
     @Query("SELECT * FROM movies m WHERE m.favorites_mark = :mark")
-    fun getMoviesByFavoriteMark(mark: Boolean): List<MovieEntity>
+    suspend fun getMoviesByFavoriteMark(mark: Boolean): List<MovieEntity>
 
     @Query("SELECT * FROM movies m WHERE m.id = :id")
-    fun getMovieById(id: Int): MovieEntity
+    suspend fun getMovieById(id: Int): MovieEntity
 
     @Query("SELECT * FROM movies m")
-    fun getMovies(): List<MovieEntity>
+    suspend fun getMovies(): List<MovieEntity>
 
     @Query("SELECT count(*) FROM movies m")
-    fun getCount(): Int
+    suspend fun getCount(): Int
 
     @Query("SELECT * FROM movies m WHERE m.site_id = :siteId AND m.page_id = :pageId")
-    fun getMovieBySiteIdAndPageId(siteId: Int, pageId: String): MovieEntity?
+    suspend fun getMovieBySiteIdAndPageId(siteId: Int, pageId: String): MovieEntity?
 
     @Query("SELECT * FROM movies WHERE id = :id")
     fun getMovieByIdStream(id: Int): Flow<MovieEntity>
@@ -38,7 +38,7 @@ interface MovieDao {
                 "JOIN episodes episode ON episode.season_id = season.id " +
                 "WHERE movie.id = :id"
     )
-    fun getMovieDetails(id: Int): Map<SiteEntity, Map<MovieEntity, Map<SeasonEntity, List<EpisodeEntity>>>>
+    suspend fun getMovieDetails(id: Int): Map<SiteEntity, Map<MovieEntity, Map<SeasonEntity, List<EpisodeEntity>>>>
 
     @Query(
         "WITH last_episodes AS ( " +
@@ -211,18 +211,18 @@ interface MovieDao {
     fun getExpectedStream(): Flow<List<ExpectedCard>>
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    fun insert(vararg movies: MovieEntity)
+    suspend fun insert(vararg movies: MovieEntity)
 
     @Update
-    fun update(vararg movie: MovieEntity)
+    suspend fun update(vararg movie: MovieEntity)
 
     @Query("UPDATE movies SET kinopoiskId = :kinopoiskId WHERE id = :id")
-    fun updateKinopoiskId(id: Int, kinopoiskId: String?)
+    suspend fun updateKinopoiskId(id: Int, kinopoiskId: String?)
 
     @Delete
-    fun delete(vararg movie: MovieEntity)
+    suspend fun delete(vararg movie: MovieEntity)
 
     @Query("UPDATE movies SET favorites_mark = NOT favorites_mark WHERE id = :id")
-    fun toggleFavoritesMark(id: Int)
+    suspend fun toggleFavoritesMark(id: Int)
 
 }

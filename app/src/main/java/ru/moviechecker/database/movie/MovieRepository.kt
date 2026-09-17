@@ -3,13 +3,13 @@ package ru.moviechecker.database.movie
 import kotlinx.coroutines.flow.Flow
 
 interface MovieRepository {
-    fun getById(id: Int): MovieEntity
-    fun getAll(): List<MovieEntity>
-    fun updateMovie(movie: MovieEntity)
-    fun updateKinopoiskId(id: Int, kinopoiskId: String?)
-    fun toggleFavoritesMark(movieId: Int)
+    suspend fun getById(id: Int): MovieEntity
+    suspend fun getAll(): List<MovieEntity>
+    suspend fun updateMovie(movie: MovieEntity)
+    suspend fun updateKinopoiskId(id: Int, kinopoiskId: String?)
+    suspend fun toggleFavoritesMark(movieId: Int)
 
-    fun getMovieDetails(id: Int): MovieDetails
+    suspend fun getMovieDetails(id: Int): MovieDetails
 
     fun getMovieCardStream(): Flow<List<MovieCard>>
 

@@ -1,14 +1,14 @@
 package ru.moviechecker.database.season
 
-import androidx.room.Embedded
-import androidx.room.Relation
+import androidx.room3.Embedded
+import androidx.room3.Relation
 import ru.moviechecker.database.episode.EpisodeEntity
 
 data class SeasonWithEpisodes(
     @Embedded val season: SeasonEntity,
     @Relation(
-        parentColumn = "id",
-        entityColumn = "season_id"
+        parentColumns = ["id"],
+        entityColumns = ["season_id"]
     )
     val episodes: List<EpisodeEntity>
 )

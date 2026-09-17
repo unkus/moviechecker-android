@@ -28,7 +28,7 @@ class RetrieveDataWorker(appContext: Context, workerParams: WorkerParameters) :
          return workInfo.get().firstOrNull()?.state?.isFinished == true
     }
 
-    fun performRefresh(): Result {
+    suspend fun performRefresh(): Result {
         val database = CheckerDatabase.getDatabase(applicationContext)
         val dataSources = listOf(AmediaDataSource(), LostfilmDataSource())
 

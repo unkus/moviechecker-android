@@ -9,13 +9,13 @@ import ru.moviechecker.database.movie.MovieEntity
 import ru.moviechecker.database.movie.MovieRepository
 
 class DefaultMovieRepository(private val movieDao: MovieDao) : MovieRepository {
-    override fun getById(id: Int) = movieDao.getMovieById(id)
-    override fun getAll() = movieDao.getMovies()
-    override fun updateMovie(movie: MovieEntity) = movieDao.update(movie)
-    override fun updateKinopoiskId(id: Int, kinopoiskId: String?) = movieDao.updateKinopoiskId(id, kinopoiskId)
-    override fun toggleFavoritesMark(movieId: Int) = movieDao.toggleFavoritesMark(movieId)
+    override suspend fun getById(id: Int) = movieDao.getMovieById(id)
+    override suspend fun getAll() = movieDao.getMovies()
+    override suspend fun updateMovie(movie: MovieEntity) = movieDao.update(movie)
+    override suspend fun updateKinopoiskId(id: Int, kinopoiskId: String?) = movieDao.updateKinopoiskId(id, kinopoiskId)
+    override suspend fun toggleFavoritesMark(movieId: Int) = movieDao.toggleFavoritesMark(movieId)
 
-    override fun getMovieDetails(id: Int) =
+    override suspend fun getMovieDetails(id: Int) =
         movieDao.getMovieDetails(id).firstNotNullOf { (site, movies) ->
             {
                 movies.firstNotNullOf { (movie, seasons) ->

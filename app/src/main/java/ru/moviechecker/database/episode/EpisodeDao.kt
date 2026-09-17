@@ -1,11 +1,11 @@
 package ru.moviechecker.database.episode
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room3.Dao
+import androidx.room3.Delete
+import androidx.room3.Insert
+import androidx.room3.OnConflictStrategy
+import androidx.room3.Query
+import androidx.room3.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -22,19 +22,19 @@ interface EpisodeDao {
     fun getEpisodesBySeasonId(seasonId: List<Int>): Flow<List<EpisodeEntity>>
 
     @Query("SELECT * FROM episodes e WHERE e.id = :id")
-    fun getById(id: Int): EpisodeEntity
+    suspend fun getById(id: Int): EpisodeEntity
     @Query("SELECT * FROM episodes e WHERE e.season_id = :seasonId ORDER BY e.number DESC LIMIT 1")
-    fun getLastBySeasonId(seasonId: Int): EpisodeEntity?
+    suspend fun getLastBySeasonId(seasonId: Int): EpisodeEntity?
     @Query("SELECT * FROM episodes e WHERE e.state = :state ORDER BY e.season_id, e.number ASC")
-    fun getByStateSortByNumberAsc(state: EpisodeState): List<EpisodeEntity>
+    suspend fun getByStateSortByNumberAsc(state: EpisodeState): List<EpisodeEntity>
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    fun insert(vararg episodes: EpisodeEntity)
+    suspend fun insert(vararg episodes: EpisodeEntity)
     @Update
-    fun update(vararg episodes: EpisodeEntity)
+    suspend fun update(vararg episodes: EpisodeEntity)
     @Delete
-    fun delete(vararg episodes: EpisodeEntity)
+    suspend fun delete(vararg episodes: EpisodeEntity)
 
     @Query("UPDATE episodes SET state = :newState WHERE id = :episodeId")
-    fun updateEpisodeState(episodeId: Int, newState: EpisodeState)
+    suspend fun updateEpisodeState(episodeId: Int, newState: EpisodeState)
 }

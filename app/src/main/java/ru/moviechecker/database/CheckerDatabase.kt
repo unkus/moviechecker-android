@@ -2,12 +2,14 @@ package ru.moviechecker.database
 
 import android.content.Context
 import android.util.Log
-import androidx.room.AutoMigration
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import androidx.sqlite.db.SupportSQLiteDatabase
+import androidx.room3.AutoMigration
+import androidx.room3.ColumnTypeConverters
+import androidx.room3.Database
+import androidx.room3.Room
+import androidx.room3.RoomDatabase
+import androidx.room3.immediateTransaction
+import androidx.room3.useWriterConnection
+import androidx.sqlite.SQLiteConnection
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import ru.moviechecker.database.episode.EpisodeDao
@@ -46,7 +48,7 @@ import java.net.URI
         AutoMigration(from = 12, to = 13),
     ]
 )
-@TypeConverters(Converters::class)
+@ColumnTypeConverters(Converters::class)
 abstract class CheckerDatabase : RoomDatabase() {
 
     abstract fun siteDao(): SiteDao
@@ -63,15 +65,15 @@ abstract class CheckerDatabase : RoomDatabase() {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(appContext, CheckerDatabase::class.java, "checker_db")
                     // Подгружает данные из файла
-//                    .createFromAsset("checker_db.db")
+                    //.createFromAsset("checker_db.db")
                     .addCallback(object : Callback() {
-                        override fun onCreate(db: SupportSQLiteDatabase) {
-                            super.onCreate(db)
+                        override suspend fun onCreate(connection: SQLiteConnection) {
+                            super.onCreate(connection)
                             Log.d(this.javaClass.simpleName, "База данных создана")
                         }
 
-                        override fun onOpen(db: SupportSQLiteDatabase) {
-                            super.onOpen(db)
+                        override suspend fun onOpen(connection: SQLiteConnection) {
+                            super.onOpen(connection)
                             Log.d(this.javaClass.simpleName, "База данных открыта")
 
                             //                            WorkManager.getInstance(appContext)
@@ -91,38 +93,41 @@ abstract class CheckerDatabase : RoomDatabase() {
         }
     }
 
-    fun populateDatabase(dataContainer: DataContainer) {
+    suspend fun populateDatabase(dataContainer: DataContainer) {
         Log.d(this.javaClass.simpleName, "Получено ${dataContainer.entries.size} записей")
-        runInTransaction {
-            val siteEntity = processSiteData(dataContainer.site)
-            dataContainer.entries
-                .filter { it.error == null }
-                .forEach { record ->
-                    val siteUri =
-                        URI.create(if (siteEntity.useMirror) siteEntity.mirror else siteEntity.address)
-                    record.movie?.let { movie ->
-                        val movieEntity =
-                            processMovieData(
-                                siteEntity.id,
-                                siteUri,
-                                movie
-                            )
-                        record.season?.let { season ->
-                            val seasonEntity = processSeasonData(
-                                siteUri,
-                                movieEntity.id,
-                                season
-                            )
-                            record.episode?.let { episode ->
-                                processEpisodeData(seasonEntity.id, episode)
+
+        useWriterConnection { connection ->
+            connection.immediateTransaction {
+                val siteEntity = processSiteData(dataContainer.site)
+                dataContainer.entries
+                    .filter { it.error == null }
+                    .forEach { record ->
+                        val siteUri =
+                            URI.create(if (siteEntity.useMirror) siteEntity.mirror else siteEntity.address)
+                        record.movie?.let { movie ->
+                            val movieEntity =
+                                processMovieData(
+                                    siteEntity.id,
+                                    siteUri,
+                                    movie
+                                )
+                            record.season?.let { season ->
+                                val seasonEntity = processSeasonData(
+                                    siteUri,
+                                    movieEntity.id,
+                                    season
+                                )
+                                record.episode?.let { episode ->
+                                    processEpisodeData(seasonEntity.id, episode)
+                                }
                             }
                         }
                     }
-                }
+            }
         }
     }
 
-    private fun processSiteData(
+    private suspend fun processSiteData(
         siteData: SiteData
     ): SiteEntity {
         Log.d(this.javaClass.simpleName, "Обрабатываем: ${siteData.mnemonic}")
@@ -148,7 +153,7 @@ abstract class CheckerDatabase : RoomDatabase() {
         return siteDao().getSiteByMnemonic(siteData.mnemonic)!!
     }
 
-    private fun processMovieData(
+    private suspend fun processMovieData(
         siteId: Int,
         siteAddress: URI,
         movieData: MovieData
@@ -197,7 +202,7 @@ abstract class CheckerDatabase : RoomDatabase() {
         }
     }
 
-    private fun processSeasonData(
+    private suspend fun processSeasonData(
         siteAddress: URI,
         movieId: Int,
         seasonData: SeasonData
@@ -230,7 +235,7 @@ abstract class CheckerDatabase : RoomDatabase() {
         return seasonDao().getSeasonByMovieIdAndNumber(movieId, seasonData.number)!!
     }
 
-    private fun processEpisodeData(
+    private suspend fun processEpisodeData(
         seasonId: Int,
         episodeData: EpisodeData
     ) {
@@ -297,7 +302,7 @@ abstract class CheckerDatabase : RoomDatabase() {
         )
     }
 
-    fun cleanupData() {
+    suspend fun cleanupData() {
         // удаляем все что не отмечено как избранное
         movieDao().getMoviesByFavoriteMark(false).forEach { movieDao().delete(it) }
 

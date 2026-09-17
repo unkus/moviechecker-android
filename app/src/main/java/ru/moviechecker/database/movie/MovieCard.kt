@@ -1,7 +1,7 @@
 package ru.moviechecker.database.movie
 
-import androidx.room.ColumnInfo
-import androidx.room.Embedded
+import androidx.room3.ColumnInfo
+import androidx.room3.Embedded
 import java.net.URI
 import java.time.LocalDateTime
 

@@ -9,10 +9,10 @@ interface EpisodeRepository {
     fun getEpisodesBySeasonIdStream(seasonId: Int): Flow<List<EpisodeEntity>>
     fun getEpisodesBySeasonIdStream(seasonIds: List<Int>): Flow<List<EpisodeEntity>>
 
-    fun getById(id: Int): EpisodeEntity
+    suspend fun getById(id: Int): EpisodeEntity
 
-    fun insertEpisode(episode: EpisodeEntity)
-    fun updateEpisode(episode: EpisodeEntity)
-    fun deleteEpisode(episode: EpisodeEntity)
-    fun updateEpisodeState(episodeId: Int, newState: EpisodeState)
+    suspend fun insertEpisode(episode: EpisodeEntity)
+    suspend fun updateEpisode(episode: EpisodeEntity)
+    suspend fun deleteEpisode(episode: EpisodeEntity)
+    suspend fun updateEpisodeState(episodeId: Int, newState: EpisodeState)
 }
