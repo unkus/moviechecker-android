@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
@@ -106,7 +107,7 @@ fun SiteDetailsScreenContent(
 //                horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = stringResource(R.string.use_mirror))
+            Text(text = stringResource(R.string.site_use_mirror_label))
             Spacer(modifier = Modifier.weight(1f))
             Switch(
                 checked = uiState.form.useMirror,
@@ -119,8 +120,8 @@ fun SiteDetailsScreenContent(
             onValueChange = { onDataChanged(uiState.form.copy(mirror = it)) },
             modifier = Modifier.fillMaxWidth(),
             enabled = uiState.form.useMirror,
-            label = { Text("Зеркало") },
-            placeholder = { Text("Введите адрес зеркала") }
+            label = { Text(stringResource(R.string.site_mirror_label)) },
+            placeholder = { Text(stringResource(R.string.site_mirror_description)) }
         )
 
         Button(
@@ -134,7 +135,7 @@ fun SiteDetailsScreenContent(
                         strokeWidth = 2.dp,
                 )
             } else {
-                Text("Сохранить")
+                Text(text = stringResource(R.string.save_action), color = if (uiState.form.isValid ) Color.Unspecified else Color.Red)
             }
         }
     }

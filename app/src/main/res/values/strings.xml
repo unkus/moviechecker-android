@@ -17,8 +17,9 @@
     <string name="site_mnemonic_label">Mnemonic</string>
     <string name="site_title_label">Title</string>
     <string name="site_address_label">Address</string>
-    <string name="site_mirror_label">Mirror</string>
     <string name="site_use_mirror_label">Use mirror</string>
+    <string name="site_mirror_label">Mirror</string>
+    <string name="site_mirror_description">Enter the mirror address</string>
     <string name="movies">Movies</string>
     <string name="open_next_or_last">Open next or last episode in browser</string>
     <string name="not_implemented">Not implemented</string>
@@ -28,5 +29,4 @@
     <string name="expected">Expected</string>
     <string name="catalog">Catalog</string>
     <string name="save_action">Save</string>
-    <string name="use_mirror">Use mirror</string>
 </resources>

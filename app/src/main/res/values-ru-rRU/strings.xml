@@ -16,8 +16,9 @@
     <string name="site_mnemonic_label">Мнемоника</string>
     <string name="site_title_label">Название</string>
     <string name="site_address_label">Адрес</string>
-    <string name="site_mirror_label">Зеркало</string>
     <string name="site_use_mirror_label">Использовать зеркало</string>
+    <string name="site_mirror_label">Зеркало</string>
+    <string name="site_mirror_description">Введите адрес зеркала</string>
     <string name="movies">Фильмы/Сериалы</string>
     <string name="open_next_or_last">Открыть следующий или последний эпизод в браузере</string>
     <string name="not_implemented">Не реализовано</string>
@@ -27,5 +28,4 @@
     <string name="expected">Ожидается</string>
     <string name="catalog">Каталог</string>
     <string name="save_action">Сохранить</string>
-    <string name="use_mirror">Использовать зеркало</string>
 </resources>
