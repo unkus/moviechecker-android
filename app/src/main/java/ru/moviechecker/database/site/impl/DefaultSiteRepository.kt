@@ -8,9 +8,8 @@ import ru.moviechecker.database.site.SiteRepository
 class DefaultSiteRepository(private val siteDao: SiteDao) : SiteRepository {
     override suspend fun findById(id: Int): SiteEntity? = siteDao.getSiteById(id)
 
-    override fun getByIdStream(id: Int): Flow<SiteEntity> = siteDao.getSiteByIdStream(id)
-
     override fun getAllStream(): Flow<List<SiteEntity>> = siteDao.getAllStream()
 
-    override suspend fun updateSite(site: SiteEntity) = siteDao.update(site)
+    override suspend fun create(entity: SiteEntity) = siteDao.insert(entity)
+    override suspend fun update(entity: SiteEntity) = siteDao.update(entity)
 }

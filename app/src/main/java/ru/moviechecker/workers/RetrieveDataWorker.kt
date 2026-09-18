@@ -11,6 +11,8 @@ import kotlinx.coroutines.withContext
 import ru.moviechecker.database.CheckerDatabase
 import ru.moviechecker.datasource.AmediaDataSource
 import ru.moviechecker.datasource.LostfilmDataSource
+import ru.moviechecker.datasource.model.DataContainer
+import ru.moviechecker.datasource.model.SiteData
 import java.net.URI
 
 class RetrieveDataWorker(appContext: Context, workerParams: WorkerParameters) :
@@ -47,6 +49,13 @@ class RetrieveDataWorker(appContext: Context, workerParams: WorkerParameters) :
                         "Не удалось получить данные для ${dataSource.mnemonic} от $address",
                         ex
                     )
+                    database.populateDatabase(DataContainer(
+                        site = SiteData(
+                            mnemonic = dataSource.mnemonic,
+                            address = dataSource.initialAddress
+                        ),
+                        entries = listOf()
+                    ))
                     "Не удалось получить данные для ${dataSource.mnemonic}"
                 }
             }

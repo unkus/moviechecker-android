@@ -1,12 +1,12 @@
 package ru.moviechecker.datasource
 
 import android.util.Log
+import ru.moviechecker.datasource.model.DataContainer
 import ru.moviechecker.datasource.model.DataState
 import ru.moviechecker.datasource.model.EpisodeData
 import ru.moviechecker.datasource.model.MovieData
 import ru.moviechecker.datasource.model.SeasonData
 import ru.moviechecker.datasource.model.SiteData
-import ru.moviechecker.datasource.model.DataContainer
 import ru.moviechecker.datasource.model.SourceDataEntry
 import ru.moviechecker.datasource.model.StrictDataSource
 import java.net.URI

@@ -54,7 +54,7 @@ fun SitesDestination(
         detailPane = {
             AnimatedPane {
                 navigator.currentDestination?.contentKey?.let {
-                    SiteDetailsScreen(it)
+                    SiteDetailsScreen(it.id)
                 }
             }
         },

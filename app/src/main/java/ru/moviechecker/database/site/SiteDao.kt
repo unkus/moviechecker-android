@@ -18,15 +18,12 @@ interface SiteDao {
     fun getAllStream(): Flow<List<SiteEntity>>
 
     @Query("SELECT * FROM sites s WHERE s.id = :id")
-    fun getSiteByIdStream(id: Int): Flow<SiteEntity>
-
-    @Query("SELECT * FROM sites s WHERE s.id = :id")
     suspend fun getSiteById(id: Int): SiteEntity?
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(vararg sites: SiteEntity)
+    suspend fun insert(vararg entities: SiteEntity)
     @Update
-    suspend fun update(vararg sites: SiteEntity)
+    suspend fun update(vararg entities: SiteEntity)
     @Delete
-    suspend fun delete(vararg sites: SiteEntity)
+    suspend fun delete(vararg entities: SiteEntity)
 }

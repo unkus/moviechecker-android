@@ -72,6 +72,7 @@ fun MovieDetailsCard(
                 )
             }
         }
+
         Row(
             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small))
         ) {
@@ -85,6 +86,7 @@ fun MovieDetailsCard(
             )
             Text(text = if (movie.favoritesMark) "В избранном" else "Добавить в избранные")
         }
+
         Row(
             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small))
         ) {
@@ -96,6 +98,7 @@ fun MovieDetailsCard(
                 placeholder = { Text("Введите id с кинопоиска") }
             )
         }
+
         Row(
             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small))
         ) {

@@ -38,5 +38,6 @@ class MovieDetailsScreenViewModel : ViewModel() {
 }
 
 data class MovieDetailsUiState(
-    val expandedSeasonNumber: Int
+    val expandedSeasonNumber: Int,
+    val kinopoiskId: String? = null
 )
