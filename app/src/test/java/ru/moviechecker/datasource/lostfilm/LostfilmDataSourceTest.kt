@@ -53,24 +53,24 @@ internal class LostfilmDataSourceTest {
             "Количество полученных записей не соответствует ожиданию"
         )
         val mufasaTheLionKing =
-            sourceData.entries.firstOrNull { it.movie.pageId == "Mufasa_The_Lion_King" }
+            sourceData.entries.firstOrNull { it.movie?.pageId == "Mufasa_The_Lion_King" }
         assertNotNull(mufasaTheLionKing, "Запись \"Муфаса: Король Лев\" не найдена")
-        assertEquals("Муфаса: Король Лев", mufasaTheLionKing!!.movie.title)
-        assertEquals("/movies/Mufasa_The_Lion_King", mufasaTheLionKing.movie.link)
+        assertEquals("Муфаса: Король Лев", mufasaTheLionKing.movie?.title)
+        assertEquals("/movies/Mufasa_The_Lion_King", mufasaTheLionKing.movie?.link)
         assertEquals(
             "/Static/Images/878/Posters/poster.jpg",
-            mufasaTheLionKing.movie.posterLink
+            mufasaTheLionKing.movie?.posterLink
         )
         assertNull(mufasaTheLionKing.season)
         assertNull(mufasaTheLionKing.episode)
 
-        val euphoria = sourceData.entries.firstOrNull { it.movie.pageId == "Euphoria" }
+        val euphoria = sourceData.entries.firstOrNull { it.movie?.pageId == "Euphoria" }
         assertNotNull(euphoria, "Запись \"Эйфория\" не найдена")
-        assertEquals("Эйфория", euphoria.movie.title)
-        assertEquals("/series/Euphoria", euphoria.movie.link)
+        assertEquals("Эйфория", euphoria.movie?.title)
+        assertEquals("/series/Euphoria", euphoria.movie?.link)
         assertEquals(
             "/Static/Images/915/Posters/e_999_1.jpg",
-            euphoria.movie.posterLink
+            euphoria.movie?.posterLink
         )
         assertEquals(999, euphoria.season?.number)
         assertNull(euphoria.season?.title)
@@ -92,13 +92,13 @@ internal class LostfilmDataSourceTest {
             euphoria.episode?.date
         )
 
-        val severance = sourceData.entries.firstOrNull { it.movie.pageId == "Severance" }
+        val severance = sourceData.entries.firstOrNull { it.movie?.pageId == "Severance" }
         assertNotNull(severance, "Запись \"Разделение\" не найдена")
-        assertEquals("Разделение", severance.movie.title)
-        assertEquals("/series/Severance", severance.movie.link)
+        assertEquals("Разделение", severance.movie?.title)
+        assertEquals("/series/Severance", severance.movie?.link)
         assertEquals(
             "/Static/Images/651/Posters/e_2_6.jpg",
-            severance.movie.posterLink
+            severance.movie?.posterLink
         )
         assertEquals(2, severance.season?.number)
         assertNull(severance.season?.title)
@@ -120,10 +120,10 @@ internal class LostfilmDataSourceTest {
             severance.episode?.date
         )
 
-        val surrealEstate = sourceData.entries.firstOrNull { it.movie.pageId == "SurrealEstate" }
+        val surrealEstate = sourceData.entries.firstOrNull { it.movie?.pageId == "SurrealEstate" }
         assertNotNull(surrealEstate, "Запись \"Сюрриэлторы\" не найдена")
-        assertEquals("Сюрриэлторы", surrealEstate.movie.title)
-        assertEquals("/series/SurrealEstate", surrealEstate.movie.link)
+        assertEquals("Сюрриэлторы", surrealEstate.movie?.title)
+        assertEquals("/series/SurrealEstate", surrealEstate.movie?.link)
         assertEquals("/series/SurrealEstate/season_3/episode_3", surrealEstate.episode?.link)
     }
 }

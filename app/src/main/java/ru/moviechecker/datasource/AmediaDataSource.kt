@@ -55,6 +55,15 @@ class AmediaDataSource : StrictDataSource("amedia", "https://amedia.online") {
     private val dateTimeRegex = PATTERN_DATE_TIME.toRegex()
     private val episodeNumberRegex = PATTERN_EPISODE_NNUMBER.toRegex()
 
+    /*
+     правило подмены:
+     если: pageId = ubijca-bogov-final
+     то сделать замену:
+     pageId = ubijca-bogov
+     seasonNumber = 4
+     */
+    private val replacementMap = mapOf("ubijca-bogov-final" to ("ubijca-bogov" to "4"))
+
     override fun retrieveData(uri: URI): DataContainer {
         val lines = readContent(uri).lines()
 
@@ -70,15 +79,18 @@ class AmediaDataSource : StrictDataSource("amedia", "https://amedia.online") {
                     val (dateString, timeString) = dateTimeRegex.find(window[6])!!.destructured
                     val (episodeNumber) = episodeNumberRegex.find(window[8])!!.destructured
 
-                    val seasonNumber = seasonNumber1.ifBlank { seasonNumber2.ifBlank { null } }
-                    val moviePageId = seasonNumber?.let { movieMnemonic.substringBeforeLast("-$seasonNumber") } ?: movieMnemonic
+                    val replacement = replacementMap[movieMnemonic]
+                    val seasonNumber = replacement?.second
+                        ?: seasonNumber1.ifBlank { seasonNumber2.ifBlank { null } }
+                    val moviePageId = replacement?.first
+                        ?: seasonNumber?.let { movieMnemonic.substringBeforeLast("-$seasonNumber") } ?: movieMnemonic
                     val movie = MovieData(
                         pageId = moviePageId,
                         title = movieTitle
                     )
                     Log.d(this.javaClass.simpleName, "movie=$movie")
                     val season = SeasonData(
-                        number = seasonNumber1.ifBlank { seasonNumber2.ifBlank { "1" } }.toInt(),
+                        number = seasonNumber?.toInt() ?: 1,
                         title = seasonTitle.ifBlank { null },
                         link = seasonPage,
                         posterLink = imgSrc

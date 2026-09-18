@@ -39,14 +39,14 @@ internal class AmediaDataSourceTest {
             AmediaDataSource().retrieveData(javaClass.getResource("/amedia/amedia.html")!!.toURI())
         assertEquals("Animedia Online", sourceData.site.title)
         assertEquals(
-            18,
+            19,
             sourceData.entries.size,
             "Количество полученных записей не соответствует ожиданию"
         )
 
-        val mojDjejmon = sourceData.entries.firstOrNull { it.movie.pageId == "moj-djejmon" }
+        val mojDjejmon = sourceData.entries.firstOrNull { it.movie?.pageId == "moj-djejmon" }
         assertNotNull(mojDjejmon, "Запись \"Мой Дэймон\" не найдена")
-        assertEquals("Мой Дэймон", mojDjejmon.movie.title)
+        assertEquals("Мой Дэймон", mojDjejmon.movie?.title)
         assertEquals(1, mojDjejmon.season?.number)
         assertEquals("/1593-moj-djejmon.html", mojDjejmon.season?.link)
         assertEquals(
@@ -62,9 +62,9 @@ internal class AmediaDataSourceTest {
         assertEquals("/1593-moj-djejmon/episode/13/seriya-onlayn.html", mojDjejmon.episode?.link)
 
         val nevestaCharodeja =
-            sourceData.entries.firstOrNull { it.movie.pageId == "nevesta-charodeja" }
+            sourceData.entries.firstOrNull { it.movie?.pageId == "nevesta-charodeja" }
         assertNotNull(nevestaCharodeja, "Запись \"Невеста чародея\" не найдена")
-        assertEquals("Невеста чародея", nevestaCharodeja.movie.title)
+        assertEquals("Невеста чародея", nevestaCharodeja.movie?.title)
         assertEquals(2, nevestaCharodeja.season?.number)
         assertEquals("/1362-nevesta-charodeja-2.html", nevestaCharodeja.season?.link)
         assertEquals(
@@ -72,7 +72,7 @@ internal class AmediaDataSourceTest {
             nevestaCharodeja.episode?.date
         )
 
-        val ubijcaGoblinov = sourceData.entries.firstOrNull { it.movie.pageId == "ubijca-goblinov" }
+        val ubijcaGoblinov = sourceData.entries.firstOrNull { it.movie?.pageId == "ubijca-goblinov" }
         assertNotNull(ubijcaGoblinov, "Запись \"Убийца гоблинов\" не найдена")
         assertEquals(DataState.EXPECTED, ubijcaGoblinov.episode?.state)
         assertEquals(
@@ -80,9 +80,9 @@ internal class AmediaDataSourceTest {
             ubijcaGoblinov.episode?.date
         )
 
-        val klevatess = sourceData.entries.firstOrNull { it.movie.pageId == "klevatess" }
+        val klevatess = sourceData.entries.firstOrNull { it.movie?.pageId == "klevatess" }
         assertNotNull(klevatess, "Запись \"Клеватесс\" не найдена")
-        assertEquals("Клеватесс", klevatess.movie.title)
+        assertEquals("Клеватесс", klevatess.movie?.title)
         assertEquals(2, klevatess.season?.number)
         assertEquals("Король демонических зверей и легенда о ложном герое", klevatess.season?.title)
         assertEquals(DataState.RELEASED, klevatess.episode?.state)
@@ -91,15 +91,26 @@ internal class AmediaDataSourceTest {
             klevatess.episode?.date
         )
 
-        val adskijRezhim = sourceData.entries.firstOrNull { it.movie.pageId == "adskij-rezhim-gejmer-kotoryj-ljubit-spidran-stanovitsja-bespodobnym-v-parallelnom-mire-s-ustarevshimi-nastrojkami" }
+        val adskijRezhim = sourceData.entries.firstOrNull { it.movie?.pageId == "adskij-rezhim-gejmer-kotoryj-ljubit-spidran-stanovitsja-bespodobnym-v-parallelnom-mire-s-ustarevshimi-nastrojkami" }
         assertNotNull(adskijRezhim, "Запись \"Адский режим\" не найдена")
-        assertEquals("Адский режим", adskijRezhim.movie.title)
+        assertEquals("Адский режим", adskijRezhim.movie?.title)
         assertEquals(2, adskijRezhim.season?.number)
         assertEquals("Геймер, который любит спидран, становится бесподобным в параллельном мире с устаревшими настройками", adskijRezhim.season?.title)
         assertEquals(DataState.RELEASED, adskijRezhim.episode?.state)
         assertEquals(
             LocalDateTime.of(LocalDate.of(2026, 8, 14), LocalTime.of(19, 16)),
             adskijRezhim.episode?.date
+        )
+
+        val ubijcaBogov = sourceData.entries.firstOrNull { it.movie?.pageId == "ubijca-bogov" }
+        assertNotNull(ubijcaBogov, "Запись \"Убийца богов\" не найдена")
+        assertEquals("Убийца богов", ubijcaBogov.movie?.title)
+        assertEquals(4, ubijcaBogov.season?.number)
+        assertEquals("Финал", ubijcaBogov.season?.title)
+        assertEquals(DataState.RELEASED, ubijcaBogov.episode?.state)
+        assertEquals(
+            LocalDateTime.of(LocalDate.of(2026, 9, 17), LocalTime.of(15, 20)),
+            ubijcaBogov.episode?.date
         )
 
         // TODO: найти более старые записи чем вчера и выходящие нестабильно
