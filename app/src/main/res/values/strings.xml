@@ -29,4 +29,5 @@
     <string name="expected">Expected</string>
     <string name="catalog">Catalog</string>
     <string name="save_action">Save</string>
+    <string name="empty_list_value">Nothing was found</string>
 </resources>
