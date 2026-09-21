@@ -3,7 +3,6 @@ package ru.moviechecker.database
 import androidx.room3.RenameColumn
 import androidx.room3.migration.AutoMigrationSpec
 import androidx.sqlite.SQLiteConnection
-import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.execSQL
 
 @RenameColumn.Entries(
@@ -33,3 +32,12 @@ class Ver8To9AutoMigration : AutoMigrationSpec {
         connection.execSQL("UPDATE sites SET `mirror` = 'https://a1.amedia.so' WHERE `mnemonic` = 'amedia'")
     }
 }
+
+@RenameColumn.Entries(
+    RenameColumn(
+        tableName = "movies",
+        fromColumnName = "kinopoiskId",
+        toColumnName = "kinopoisk_id"
+    )
+)
+class Ver13To14AutoMigration : AutoMigrationSpec

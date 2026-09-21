@@ -19,6 +19,7 @@ data class MovieEntity(
     var poster: ByteArray? = null,
     @ColumnInfo(name = "favorites_mark")
     var favoritesMark: Boolean = false,
+    @ColumnInfo(name = "kinopoisk_id")
     var kinopoiskId: String? = null
 ) {
     override fun equals(other: Any?): Boolean {

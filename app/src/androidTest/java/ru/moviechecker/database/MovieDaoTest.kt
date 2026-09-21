@@ -1,10 +1,10 @@
 package ru.moviechecker.database
 
-import androidx.room.Room
+import androidx.room3.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert
 import org.junit.Assert.assertEquals
@@ -95,17 +95,11 @@ class MovieDaoTest {
     fun createDb() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         checkerDatabase = Room.inMemoryDatabaseBuilder(context, CheckerDatabase::class.java)
-            .allowMainThreadQueries()
             .build()
         siteDao = checkerDatabase.siteDao()
         movieDao = checkerDatabase.movieDao()
         seasonDao = checkerDatabase.seasonDao()
         episodeDao = checkerDatabase.episodeDao()
-
-        siteDao.insert(site1, site2)
-        movieDao.insert(movie1, movie2, movie3)
-        seasonDao.insert(season1, season2, season3, season4)
-        episodeDao.insert(episode1, episode2, episode3, episode4, episode5)
     }
 
     @After
@@ -114,20 +108,35 @@ class MovieDaoTest {
     }
 
     @Test
-    fun daoGetMovieBySiteIdAndPageId_returnsMovieFromDB() = runBlocking {
+    fun daoGetMovieBySiteIdAndPageId_returnsMovieFromDB() = runTest {
+        siteDao.insert(site1, site2)
+        movieDao.insert(movie1, movie2, movie3)
+        seasonDao.insert(season1, season2, season3, season4)
+        episodeDao.insert(episode1, episode2, episode3, episode4, episode5)
+
         movieDao.getMovieBySiteIdAndPageId(1, "movie1")?.let {
             assertEquals(movie1, it)
         } ?: Assert.fail("Movie not found")
     }
 
     @Test
-    fun daoGetMovieById_returnsMovieFromDB() = runBlocking {
+    fun daoGetMovieById_returnsMovieFromDB() = runTest {
+        siteDao.insert(site1, site2)
+        movieDao.insert(movie1, movie2, movie3)
+        seasonDao.insert(season1, season2, season3, season4)
+        episodeDao.insert(episode1, episode2, episode3, episode4, episode5)
+
         assertNull("Some movie found but not expected", movieDao.getMovieById(4))
         assertEquals(movie2, movieDao.getMovieById(2)) ?: Assert.fail("Movie not found")
     }
 
     @Test
-    fun daoGetMovieBySiteIdAndMovieId_returnsMovieFromDB() = runBlocking {
+    fun daoGetMovieBySiteIdAndMovieId_returnsMovieFromDB() = runTest {
+        siteDao.insert(site1, site2)
+        movieDao.insert(movie1, movie2, movie3)
+        seasonDao.insert(season1, season2, season3, season4)
+        episodeDao.insert(episode1, episode2, episode3, episode4, episode5)
+
         movieDao.getMovieBySiteIdAndPageId(2, "movie2")?.let {
             Assert.fail("Some movie found but not expected")
         }
@@ -137,7 +146,12 @@ class MovieDaoTest {
     }
 
     @Test
-    fun daoGetMovieDetailsByMovieId() = runBlocking {
+    fun daoGetMovieDetailsByMovieId() = runTest {
+        siteDao.insert(site1, site2)
+        movieDao.insert(movie1, movie2, movie3)
+        seasonDao.insert(season1, season2, season3, season4)
+        episodeDao.insert(episode1, episode2, episode3, episode4, episode5)
+
         val movie1 = movieDao.getMovieDetails(1)
 //        assertEquals(1, movie1.movie.id)
 //        assertEquals("http://1.site", movie1.movie.address)
@@ -152,8 +166,13 @@ class MovieDaoTest {
     }
 
     @Test
-    fun daoGetNewMovieCards() = runBlocking {
-        var cards = movieDao.getMovieCardStream().first()
+    fun daoGetNewMovieCards() = runTest {
+        siteDao.insert(site1, site2)
+        movieDao.insert(movie1, movie2, movie3)
+        seasonDao.insert(season1, season2, season3, season4)
+        episodeDao.insert(episode1, episode2, episode3, episode4, episode5)
+
+        val cards = movieDao.getMovieCardStream().first()
 
         assertEquals(3, cards.size)
         val card1 = cards[0]

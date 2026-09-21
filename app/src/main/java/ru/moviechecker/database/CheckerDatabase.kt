@@ -32,7 +32,7 @@ import java.net.URI
 @Database(
     entities = [SiteEntity::class, MovieEntity::class, SeasonEntity::class, EpisodeEntity::class],
     views = [],
-    version = 13,
+    version = 14,
     autoMigrations = [
         AutoMigration(from = 1, to = 2, spec = Ver1To2AutoMigration::class),
         AutoMigration(from = 2, to = 3),
@@ -46,6 +46,7 @@ import java.net.URI
         AutoMigration(from = 10, to = 11),
         AutoMigration(from = 11, to = 12),
         AutoMigration(from = 12, to = 13),
+        AutoMigration(from = 13, to = 14, spec = Ver13To14AutoMigration::class),
     ]
 )
 @ColumnTypeConverters(Converters::class)

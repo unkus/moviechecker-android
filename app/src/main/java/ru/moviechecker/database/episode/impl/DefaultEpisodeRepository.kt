@@ -10,8 +10,8 @@ class DefaultEpisodeRepository(private val episodeDao: EpisodeDao) : EpisodeRepo
     override fun getAllStream(): Flow<List<EpisodeEntity>> = episodeDao.getAllEpisodesStream()
     override fun getByIdStream(id: Int): Flow<EpisodeEntity> = episodeDao.getEpisodeById(id)
 
-    override fun getEpisodesBySeasonIdStream(seasonId: Int): Flow<List<EpisodeEntity>> = episodeDao.getEpisodesBySeasonId(seasonId)
-    override fun getEpisodesBySeasonIdStream(seasonIds: List<Int>): Flow<List<EpisodeEntity>> = episodeDao.getEpisodesBySeasonId(seasonIds)
+    override fun getEpisodesBySeasonIdStream(seasonId: Int): Flow<List<EpisodeEntity>> = episodeDao.getEpisodesBySeasonIdStream(seasonId)
+    override fun getEpisodesBySeasonIdStream(seasonIds: List<Int>): Flow<List<EpisodeEntity>> = episodeDao.getEpisodesBySeasonIdStream(seasonIds)
 
     override suspend fun getById(id: Int): EpisodeEntity = episodeDao.getById(id)
 

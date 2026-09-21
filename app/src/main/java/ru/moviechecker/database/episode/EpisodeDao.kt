@@ -17,9 +17,10 @@ interface EpisodeDao {
     fun getEpisodeById(id: Int): Flow<EpisodeEntity>
 
     @Query("SELECT * FROM episodes e WHERE e.season_id = :seasonId")
-    fun getEpisodesBySeasonId(seasonId: Int): Flow<List<EpisodeEntity>>
+    fun getEpisodesBySeasonIdStream(seasonId: Int): Flow<List<EpisodeEntity>>
+
     @Query("SELECT * FROM episodes e WHERE e.season_id in (:seasonId)")
-    fun getEpisodesBySeasonId(seasonId: List<Int>): Flow<List<EpisodeEntity>>
+    fun getEpisodesBySeasonIdStream(seasonId: List<Int>): Flow<List<EpisodeEntity>>
 
     @Query("SELECT * FROM episodes e WHERE e.id = :id")
     suspend fun getById(id: Int): EpisodeEntity

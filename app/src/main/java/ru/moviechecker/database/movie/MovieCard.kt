@@ -11,6 +11,7 @@ data class MovieCard(
     @ColumnInfo(name = "favorites_mark")
     val favoritesMark: Boolean,
     val poster: ByteArray?,
+    @ColumnInfo(name = "kinopoisk_id")
     val kinopoiskId: String?,
 
     @Embedded(prefix = "site_")
@@ -41,6 +42,7 @@ data class MovieCardMovie(
     val favoritesMark: Boolean, // для отображения и фильтра
     @ColumnInfo(name = "last_season_number")
     val seasonLastNumber: Int, // для отображения последний/не последний
+    @ColumnInfo(name = "kinopoisk_id")
     val kinopoiskId: String? // для перехода на кинопоиск
 )
 
