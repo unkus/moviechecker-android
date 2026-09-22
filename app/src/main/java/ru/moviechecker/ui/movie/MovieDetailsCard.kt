@@ -1,7 +1,6 @@
 package ru.moviechecker.ui.movie
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import android.graphics.BitmapFactory
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -31,7 +29,6 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -65,10 +62,13 @@ fun MovieDetailsCard(
             Row(
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small))
             ) {
-                Poster(
-                    it,
+                Image(
+                    bitmap = it,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
                 )
             }
         }
@@ -130,7 +130,15 @@ fun MovieDetailsSeasonCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(Modifier.padding(dimensionResource(id = R.dimen.padding_small))) {
-            season.poster?.let { Poster(it, modifier = Modifier.width(60.dp)) }
+            season.poster?.let {
+                Image(
+                    bitmap = it,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                )
+            }
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -199,30 +207,6 @@ fun MovieDetailsEpisodeCard(
     }
 }
 
-@Composable
-private fun Poster(
-    data: ByteArray,
-    modifier: Modifier = Modifier
-) {
-    val image = try {
-        BitmapFactory.decodeByteArray(
-            data,
-            0,
-            data.size
-        )
-            .asImageBitmap()
-    } catch (exception: Exception) {
-        return
-    }
-    Image(
-        bitmap = image,
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
-        modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
-    )
-}
-
 @Preview("Детализации")
 @Preview("Детализации (темная тема)", uiMode = UI_MODE_NIGHT_YES)
 @Composable
@@ -236,13 +220,13 @@ fun PreviewMovieDetailsCard(
                 siteId = 1,
                 pageId = "movie_page_id",
                 title = "Фильм такой-то",
-                poster = poster,
+                poster = bitmap,
                 favoritesMark = favoritesMark,
                 seasons = listOf(
                     SeasonCardModel(
                         id = 1,
                         number = 1,
-                        poster = poster,
+                        poster = bitmap,
                         episodes = listOf(
                             EpisodeCardModel(
                                 id = 1,
@@ -280,7 +264,7 @@ fun PreviewMovieDetailsSeasonCard() {
                 id = 1,
                 number = 1,
                 title = "Заголовок сезона",
-                poster = poster,
+                poster = bitmap,
                 episodes = listOf(
                     EpisodeCardModel(
                         id = 1,

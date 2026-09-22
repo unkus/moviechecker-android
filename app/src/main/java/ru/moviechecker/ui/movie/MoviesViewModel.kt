@@ -1,5 +1,8 @@
 package ru.moviechecker.ui.movie
 
+import android.graphics.BitmapFactory
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
@@ -110,7 +113,7 @@ class MoviesViewModel(
 data class MovieCardModel(
     override val id: Int,
     val title: String,
-    val poster: ByteArray? = null,
+    val poster: ImageBitmap? = null,
     val favoritesMark: Boolean,
     val kinopoiskId: String? = null,
     val season: SeasonModel,
@@ -123,12 +126,13 @@ data class MovieCardModel(
         fun fromEntity(entity: MovieCard): MovieCardModel {
             val host = if (entity.site.useMirror) entity.site.mirror else entity.site.address
             val season = SeasonModel.fromEntity(entity.season)
+            val bitmap = entity.poster?.let { BitmapFactory.decodeByteArray(it, 0, it.size) }
             val episode =
                 EpisodeModel.fromEntity(entity.episode, URI.create("${host}${entity.episode.link}"))
             return MovieCardModel(
                 id = entity.id,
                 title = entity.title,
-                poster = entity.poster,
+                poster = bitmap?.asImageBitmap(),
                 favoritesMark = entity.favoritesMark,
                 kinopoiskId = entity.kinopoiskId,
                 season = season,
@@ -141,12 +145,13 @@ data class MovieCardModel(
         fun fromEntity(entity: ExpectedCard): MovieCardModel {
             val host = if (entity.site.useMirror) entity.site.mirror else entity.site.address
             val season = SeasonModel.fromEntity(entity.season)
+            val bitmap = entity.poster?.let { BitmapFactory.decodeByteArray(it, 0, it.size) }
             val episode =
                 EpisodeModel.fromEntity(entity.episode, URI.create("${host}${entity.episode.link}"))
             return MovieCardModel(
                 id = entity.id,
                 title = entity.title,
-                poster = entity.poster,
+                poster = bitmap?.asImageBitmap(),
                 favoritesMark = entity.favoritesMark,
                 kinopoiskId = entity.kinopoiskId,
                 season = season,
@@ -155,38 +160,6 @@ data class MovieCardModel(
                 updatedAt = entity.episode.date
             )
         }
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as MovieCardModel
-
-        if (id != other.id) return false
-        if (favoritesMark != other.favoritesMark) return false
-        if (hasMoreEpisodes != other.hasMoreEpisodes) return false
-        if (title != other.title) return false
-        if (!poster.contentEquals(other.poster)) return false
-        if (kinopoiskId != other.kinopoiskId) return false
-        if (season != other.season) return false
-        if (episode != other.episode) return false
-        if (updatedAt != other.updatedAt) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = id
-        result = 31 * result + favoritesMark.hashCode()
-        result = 31 * result + hasMoreEpisodes.hashCode()
-        result = 31 * result + title.hashCode()
-        result = 31 * result + (poster?.contentHashCode() ?: 0)
-        result = 31 * result + (kinopoiskId?.hashCode() ?: 0)
-        result = 31 * result + season.hashCode()
-        result = 31 * result + episode.hashCode()
-        result = 31 * result + updatedAt.hashCode()
-        return result
     }
 
 }
@@ -251,7 +224,7 @@ data class MovieDetailsCardModel(
     val pageId: String,
     val title: String,
     val link: String? = null,
-    val poster: ByteArray? = null,
+    val poster: ImageBitmap? = null,
     val favoritesMark: Boolean = false,
     val kinopoiskId: String? = null,
     val seasons: List<SeasonCardModel>
@@ -261,13 +234,14 @@ data class MovieDetailsCardModel(
         fun fromEntity(
             entity: MovieDetails
         ): MovieDetailsCardModel {
+            val bitmap = entity.poster?.let { BitmapFactory.decodeByteArray(it, 0, it.size) }
             return MovieDetailsCardModel(
                 id = entity.id,
                 siteId = entity.siteId,
                 pageId = entity.pageId,
                 title = entity.title,
                 link = entity.link,
-                poster = entity.poster,
+                poster = bitmap?.asImageBitmap(),
                 favoritesMark = entity.favoritesMark,
                 kinopoiskId = entity.kinopoiskId,
                 seasons = entity.seasons.map { (season, episodes) ->
@@ -277,38 +251,6 @@ data class MovieDetailsCardModel(
         }
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as MovieDetailsCardModel
-
-        if (id != other.id) return false
-        if (siteId != other.siteId) return false
-        if (favoritesMark != other.favoritesMark) return false
-        if (pageId != other.pageId) return false
-        if (title != other.title) return false
-        if (link != other.link) return false
-        if (!poster.contentEquals(other.poster)) return false
-        if (kinopoiskId != other.kinopoiskId) return false
-        if (seasons != other.seasons) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = id
-        result = 31 * result + siteId
-        result = 31 * result + favoritesMark.hashCode()
-        result = 31 * result + pageId.hashCode()
-        result = 31 * result + title.hashCode()
-        result = 31 * result + (link?.hashCode() ?: 0)
-        result = 31 * result + (poster?.contentHashCode() ?: 0)
-        result = 31 * result + (kinopoiskId?.hashCode() ?: 0)
-        result = 31 * result + seasons.hashCode()
-        return result
-    }
-
 }
 
 data class SeasonCardModel(
@@ -316,7 +258,7 @@ data class SeasonCardModel(
     val number: Int,
     var title: String? = null,
     var link: String? = null,
-    var poster: ByteArray? = null,
+    var poster: ImageBitmap? = null,
     val episodes: List<EpisodeCardModel>
 ) : Identifiable {
     companion object Factory {
@@ -324,40 +266,15 @@ data class SeasonCardModel(
             entity: SeasonEntity,
             episodes: List<EpisodeCardModel> = listOf()
         ): SeasonCardModel {
+            val bitmap = entity.poster?.let { BitmapFactory.decodeByteArray(it, 0, it.size) }
             return SeasonCardModel(
                 id = entity.id,
                 number = entity.number,
                 title = entity.title,
-                poster = entity.poster,
+                poster = bitmap?.asImageBitmap(),
                 episodes = episodes
             )
         }
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as SeasonCardModel
-
-        if (id != other.id) return false
-        if (number != other.number) return false
-        if (title != other.title) return false
-        if (link != other.link) return false
-        if (!poster.contentEquals(other.poster)) return false
-        if (episodes != other.episodes) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = id
-        result = 31 * result + number
-        result = 31 * result + (title?.hashCode() ?: 0)
-        result = 31 * result + (link?.hashCode() ?: 0)
-        result = 31 * result + (poster?.contentHashCode() ?: 0)
-        result = 31 * result + episodes.hashCode()
-        return result
     }
 
 }

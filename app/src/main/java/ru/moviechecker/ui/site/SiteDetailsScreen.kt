@@ -68,11 +68,13 @@ fun SiteDetailsScreenContent(
         modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
     ) {
         uiState.data.poster?.let {
-            Poster(
-                it,
+            Image(
+                bitmap = it,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .align(CenterHorizontally)
+                    .clip(RoundedCornerShape(8.dp))
             )
         }
 
@@ -138,29 +140,6 @@ fun SiteDetailsScreenContent(
                 Text(text = stringResource(R.string.save_action), color = if (uiState.form.isValid ) Color.Unspecified else Color.Red)
             }
         }
-    }
-}
-
-@Composable
-private fun Poster(
-    data: ByteArray,
-    modifier: Modifier = Modifier
-) {
-    val image = remember(data) {
-        try {
-            BitmapFactory.decodeByteArray(data, 0, data.size).asImageBitmap()
-        } catch (e: Exception) {
-            null
-        }
-    }
-    if (image != null) {
-        Image(
-            bitmap = image,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = modifier
-                .clip(RoundedCornerShape(8.dp))
-        )
     }
 }
 

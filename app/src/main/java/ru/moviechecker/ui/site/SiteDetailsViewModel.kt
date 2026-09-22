@@ -1,6 +1,9 @@
 package ru.moviechecker.ui.site
 
+import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
@@ -27,10 +30,11 @@ class SiteDetailsViewModel(private val siteRepository: SiteRepository) : ViewMod
                 val entity = siteRepository.findById(id)
                 if (entity != null) {
                     _uiState.update {
+                        val bitmap = entity.poster?.let { BitmapFactory.decodeByteArray(it, 0, it.size) }
                         it.copy(
                             data = SiteData(
                                 id = entity.id,
-                                poster = entity.poster
+                                poster = bitmap?.asImageBitmap()
                             ),
                             form = SiteFormState(
                                 mnemonic = entity.mnemonic,
@@ -67,7 +71,8 @@ class SiteDetailsViewModel(private val siteRepository: SiteRepository) : ViewMod
                     mnemonic = state.form.mnemonic,
                     address = state.form.address,
                     title = state.form.title.ifBlank { null },
-                    poster = state.data.poster,
+                    // FIXME: Обновлять в бд только измененные поля - сейчас постер будет затираться
+//                    poster = state.data.poster,
                     useMirror = state.form.useMirror,
                     mirror = state.form.mirror.ifBlank { null }
                 )
@@ -115,18 +120,5 @@ data class SiteFormState(
 
 data class SiteData(
     override val id: Int = 0,
-    val poster: ByteArray? = null
-) : Identifiable {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as SiteData
-
-        return id == other.id
-    }
-
-    override fun hashCode(): Int {
-        return id
-    }
-}
+    val poster: ImageBitmap? = null
+) : Identifiable

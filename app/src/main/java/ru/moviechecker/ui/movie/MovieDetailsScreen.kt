@@ -83,13 +83,13 @@ fun PreviewMovieDetailsScreen() {
                 siteId = 1,
                 pageId = "movie_page_id",
                 title = "Фильм такой-то",
-                poster = poster,
+                poster = bitmap,
                 favoritesMark = true,
                 seasons = listOf(
                     SeasonCardModel(
                         id = 1,
                         number = 1,
-                        poster = poster,
+                        poster = bitmap,
                         episodes = listOf(
                             EpisodeCardModel(
                                 id = 1,
@@ -110,7 +110,7 @@ fun PreviewMovieDetailsScreen() {
                     SeasonCardModel(
                         id = 2,
                         number = 2,
-                        poster = poster,
+                        poster = bitmap,
                         episodes = listOf(
                             EpisodeCardModel(
                                 id = 1,
@@ -131,7 +131,7 @@ fun PreviewMovieDetailsScreen() {
                     SeasonCardModel(
                         id = 3,
                         number = 3,
-                        poster = poster,
+                        poster = bitmap,
                         episodes = listOf()
                     )
                 )

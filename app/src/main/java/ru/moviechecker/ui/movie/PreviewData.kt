@@ -1,5 +1,8 @@
 package ru.moviechecker.ui.movie
 
+import android.graphics.BitmapFactory
+import androidx.compose.ui.graphics.asImageBitmap
+
 val poster = byteArrayOf(
     82,
     73,
@@ -2431,3 +2434,5 @@ val poster = byteArrayOf(
     0,
     0
 )
+val bitmap = BitmapFactory.decodeByteArray(poster, 0, poster.size)
+    .asImageBitmap()
