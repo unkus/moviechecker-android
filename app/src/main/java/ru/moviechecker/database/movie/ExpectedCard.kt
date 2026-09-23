@@ -10,6 +10,7 @@ data class ExpectedCard(
     @ColumnInfo(name = "favorites_mark")
     val favoritesMark: Boolean,
     val poster: ByteArray?,
+    @ColumnInfo(name = "kinopoisk_id")
     val kinopoiskId: String?,
 
     @Embedded(prefix = "site_")

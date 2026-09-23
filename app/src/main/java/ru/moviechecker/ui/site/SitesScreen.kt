@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.net.toUri
 import ru.moviechecker.R
 import ru.moviechecker.ui.common.CommonList
+import ru.moviechecker.ui.common.asListItems
 import ru.moviechecker.ui.common.openInBrowser
 import ru.moviechecker.ui.theme.MoviecheckerTheme
 
@@ -33,7 +34,7 @@ fun SitesScreen(
     onClickOnItem: (SiteModel) -> Unit = {}
 ) {
     CommonList(
-        items = sitesProvider(),
+        items = sitesProvider().asListItems(),
         itemContent = { site ->
             SiteCardContent(
                 dataProvider = { site }

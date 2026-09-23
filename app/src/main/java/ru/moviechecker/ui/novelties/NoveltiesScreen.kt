@@ -7,6 +7,7 @@ import androidx.compose.ui.tooling.preview.AndroidUiModes.UI_MODE_NIGHT_NO
 import androidx.compose.ui.tooling.preview.AndroidUiModes.UI_MODE_NIGHT_YES
 import androidx.compose.ui.tooling.preview.Preview
 import ru.moviechecker.ui.common.CommonList
+import ru.moviechecker.ui.common.asListItems
 import ru.moviechecker.ui.main.Refreshable
 import ru.moviechecker.ui.movie.MovieCardContent
 import ru.moviechecker.ui.movie.MovieCardModel
@@ -28,7 +29,7 @@ fun NoveltiesScreen(
         onRefresh = onRefresh
     ) {
         CommonList(
-            items = moviesProvider(),
+            items = moviesProvider().asListItems(),
             itemContent = { movie ->
                 MovieCardContent(
                     dataProvider = { movie },

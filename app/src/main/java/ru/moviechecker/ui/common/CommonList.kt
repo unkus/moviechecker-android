@@ -4,26 +4,22 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
 import ru.moviechecker.R
 import ru.moviechecker.model.Identifiable
 
 @Composable
 fun <T : Identifiable> CommonList(
-    items: List<T>,
+    items: ListItems<T>,
     itemContent: @Composable (T) -> Unit,
     modifier: Modifier = Modifier,
     onItemClick: (T) -> Unit = {},
@@ -31,28 +27,18 @@ fun <T : Identifiable> CommonList(
 ) {
     LazyColumn(
         modifier = modifier,
-        contentPadding = contentPadding
+        contentPadding = contentPadding,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (items.isEmpty()) {
-            item {
-                Text(
-                    text = stringResource(R.string.empty_list_value),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier
-                        .padding(contentPadding)
-                        .fillMaxWidth(),
-                )
-            }
-        } else {
-            items(items = items, key = { it.id }) { item ->
-                CommonListItem(
-                    item = item,
-                    content = itemContent,
-                    modifier = Modifier
-                        .padding(dimensionResource(id = R.dimen.padding_small))
-                        .clickable { onItemClick(item) })
-            }
+        items(count = items.itemCount, key = { items[it]?.id ?: it }) { index ->
+            val item = items[index] ?: return@items
+            CommonListItem(
+                item = item,
+                content = itemContent,
+                modifier = Modifier
+                    .padding(dimensionResource(id = R.dimen.padding_small))
+                    .animateItem()
+                    .clickable { onItemClick(item) })
         }
     }
 }
@@ -74,4 +60,14 @@ private fun <T : Identifiable> CommonListItem(
             content(item)
         }
     }
+}
+
+interface ListItems<T> {
+    val itemCount: Int
+    operator fun get(index: Int): T?
+}
+
+fun <T> List<T>.asListItems() = object : ListItems<T> {
+    override val itemCount = size
+    override fun get(index: Int) = getOrNull(index)
 }
