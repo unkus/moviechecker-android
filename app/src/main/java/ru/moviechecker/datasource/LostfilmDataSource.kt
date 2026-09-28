@@ -119,7 +119,7 @@ class LostfilmDataSource : StrictDataSource("lostfilm", "https://www.lostfilm.tv
         val (date) = getFirstValueByRegex(lineIterator, dateRegex)
 
         val movie = MovieData(
-            pageId = pageId,
+            mnemonic = pageId,
             title = title,
             //                description = description,
             link = href,
@@ -150,7 +150,7 @@ class LostfilmDataSource : StrictDataSource("lostfilm", "https://www.lostfilm.tv
         val (episodeDate) = getFirstValueByRegex(lineIterator, dateRegex)
 
         val movie = MovieData(
-            pageId = pageId,
+            mnemonic = pageId,
             title = seriesTitle,
             link = href.split("/").take(3).joinToString(separator = "/"),
             posterLink = seriesPosterLink

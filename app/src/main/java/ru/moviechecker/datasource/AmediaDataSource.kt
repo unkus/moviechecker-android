@@ -23,8 +23,9 @@ private const val PATTERN_SITE_TITLE = """<title>(?<title>.*) -.*</title>"""
 // <a class="ftop-item d-flex has-overlay" href="/2370-voennaja-hronika-malenkoj-devochki-2.html">
 // <a class="ftop-item d-flex has-overlay" href="/2371-klevatess-2-korol-demonicheskih-zverej-i-legenda-o-lozhnom-geroe.html">
 // <a class="ftop-item d-flex has-overlay" href="/2340-adskij-rezhim-gejmer-kotoryj-ljubit-spidran-stanovitsja-bespodobnym-v-parallelnom-mire-s-ustarevshimi-nastrojkami-2.html">
+// <a class="ftop-item d-flex has-overlay" href="/2344-reinkarnacija-bezrabotnogo-istorija-o-prikljuchenijah-v-drugom-mire-3.html">
 private const val PATTERN_EPISODE_LINK =
-    """<a class="ftop-item d-flex has-overlay" href="(?<seasonPage>/(?<seasonPageId>\d+-(?<mnemonic>.*?)(?:-\d{1,2})?)\.html)">"""
+    """<a class="ftop-item d-flex has-overlay" href="(?<seasonRef>/(?<seasonPageId>\d+)-(?<mnemonic>.*?)\.html)">"""
 
 // <img src="/uploads/posts/2023-12/thumbs/fhk1xclgnqldcwyf__6895b8df64dcf260929c7c58a83a81e7.webp" alt="постер к аниме Мой Дэймон" >
 private const val PATTERN_IMG_SRC = """<img src="(?<imgSrc>.*)" alt=".*""""
@@ -33,8 +34,9 @@ private const val PATTERN_IMG_SRC = """<img src="(?<imgSrc>.*)" alt=".*""""
 // <div class="ftop-item__title  line-clamp">Старик из деревни становится Святым мечом 2 </div>
 // <div class="ftop-item__title  line-clamp">Клеватесс 2: Король демонических зверей и легенда о ложном герое </div>
 // <div class="ftop-item__title  line-clamp">Адский режим: Геймер, который любит спидран, становится бесподобным в параллельном мире с устаревшими настройками 2 </div>
+// <div class="ftop-item__title  line-clamp">Реинкарнация безработного: История о приключениях в другом мире 3. Часть 1 </div>
 private const val PATTERN_TITLE =
-    """<div class="ftop-item__title +line-clamp">(?<movieTitle>.*?)\s*(?<seasonNumber1>\d{1,2})?(?::\s*(?<seasonTitle>.+?))?\s*(?<seasonNumber2>\d{1,2})?\s*</div>"""
+    """<div class="ftop-item__title +line-clamp">(?<movieTitle>.*?)\s*(?<seasonNumber1>\d{1,2})?\s*(?::\s*(?<seasonTitle>.*?)(?:\s*(?<seasonNumber2>\d{1,2}))?)?(?:.\s*Часть \d+)?\s*</div>"""
 
 // <div class="ftop-item__meta poster__subtitle line-clamp">Сегодня, 17:13</div>
 private const val PATTERN_DATE_TIME =
@@ -62,7 +64,10 @@ class AmediaDataSource : StrictDataSource("amedia", "https://amedia.online") {
      pageId = ubijca-bogov
      seasonNumber = 4
      */
-    private val replacementMap = mapOf("ubijca-bogov-final" to ("ubijca-bogov" to "4"))
+    private val replacementMap = mapOf(
+        "2411" to ("ubijca-bogov" to "4"),
+        "2344" to ("reinkarnacija-bezrabotnogo" to "3")
+    )
 
     override fun retrieveData(uri: URI): DataContainer {
         val lines = readContent(uri).lines()
@@ -73,32 +78,35 @@ class AmediaDataSource : StrictDataSource("amedia", "https://amedia.online") {
             .filter { itemRegex.find(it.first()) != null }
             .map { window ->
                 try {
-                    val (seasonPage, seasonPageId, movieMnemonic) = itemRegex.find(window.first())!!.destructured
+                    val (seasonRef, seasonPageId, seasonMnemonic) = itemRegex.find(window.first())!!.destructured
                     val (imgSrc) = posterRegex.find(window[2])!!.destructured
-                    val (movieTitle, seasonNumber1, seasonTitle, seasonNumber2) = titleRegex.find(window[5])!!.destructured
+                    val (movieTitle, seasonNumber1, seasonTitle, seasonNumber2) = titleRegex.find(
+                        window[5]
+                    )!!.destructured
                     val (dateString, timeString) = dateTimeRegex.find(window[6])!!.destructured
                     val (episodeNumber) = episodeNumberRegex.find(window[8])!!.destructured
 
-                    val replacement = replacementMap[movieMnemonic]
+                    val replacement = replacementMap[seasonPageId]
                     val seasonNumber = replacement?.second
                         ?: seasonNumber1.ifBlank { seasonNumber2.ifBlank { null } }
-                    val moviePageId = replacement?.first
-                        ?: seasonNumber?.let { movieMnemonic.substringBeforeLast("-$seasonNumber") } ?: movieMnemonic
+                    val movieMnemonic = replacement?.first
+                        ?: seasonNumber?.let { seasonMnemonic.substringBeforeLast("-$seasonNumber") }
+                        ?: seasonMnemonic
                     val movie = MovieData(
-                        pageId = moviePageId,
+                        mnemonic = movieMnemonic,
                         title = movieTitle
                     )
                     Log.d(this.javaClass.simpleName, "movie=$movie")
                     val season = SeasonData(
                         number = seasonNumber?.toInt() ?: 1,
                         title = seasonTitle.ifBlank { null },
-                        link = seasonPage,
+                        link = seasonRef,
                         posterLink = imgSrc
                     )
                     Log.d(this.javaClass.simpleName, "season=$season")
                     val episode = EpisodeData(
                         number = episodeNumber.toInt(),
-                        link = "/$seasonPageId/episode/$episodeNumber/seriya-onlayn.html",
+                        link = "/$seasonPageId-$seasonMnemonic/episode/$episodeNumber/seriya-onlayn.html",
                         state = if (dateString == "Новая серия в") DataState.EXPECTED else DataState.RELEASED,
                         date = parseDateTime(dateString, timeString)
                     )

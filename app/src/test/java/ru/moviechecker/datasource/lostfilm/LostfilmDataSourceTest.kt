@@ -53,7 +53,7 @@ internal class LostfilmDataSourceTest {
             "Количество полученных записей не соответствует ожиданию"
         )
         val mufasaTheLionKing =
-            sourceData.entries.firstOrNull { it.movie?.pageId == "Mufasa_The_Lion_King" }
+            sourceData.entries.firstOrNull { it.movie?.mnemonic == "Mufasa_The_Lion_King" }
         assertNotNull(mufasaTheLionKing, "Запись \"Муфаса: Король Лев\" не найдена")
         assertEquals("Муфаса: Король Лев", mufasaTheLionKing.movie?.title)
         assertEquals("/movies/Mufasa_The_Lion_King", mufasaTheLionKing.movie?.link)
@@ -64,7 +64,7 @@ internal class LostfilmDataSourceTest {
         assertNull(mufasaTheLionKing.season)
         assertNull(mufasaTheLionKing.episode)
 
-        val euphoria = sourceData.entries.firstOrNull { it.movie?.pageId == "Euphoria" }
+        val euphoria = sourceData.entries.firstOrNull { it.movie?.mnemonic == "Euphoria" }
         assertNotNull(euphoria, "Запись \"Эйфория\" не найдена")
         assertEquals("Эйфория", euphoria.movie?.title)
         assertEquals("/series/Euphoria", euphoria.movie?.link)
@@ -92,7 +92,7 @@ internal class LostfilmDataSourceTest {
             euphoria.episode?.date
         )
 
-        val severance = sourceData.entries.firstOrNull { it.movie?.pageId == "Severance" }
+        val severance = sourceData.entries.firstOrNull { it.movie?.mnemonic == "Severance" }
         assertNotNull(severance, "Запись \"Разделение\" не найдена")
         assertEquals("Разделение", severance.movie?.title)
         assertEquals("/series/Severance", severance.movie?.link)
@@ -120,7 +120,7 @@ internal class LostfilmDataSourceTest {
             severance.episode?.date
         )
 
-        val surrealEstate = sourceData.entries.firstOrNull { it.movie?.pageId == "SurrealEstate" }
+        val surrealEstate = sourceData.entries.firstOrNull { it.movie?.mnemonic == "SurrealEstate" }
         assertNotNull(surrealEstate, "Запись \"Сюрриэлторы\" не найдена")
         assertEquals("Сюрриэлторы", surrealEstate.movie?.title)
         assertEquals("/series/SurrealEstate", surrealEstate.movie?.link)

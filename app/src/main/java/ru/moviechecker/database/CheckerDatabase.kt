@@ -161,9 +161,9 @@ abstract class CheckerDatabase : RoomDatabase() {
     ): MovieEntity {
         Log.d(
             this.javaClass.simpleName,
-            "Обрабатываем фильм: ${movieData.title}(${movieData.pageId})"
+            "Обрабатываем фильм: ${movieData.title}(${movieData.mnemonic})"
         )
-        movieDao().getMovieBySiteIdAndPageId(siteId, movieData.pageId)
+        movieDao().getMovieBySiteIdAndPageId(siteId, movieData.mnemonic)
             ?.let { entity ->
                 entity.title = movieData.title
                 entity.link = movieData.link
@@ -175,7 +175,7 @@ abstract class CheckerDatabase : RoomDatabase() {
             ?: movieDao().insert(
                 MovieEntity(
                     siteId = siteId,
-                    pageId = movieData.pageId,
+                    pageId = movieData.mnemonic,
                     title = movieData.title,
                     link = movieData.link,
                     poster = movieData.posterLink?.let { link ->
@@ -185,7 +185,7 @@ abstract class CheckerDatabase : RoomDatabase() {
                 )
             )
 
-        return movieDao().getMovieBySiteIdAndPageId(siteId, movieData.pageId)!!
+        return movieDao().getMovieBySiteIdAndPageId(siteId, movieData.mnemonic)!!
     }
 
     private fun getPoster(link: URI): ByteArray? = runBlocking(Dispatchers.IO) {
